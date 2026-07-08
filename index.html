@@ -281,7 +281,7 @@
 <div class="app">
   <header>
     <h1 class="title">bill's bad belly</h1>
-    <p class="subtitle">Phase 3 OCR-first Recognition Engine prototype v2</p>
+    <p class="subtitle">Phase 3 OCR-first Recognition Engine prototype v4</p>
   </header>
 
   <main class="recognition-stage">
@@ -291,7 +291,7 @@
       <div class="reticle"></div>
       <div class="hint-card">
         <p id="status" class="status">Ready to scan label text.</p>
-        <p id="statusSmall" class="small">Point at ingredients or nutrition facts. Start with one clear label panel.</p>
+        <p id="statusSmall" class="small">Point at ingredients or nutrition facts. The scan holds for five seconds before OCR.</p>
       </div>
     </section>
   </main>
@@ -299,14 +299,14 @@
   <section class="dock">
     <div class="button-row">
       <button id="startCameraBtn">Start Camera</button>
-      <button id="scanBtn" class="secondary" disabled>Scan Label</button>
+      <button id="scanBtn" class="secondary" disabled>5-sec Scan</button>
     </div>
     <div class="mini-row">
-      <button id="scanIngredientsBtn" class="secondary" disabled>Add Ingredients</button>
+      <button id="scanIngredientsBtn" class="secondary" disabled>5-sec Ingredients</button>
       <button id="analyzeTextBtn" class="secondary">Analyze Paste</button>
       <button id="resetBtn" class="secondary">Reset</button>
     </div>
-    <p class="scan-note">If the first scan only catches Nutrition Facts, point lower at the small ingredients paragraph and tap Add Ingredients. The engine merges the text into one food record.</p>
+    <p class="scan-note">If the first scan only catches Nutrition Facts, point lower at the small ingredients paragraph and tap Add Ingredients. The engine merges manual second scans into one food record. This build uses a five-second hold/settle capture, then runs one OCR pass. No automatic looping.</p>
     <div class="manual-box">
       <textarea id="manualText" placeholder="Optional: paste ingredients or nutrition text here for testing without the camera."></textarea>
     </div>
@@ -401,7 +401,7 @@
       video.srcObject = stream;
       scanBtn.disabled = false;
       scanIngredientsBtn.disabled = false;
-      setStatus('Camera ready.', 'Point at the label, then tap Scan Label. If ingredients are missed, aim lower and tap Add Ingredients.');
+      setStatus('Camera ready.', 'Point at the label, hold steady, then tap 5-sec Scan. If ingredients are missed, aim lower and tap 5-sec Ingredients.');
     } catch (err) {
       setStatus('Camera unavailable.', 'Use pasted text below, or check browser camera permissions.');
       console.error(err);
@@ -411,11 +411,61 @@
   function captureFrame() {
     const width = video.videoWidth || 1280;
     const height = video.videoHeight || 720;
+    const c = makeCanvas(width, height);
+    const ctx = c.getContext('2d', { willReadFrequently: true });
+    ctx.drawImage(video, 0, 0, width, height);
+
+    // Also mirror the latest capture into the on-page canvas for debugging/preview continuity.
     canvas.width = width;
     canvas.height = height;
-    const ctx = canvas.getContext('2d', { willReadFrequently: true });
-    ctx.drawImage(video, 0, 0, width, height);
-    return canvas;
+    canvas.getContext('2d', { willReadFrequently: true }).drawImage(c, 0, 0);
+    return c;
+  }
+
+  function wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  function sharpnessScore(c) {
+    const sampleW = 180;
+    const sampleH = Math.max(120, Math.round(sampleW * c.height / c.width));
+    const small = makeCanvas(sampleW, sampleH);
+    const ctx = small.getContext('2d', { willReadFrequently: true });
+    ctx.drawImage(c, 0, 0, sampleW, sampleH);
+    const data = ctx.getImageData(0, 0, sampleW, sampleH).data;
+    let score = 0;
+    for (let y = 1; y < sampleH; y += 2) {
+      for (let x = 1; x < sampleW; x += 2) {
+        const i = (y * sampleW + x) * 4;
+        const left = (y * sampleW + (x - 1)) * 4;
+        const up = ((y - 1) * sampleW + x) * 4;
+        const g = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
+        const gl = data[left] * 0.299 + data[left + 1] * 0.587 + data[left + 2] * 0.114;
+        const gu = data[up] * 0.299 + data[up + 1] * 0.587 + data[up + 2] * 0.114;
+        score += Math.abs(g - gl) + Math.abs(g - gu);
+      }
+    }
+    return score;
+  }
+
+  async function collectBestFrame(durationMs = 5000, sampleCount = 6) {
+    let bestFrame = null;
+    let bestScore = -1;
+
+    for (let i = 0; i < sampleCount; i++) {
+      const secondsLeft = Math.ceil((durationMs - (i * durationMs / sampleCount)) / 1000);
+      setStatus(`Hold steady… ${Math.max(1, secondsLeft)}`, 'Collecting frames for five seconds, then OCR runs once on the clearest frame.');
+      const frame = captureFrame();
+      const score = sharpnessScore(frame);
+      if (score > bestScore) {
+        bestScore = score;
+        bestFrame = frame;
+      }
+      if (i < sampleCount - 1) await wait(durationMs / (sampleCount - 1));
+    }
+
+    setStatus('Best frame selected.', 'Now reading text from one selected frame.');
+    return bestFrame || captureFrame();
   }
 
   function makeCanvas(width, height) {
@@ -446,22 +496,21 @@
     ctx.putImageData(img, 0, 0);
   }
 
-  function getOCRCanvases(mode = 'label') {
-    const frame = captureFrame();
+  async function getOCRCanvases(mode = 'label') {
+    const frame = await collectBestFrame(5000, 6);
     const w = frame.width;
     const h = frame.height;
 
+    // v4 rule: five-second collection window, then ONE OCR pass only.
+    // No automatic top/bottom/top/bottom loop.
     if (mode === 'ingredients') {
       return [
-        { name: 'ingredients lower label', canvas: cropCanvas(frame, 0, h * 0.38, w, h * 0.62, 2.6) },
-        { name: 'ingredients full label', canvas: cropCanvas(frame, 0, 0, w, h, 2.1) }
+        { name: 'ingredients area', canvas: cropCanvas(frame, 0, h * 0.30, w, h * 0.70, 2.2) }
       ];
     }
 
     return [
-      { name: 'full label', canvas: cropCanvas(frame, 0, 0, w, h, 2.0) },
-      { name: 'lower label', canvas: cropCanvas(frame, 0, h * 0.45, w, h * 0.55, 2.5) },
-      { name: 'center label', canvas: cropCanvas(frame, w * 0.08, h * 0.08, w * 0.84, h * 0.84, 2.2) }
+      { name: 'visible label', canvas: cropCanvas(frame, 0, 0, w, h, 1.75) }
     ];
   }
 
@@ -483,23 +532,35 @@
     return merged.join('\n');
   }
 
+  const OCR_TIMEOUT_MS = 25000;
+
+  function withTimeout(promise, ms, message) {
+    let timeoutId;
+    const timeout = new Promise((_, reject) => {
+      timeoutId = setTimeout(() => reject(new Error(message || 'OCR timed out')), ms);
+    });
+    return Promise.race([promise, timeout]).finally(() => clearTimeout(timeoutId));
+  }
+
   async function recognizeCanvasSet(items) {
-    const textParts = [];
-    for (let i = 0; i < items.length; i++) {
-      const item = items[i];
-      setStatus(`Reading ${item.name}…`, `Pass ${i + 1} of ${items.length}. Small ingredients text needs extra OCR passes.`);
-      const result = await Tesseract.recognize(item.canvas, 'eng', {
+    const item = items[0];
+    setStatus(`Reading ${item.name}…`, 'Five-second capture complete. OCR is now running once.');
+
+    const result = await withTimeout(
+      Tesseract.recognize(item.canvas, 'eng', {
         logger: m => {
           if (m.status === 'recognizing text') {
             const pct = Math.round((m.progress || 0) * 100);
             setStatus(`Reading ${item.name}… ${pct}%`, 'Checking ingredients, allergens, serving size, and nutrition fields.');
           }
         }
-      });
-      const text = result?.data?.text || '';
-      if (text.trim()) textParts.push(text);
-    }
-    return mergeOCRText('', textParts.join('\n'));
+      }),
+      OCR_TIMEOUT_MS,
+      'OCR timed out'
+    );
+
+    const text = result?.data?.text || '';
+    return mergeOCRText('', text);
   }
 
   async function runOCRFromCamera(mode = 'label') {
@@ -515,7 +576,7 @@
     const timer = rotateStatus();
 
     try {
-      const canvases = getOCRCanvases(mode);
+      const canvases = await getOCRCanvases(mode);
       const newText = await recognizeCanvasSet(canvases);
       accumulatedOCRText = mode === 'label'
         ? mergeOCRText('', newText)
@@ -523,7 +584,11 @@
       completeRecognition(accumulatedOCRText, { mode });
     } catch (err) {
       console.error(err);
-      setStatus('Text scan failed.', 'Try better light, flatter label angle, or paste text manually.');
+      if (String(err.message || err).toLowerCase().includes('timed out')) {
+        setStatus('Scan timed out.', 'This label angle is too hard. Try a flatter box panel, better light, or paste text manually.');
+      } else {
+        setStatus('Text scan failed.', 'Try better light, flatter label angle, or paste text manually.');
+      }
     } finally {
       clearInterval(timer);
       viewport.classList.remove('recognizing');
@@ -751,7 +816,7 @@
     document.getElementById('rawText').textContent = '';
     lastRecord = null;
     accumulatedOCRText = '';
-    setStatus('Ready to scan label text.', 'Point at ingredients or nutrition facts. Start with one clear label panel.');
+    setStatus('Ready to scan label text.', 'Point at ingredients or nutrition facts. The scan holds for five seconds before OCR.');
   }
 
   startCameraBtn.addEventListener('click', startCamera);
