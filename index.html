@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="theme-color" content="#1b2027" />
-<title>bill's bad belly — v1.1.6 card layout cleanup</title>
+<title>bill's bad belly — v1.1.7 flare pill consistency</title>
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Baumans&display=swap");
 :root{
@@ -1164,6 +1164,28 @@ body.flare-active .screen-card{
   text-align:center !important;
 }
 
+
+/* ---------- v1.1.7 Flare pill consistency ---------- */
+.rating-pill.flare-severe{
+  color:#ffd8c6 !important;
+  border-color:rgba(215,118,62,.78) !important;
+  background:linear-gradient(145deg,rgba(63,48,43,.96),rgba(30,24,22,.96)) !important;
+}
+.rating-pill.flare-severe::before{
+  content:"";
+  width:11px;
+  height:14px;
+  display:inline-block;
+  flex:0 0 11px;
+  margin-right:7px;
+  border-radius:70% 55% 70% 55%;
+  transform:rotate(45deg);
+  background:
+    radial-gradient(circle at 66% 68%,rgba(255,154,76,.92) 0 16%,transparent 21%),
+    linear-gradient(145deg,#c58ae9 10%,#7d5f86 55%,#e88036 100%);
+  box-shadow:0 0 9px rgba(197,138,233,.28);
+}
+
 </style>
 </head>
 <body>
@@ -1171,7 +1193,7 @@ body.flare-active .screen-card{
   <header class="topbar">
     <div class="header-mascot-wrap" aria-hidden="true"><div class="header-mascot-fallback">bb</div></div>
     <div class="brand-title-wrap">
-      <p class="eyebrow">v1.1.6 card layout cleanup</p>
+      <p class="eyebrow">v1.1.7 flare pill consistency</p>
       <h1>bill's bad belly</h1>
     </div>
     <div class="logo-mark" aria-hidden="true">bb</div>
@@ -1345,6 +1367,12 @@ Object.assign(TRAIT_LABELS,{nutrition_high_fiber:"high fiber",nutrition_low_fibe
 function formatConfidence(c){return String(c||"unknown").replaceAll("_"," ").replace(/\b\w/g,s=>s.toUpperCase());}
 function ratingClass(r){if(r==="usually_gentle")return"good";if(r==="likely_rough"||r==="personal_trigger")return"ugly";if(r==="flare_caution")return"flare";return"ehh";}
 function ratingPill(r){return `<span class="rating-pill rating-${ratingClass(r)}">${escapeHtml(RATINGS[r]||"unknown")}</span>`;}
+function flareComparePill(r){
+  if(r==="likely_rough"||r==="personal_trigger"){
+    return `<span class="rating-pill rating-flare flare-severe">flare caution</span>`;
+  }
+  return ratingPill(r);
+}
 function findFastCards(text){const hay=normalizeText(text);return MEAL_FAST_CARDS.filter(c=>containsTerm(hay,c.name)||c.aliases.some(a=>containsTerm(hay,a)));}
 function findIngredientMatches(text){const hay=normalizeText(text);return INGREDIENT_DICTIONARY.filter(i=>[i.name,...i.aliases].some(t=>containsTerm(hay,t)));}
 function findProducts(text){const hay=normalizeText(text);if(!hay)return[];return PRODUCT_DB.filter(p=>normalizeText(`${p.brand} ${p.name} ${p.category} ${p.notes}`).includes(hay)||hay.split(" ").some(w=>w.length>3&&normalizeText(`${p.name} ${p.category}`).includes(w))).slice(0,4);}
@@ -1581,14 +1609,14 @@ function resultCard(a){
         <div class="state-label">${escapeHtml(resultStateLabel(active))}</div>
         <div class="confidence-tag">${formatConfidence(a.confidence)}</div>
       </div>
-      ${ratingPill(active)}
+      ${state.mode==="Flare"?flareComparePill(active):ratingPill(active)}
     </div>
 
     <div class="result-verdict">
       <p class="result-summary-line">${escapeHtml(a.plainWhy||a.reason)}</p>
       <div class="grid-two rating-compare">
         <div class="compare-pill-wrap">${ratingPill(a.normalRating)}<p class="compare-label">normal</p></div>
-        <div class="compare-pill-wrap">${ratingPill(a.flareRating)}<p class="compare-label">flare</p></div>
+        <div class="compare-pill-wrap">${flareComparePill(a.flareRating)}<p class="compare-label">flare</p></div>
       </div>
     </div>
 
