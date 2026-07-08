@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="theme-color" content="#1b2027" />
-<title>bill's bad belly — v1.1.4 neutral-text ring cards</title>
+<title>bill's bad belly — v1.1.5 pill polish demo fixes</title>
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Baumans&display=swap");
 :root{
@@ -1039,6 +1039,61 @@ body.flare-active .screen-card{
 .answer-card.state-caution::before{border-color:rgba(205,142,84,.80) !important}
 .answer-card.state-ugly::before{border-color:rgba(176,84,103,.80) !important}
 
+
+/* ---------- v1.1.5 pill polish + demo fixes ---------- */
+.result-top > .rating-pill,
+.rating-compare .rating-pill{
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-align:center !important;
+  min-width:102px;
+  padding-inline:16px !important;
+}
+.result-top > .rating-pill{align-self:flex-start}
+.compare-label{
+  margin:6px 0 0 !important;
+  color:var(--purple-light) !important;
+  font-size:.92rem !important;
+}
+.result-top .rating-pill.rating-good,
+.rating-compare .rating-pill.rating-good{
+  color:var(--purple-light) !important;
+  border-color:rgba(159,177,159,.78) !important;
+}
+.result-top .rating-pill.rating-ehh,
+.rating-compare .rating-pill.rating-ehh{
+  color:var(--purple-light) !important;
+  border-color:rgba(205,142,84,.80) !important;
+}
+.result-top .rating-pill.rating-ugly,
+.rating-compare .rating-pill.rating-ugly{
+  color:var(--purple-light) !important;
+  border-color:rgba(176,84,103,.82) !important;
+}
+.result-top .rating-pill.rating-flare,
+.rating-compare .rating-pill.rating-flare{
+  color:#ffd8c6 !important;
+  border-color:rgba(215,118,62,.78) !important;
+  background:linear-gradient(145deg,rgba(63,48,43,.96),rgba(30,24,22,.96)) !important;
+  position:relative;
+}
+.result-top .rating-pill.rating-flare::before,
+.rating-compare .rating-pill.rating-flare::before{
+  content:"";
+  width:11px;height:14px;display:inline-block;flex:0 0 11px;margin-right:7px;
+  border-radius:70% 55% 70% 55%;transform:rotate(45deg);
+  background:radial-gradient(circle at 66% 68%,rgba(255,154,76,.92) 0 16%,transparent 21%),linear-gradient(145deg,#c58ae9 10%,#7d5f86 55%,#e88036 100%);
+  box-shadow:0 0 9px rgba(197,138,233,.28);
+}
+.result-card .result-top > div > span,
+.result-card .state-label{
+  color:var(--purple-light) !important;
+}
+.result-card .state-label{
+  background:rgba(184,154,192,.08) !important;
+}
+
 </style>
 </head>
 <body>
@@ -1046,7 +1101,7 @@ body.flare-active .screen-card{
   <header class="topbar">
     <div class="header-mascot-wrap" aria-hidden="true"><div class="header-mascot-fallback">bb</div></div>
     <div class="brand-title-wrap">
-      <p class="eyebrow">v1.1.4 neutral-text ring cards</p>
+      <p class="eyebrow">v1.1.5 pill polish demo fixes</p>
       <h1>bill's bad belly</h1>
     </div>
     <div class="logo-mark" aria-hidden="true">bb</div>
@@ -1459,9 +1514,9 @@ function resultCard(a){
 
     <p class="result-summary-line">${escapeHtml(a.plainWhy||a.reason)}</p>
 
-    <div class="grid-two" style="margin-top:12px;">
-      <div>${ratingPill(a.normalRating)}<p class="small-muted">normal</p></div>
-      <div>${ratingPill(a.flareRating)}<p class="small-muted">flare</p></div>
+    <div class="grid-two rating-compare" style="margin-top:12px;">
+      <div class="compare-pill-wrap">${ratingPill(a.normalRating)}<p class="compare-label">normal</p></div>
+      <div class="compare-pill-wrap">${ratingPill(a.flareRating)}<p class="compare-label">flare</p></div>
     </div>
 
     ${a.detectedGroups?.length?`<div class="result-section">
@@ -1515,32 +1570,131 @@ function render(){
 }
 
 function demoResult(kind){
-  if(kind==="good"){
-    state.foodName="plain chicken and white rice";
-    state.ingredientText="Ingredients: chicken breast, white rice, chicken broth. Nutrition Facts: Total Fat 2g, Dietary Fiber 1g, Total Sugars 0g, Protein 24g, Sodium 280mg.";
-    state.lastAnalysis={
-      type:"demo",detected:"plain chicken and white rice",cards:[],products:[],
-      hits:[ing("chicken",[],["lean_protein","soft_texture"],""),ing("rice",[],["white_starch","low_residue"],""),ing("broth",[],["broth_based"],"")],
-      traits:["lean_protein","soft_texture","white_starch","low_residue","broth_based","nutrition_low_fiber","nutrition_low_fat","nutrition_protein_support"],
-      normalRating:"usually_gentle",flareRating:"usually_gentle",confidence:"demo_result",
-      nutrition:{hasNutrition:true,found:[{key:"fat",value:2},{key:"fiber",value:1},{key:"protein",value:24}],notes:["Low fat, low fiber, and high protein support a gentler read."]},
-      detectedGroups:[["Simple protein / starch","chicken, white rice, broth","Lower-residue starch plus lean protein is usually the cleaner pattern."],["Nutrition support","fat 2g, fiber 1g, protein 24g","Nutrition supports the ingredient read here."]],
-      plainWhy:"This read is driven by lean protein, white rice, low fiber, and low fat.",
-      next:"This looks more workable. Log the portion and reaction so personal history can confirm it."
-    };
-  }
-  if(kind==="caution"){
-    state.foodName="broccoli cheddar pasta";
-    state.ingredientText="Ingredients: pasta, cream, cheddar cheese, broccoli, onion powder, garlic powder, xanthan gum. Nutrition Facts: Total Fat 15g, Dietary Fiber 3g, Total Sugars 4g, Protein 12g, Sodium 760mg.";
-    analyze("deep");
-    return;
-  }
-  if(kind==="ugly"){
-    state.foodName="spicy pepperoni whole wheat bean pasta";
-    state.ingredientText="Ingredients: whole wheat pasta, chickpea pasta, pepperoni, sausage, hot sauce, garlic powder, onion powder, broccoli, xanthan gum. Nutrition Facts: Total Fat 22g, Dietary Fiber 9g, Total Sugars 6g, Protein 18g, Sodium 1180mg.";
-    analyze("deep");
-    return;
-  }
+  const demos={
+    good:{
+      foodName:"plain chicken and white rice",
+      ingredientText:"Ingredients: chicken breast, white rice, chicken broth. Nutrition Facts: Total Fat 2g, Dietary Fiber 1g, Total Sugars 0g, Protein 24g, Sodium 280mg.",
+      analysis:{
+        type:"demo",detected:"plain chicken and white rice",cards:[],products:[],
+        hits:[
+          {name:"chicken",traits:["lean_protein","soft_texture"]},
+          {name:"rice",traits:["white_starch","low_residue"]},
+          {name:"broth",traits:["broth_based"]}
+        ],
+        traits:["lean_protein","soft_texture","white_starch","low_residue","broth_based","nutrition_low_fiber","nutrition_low_fat","nutrition_protein_support"],
+        normalRating:"usually_gentle",flareRating:"usually_gentle",confidence:"demo_result",
+        nutrition:{hasNutrition:true,found:[{key:"fat",value:2},{key:"fiber",value:1},{key:"protein",value:24},{key:"sodium",value:280}],notes:["Fiber is 1g, a lower-residue clue.","Total fat is 2g, a lower-fat clue.","Protein is 24g, useful support if the ingredient list is otherwise simple.","Sodium is 280mg."]},
+        detectedGroups:[
+          ["Simple protein / starch","chicken, white rice, broth","Lower-residue starch plus lean protein is usually the cleaner pattern."],
+          ["Nutrition support","fiber 1g, fat 2g, protein 24g","Nutrition supports the ingredient read here."]
+        ],
+        plainWhy:"This read is driven by lean protein, white rice, low fiber, and low fat.",
+        next:"This looks more workable. Log the portion and reaction so personal history can confirm it."
+      }
+    },
+    caution:{
+      foodName:"Campbell's Chicken Noodle Soup",
+      ingredientText:"Ingredients: enriched egg noodles, chicken stock, chicken meat, celery, carrots, onion extract, chicken fat. Nutrition Facts: Total Fat 2g, Dietary Fiber 1g, Total Sugars 1g, Protein 7g, Sodium 890mg.",
+      analysis:{
+        type:"demo",detected:"Campbell's Chicken Noodle Soup",cards:[],products:[],
+        hits:[
+          {name:"chicken",traits:["lean_protein","soft_texture"]},
+          {name:"small shells",traits:["white_starch","soft_pasta"]},
+          {name:"broth",traits:["broth_based"]}
+        ],
+        traits:["lean_protein","soft_texture","white_starch","soft_pasta","low_residue","broth_based","processed_food","nutrition_low_fiber","nutrition_low_fat"],
+        normalRating:"caution",flareRating:"flare_caution",confidence:"demo_result",
+        nutrition:{hasNutrition:true,found:[{key:"fat",value:2},{key:"fiber",value:1},{key:"protein",value:7},{key:"sodium",value:890}],notes:["Fiber is 1g, a lower-residue clue.","Total fat is 2g, a lower-fat clue.","Sodium is 890mg, a processed-food clue."]},
+        detectedGroups:[
+          ["Nutrition support","fiber 1g, fat 2g, sodium 890mg","Simple texture helps, but processed sodium keeps this in the middle lane."],
+          ["Soft starch / broth","noodles, broth, chicken","Texture is workable, but packaged soup still deserves some caution."]
+        ],
+        plainWhy:"This read is driven by nutrition support and a simple soft soup pattern.",
+        next:"In Flare Mode, treat this as a cautious test: smaller portion, simpler sauce, softer texture, or wait until normal mode."
+      }
+    },
+    ugly:{
+      foodName:"spicy pepperoni whole wheat bean pasta",
+      ingredientText:"Ingredients: whole wheat pasta, chickpea pasta, pepperoni, sausage, hot sauce, garlic powder, onion powder, broccoli, xanthan gum. Nutrition Facts: Total Fat 22g, Dietary Fiber 9g, Total Sugars 6g, Protein 18g, Sodium 1180mg.",
+      analysis:{
+        type:"demo",detected:"spicy pepperoni whole wheat bean pasta",cards:[],products:[],
+        hits:[
+          {name:"whole wheat pasta",traits:["whole_grain","dense_pasta"]},
+          {name:"chickpea pasta",traits:["beans_legumes","legume_gas_risk"]},
+          {name:"pepperoni",traits:["processed_meat","spicy_heat"]},
+          {name:"sausage",traits:["processed_meat","high_fat"]},
+          {name:"hot sauce",traits:["spicy_heat","acidic"]},
+          {name:"onion",traits:["garlic_onion"]},
+          {name:"garlic",traits:["garlic_onion"]},
+          {name:"broccoli",traits:["cruciferous"]},
+          {name:"xanthan gum",traits:["gum_thickener","processed_food"]}
+        ],
+        traits:["whole_grain","dense_pasta","beans_legumes","legume_gas_risk","processed_meat","spicy_heat","high_fat","acidic","garlic_onion","cruciferous","gum_thickener","processed_food","added_fiber","nutrition_high_fiber","nutrition_high_sodium"],
+        normalRating:"likely_rough",flareRating:"likely_rough",confidence:"demo_result",
+        nutrition:{hasNutrition:true,found:[{key:"fat",value:22},{key:"fiber",value:9},{key:"protein",value:18},{key:"sodium",value:1180}],notes:["Fiber is 9g, which strengthens caution in Flare Mode.","Total fat is 22g, which can raise gut load.","Protein is 18g, useful support if the ingredient list is otherwise simple.","Sodium is 1180mg, a processed-food clue."]},
+        detectedGroups:[
+          ["Pasta / starch","whole wheat pasta, chickpea pasta","Whole grain plus legume pasta stacks density and fiber risk."],
+          ["Spice / processed meat","pepperoni, sausage, hot sauce","Spice, fat, and processed meat often stack together."],
+          ["Garlic / onion","garlic powder, onion powder","Powders still count; they can stack gas and pungent risk."],
+          ["Nutrition support","fiber 9g, fat 22g, sodium 1180mg","Nutrition clearly reinforces the rougher read here."]
+        ],
+        plainWhy:"This read is driven by whole-grain/legume pasta, processed meat, spice, garlic/onion, broccoli, and high fiber/fat.",
+        next:"Treat this as an ugly / rough card. Skip during a flare, or save only as a known personal trigger if you want to log it."
+      }
+    },
+    pasta:{
+      foodName:"broccoli cheddar pasta",
+      ingredientText:"Ingredients: pasta, cream, cheddar cheese, broccoli, onion powder, garlic powder, xanthan gum. Nutrition Facts: Total Fat 15g, Dietary Fiber 3g, Total Sugars 4g, Protein 12g, Sodium 760mg.",
+      analysis:{
+        type:"demo",detected:"broccoli cheddar pasta",cards:[],products:[],
+        hits:[
+          {name:"pasta",traits:["white_starch","soft_pasta"]},
+          {name:"cream",traits:["dairy","high_fat"]},
+          {name:"cheese",traits:["dairy","lactose_possible"]},
+          {name:"broccoli",traits:["cruciferous"]},
+          {name:"onion",traits:["garlic_onion"]},
+          {name:"garlic",traits:["garlic_onion"]},
+          {name:"xanthan gum",traits:["gum_thickener","processed_food"]}
+        ],
+        traits:["white_starch","soft_pasta","dairy","high_fat","lactose_possible","cruciferous","garlic_onion","gum_thickener","processed_food"],
+        normalRating:"caution",flareRating:"likely_rough",confidence:"demo_result",
+        nutrition:{hasNutrition:true,found:[{key:"fat",value:15},{key:"fiber",value:3},{key:"protein",value:12},{key:"sodium",value:760}],notes:["Total fat is 15g, which can raise gut load.","Protein is 12g, useful support if the ingredient list is otherwise simple.","Sodium is 760mg, a processed-food clue."]},
+        detectedGroups:[
+          ["Dairy / fat","cream, cheddar cheese","Dairy plus fat load raises caution, especially in Flare Mode."],
+          ["Gas vegetable","broccoli","Broccoli can add fiber/gas risk even when cooked."],
+          ["Garlic / onion","onion powder, garlic powder","Powders still count; they can stack gas and pungent risk."],
+          ["Nutrition support","fat 15g, protein 12g, sodium 760mg","Nutrition reinforces the middle-lane caution read."]
+        ],
+        plainWhy:"This read is driven by dairy/fat, broccoli, garlic/onion seasoning, and nutrition support.",
+        next:"Try a smaller portion in normal mode only, or simplify the sauce if you are testing tolerance."
+      }
+    },
+    nutrition:{
+      foodName:"simple nutrition-led soup read",
+      ingredientText:"Ingredients: rice, chicken broth, chicken. Nutrition Facts: Total Fat 2g, Dietary Fiber 1g, Total Sugars 0g, Protein 10g, Sodium 220mg.",
+      analysis:{
+        type:"demo",detected:"simple nutrition-led soup read",cards:[],products:[],
+        hits:[
+          {name:"rice",traits:["white_starch","low_residue"]},
+          {name:"chicken",traits:["lean_protein","soft_texture"]},
+          {name:"broth",traits:["broth_based"]}
+        ],
+        traits:["white_starch","low_residue","lean_protein","soft_texture","broth_based","nutrition_low_fiber","nutrition_low_fat","nutrition_protein_support"],
+        normalRating:"usually_gentle",flareRating:"caution",confidence:"demo_result",
+        nutrition:{hasNutrition:true,found:[{key:"fat",value:2},{key:"fiber",value:1},{key:"protein",value:10},{key:"sodium",value:220}],notes:["Fiber is 1g, a lower-residue clue.","Total fat is 2g, a lower-fat clue.","Protein is 10g, useful support if the ingredient list is otherwise simple."]},
+        detectedGroups:[
+          ["Nutrition support","fiber 1g, fat 2g, protein 10g","Nutrition supports a gentler read here."],
+          ["Simple ingredients","rice, chicken, broth","A plain ingredient pattern keeps this on the gentler side."]
+        ],
+        plainWhy:"This read is driven by nutrition support plus a very simple ingredient pattern.",
+        next:"This is a cleaner test card. Portion and personal tolerance still matter, especially in Flare Mode."
+      }
+    }
+  };
+  const chosen=demos[kind]||demos.caution;
+  state.foodName=chosen.foodName;
+  state.ingredientText=chosen.ingredientText;
+  state.lastAnalysis=chosen.analysis;
   state.scanView="expanded";
   localStorage.setItem(VIEW_KEY,state.scanView);
   state.savedNotice="";
@@ -1562,15 +1716,15 @@ function bindEvents(){
     if(a==="go-flare"){state.activeTab="flare";}
     if(a==="quick-read"){analyze("quick");return;}
     if(a==="deep-check"){analyze("deep");return;}
-    if(a==="sample-pasta"){state.foodName="broccoli cheddar pasta";state.ingredientText="Ingredients: pasta, cream, cheddar cheese, broccoli, onion powder, garlic powder, xanthan gum. Nutrition Facts: Total Fat 15g, Dietary Fiber 3g, Total Sugars 4g, Protein 12g, Sodium 760mg.";state.scanView="expanded";localStorage.setItem(VIEW_KEY,state.scanView);analyze("deep");return;}
-    if(a==="sample-nutrition"){state.foodName="sample nutrition label";state.ingredientText="Nutrition Facts: Total Fat 2g, Dietary Fiber 1g, Total Sugars 16g, Added Sugars 12g, Protein 10g, Sodium 220mg. Ingredients: rice, chicken broth, chicken.";state.scanView="expanded";localStorage.setItem(VIEW_KEY,state.scanView);analyze("deep");return;}
+    if(a==="sample-pasta"){demoResult("pasta");return;}
+    if(a==="sample-nutrition"){demoResult("nutrition");return;}
     if(a==="sample-good"){demoResult("good");return;}
     if(a==="sample-caution"){demoResult("caution");return;}
     if(a==="sample-ugly"){demoResult("ugly");return;}
     if(a==="clear-scan"){state.foodName="";state.ingredientText="";state.lastAnalysis=null;state.savedNotice="";state.capturedImage="";state.capturedMeta=null;state.cameraMessage="";}
     if(a==="focus-deep"){state.scanView="expanded";localStorage.setItem(VIEW_KEY,state.scanView);render();setTimeout(()=>{document.getElementById("deepDrawer")?.scrollIntoView({behavior:"smooth",block:"start"});document.getElementById("ingredientText")?.focus();},120);return;}
     if(a==="save-food"){saveCurrentFood(false);return;}
-    if(a==="log-reaction"){saveCurrentFood(true);return;}
+    if(a==="log-reaction"||a==="log-ok"){saveCurrentFood(true);return;}
     if(a==="load-saved"){const f=getSavedFoods().find(x=>x.id===btn.dataset.id);if(f){state.foodName=f.foodName;state.ingredientText=f.ingredientText||"";state.activeTab="scan";analyze(state.ingredientText?"deep":"quick");return;}}
     if(a==="delete-saved"){setSavedFoods(getSavedFoods().filter(x=>x.id!==btn.dataset.id));}
     if(a==="open-camera"){openCameraOverlay();return;}
