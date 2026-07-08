@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="theme-color" content="#1b2027" />
-<title>bill's bad belly — v1.0.5 camera-first test</title>
+<title>bill's bad belly — v1.0.6 thumbnail flow test</title>
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Baumans&display=swap");
 :root{
@@ -216,6 +216,78 @@ body.compact .drawer.optional:not([open]){display:block}
   margin-top:10px;
 }
 
+
+/* ---------- v1.0.6 thumbnail capture flow ---------- */
+.capture-strip{
+  display:grid;
+  grid-template-columns:76px 1fr auto;
+  gap:10px;
+  align-items:center;
+  padding:10px;
+  border:1px solid rgba(159,177,159,.32);
+  border-radius:18px;
+  background:
+    radial-gradient(circle at 8% 12%,rgba(159,177,159,.08),transparent 30%),
+    rgba(17,21,26,.34);
+}
+.capture-thumb{
+  width:76px;
+  height:76px;
+  object-fit:cover;
+  border-radius:14px;
+  border:1px solid rgba(184,154,192,.24);
+  background:rgba(17,21,26,.50);
+}
+.capture-strip strong{
+  color:#d9ead9;
+  font-family:var(--display-font);
+  font-size:1rem;
+}
+.capture-strip span{
+  display:block;
+  margin-top:3px;
+  color:var(--muted);
+  font-size:.78rem;
+  line-height:1.25;
+}
+.capture-preview-drawer{
+  border-color:rgba(159,177,159,.26);
+  background:rgba(29,39,41,.72);
+}
+.capture-preview-drawer[open]{
+  border-color:rgba(159,177,159,.42);
+  background:linear-gradient(145deg,rgba(35,49,50,.94),rgba(21,30,32,.94));
+}
+.capture-preview-drawer summary{
+  padding:10px;
+}
+.capture-preview-drawer summary::after{
+  width:26px;
+  height:26px;
+}
+.capture-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.no-result-note{
+  border:1px dashed rgba(184,154,192,.22);
+  border-radius:18px;
+  padding:12px;
+  color:var(--muted);
+  background:rgba(17,21,26,.18);
+  line-height:1.35;
+}
+.no-result-note strong{
+  color:var(--purple-light);
+}
+@media(max-width:360px){
+  .capture-strip{grid-template-columns:62px 1fr;align-items:start}
+  .capture-strip .compact-action{grid-column:1 / -1;width:100%}
+  .capture-thumb{width:62px;height:62px}
+  .capture-actions{grid-template-columns:1fr}
+}
+
 @media(max-width:360px){.screen-title{padding-right:86px}.grid-two,.search-row{grid-template-columns:1fr}.logo-mark{width:48px;height:48px;flex-basis:48px}.brand-title-wrap h1{font-size:1.62rem}}
 </style>
 </head>
@@ -224,7 +296,7 @@ body.compact .drawer.optional:not([open]){display:block}
   <header class="topbar">
     <div class="header-mascot-wrap" aria-hidden="true"><div class="header-mascot-fallback">bb</div></div>
     <div class="brand-title-wrap">
-      <p class="eyebrow">v1.0.5 camera-first test</p>
+      <p class="eyebrow">v1.0.6 thumbnail flow test</p>
       <h1>bill's bad belly</h1>
     </div>
     <div class="logo-mark" aria-hidden="true">bb</div>
@@ -419,31 +491,36 @@ function homeScreen(){return `<div class="screen-content">${screenTitle("BB","To
 function scanScreen(){
   const a=state.lastAnalysis;
   return `<div class="screen-content">
-    ${screenTitle("Scan","Camera first. Quick Read and Deep Check underneath.")}
+    ${screenTitle("Scan","Camera first. Then Quick Read or Deep Check.")}
 
     <section class="camera-launch-card camera-priority-card">
       <h3>Camera Scan</h3>
       <p class="camera-subhead">Package capture test</p>
-      <p class="section-kicker">Use the camera first when you are holding a label. This build captures frames and stores the preview; OCR/barcode wiring comes next.</p>
+      <p class="section-kicker">Capture the label first. The photo is kept as a small saved reference so it does not take over the screen.</p>
       <button class="primary-action full-width" data-action="open-camera" type="button"><span class="icon">${icons.camera}</span> scan product</button>
     </section>
 
     ${state.capturedImage?`
-      <article class="result-card scan-captured-card">
-        <h3>Camera scan captured</h3>
-        <img class="camera-result-preview" src="${state.capturedImage}" alt="Captured scan preview">
-        <p class="small-muted">${escapeHtml(state.cameraMessage)} ${state.capturedMeta?`Image: ${state.capturedMeta.width} × ${state.capturedMeta.height}px • ${state.capturedMeta.sizeKb} KB`:``}</p>
-        <div class="grid-two" style="margin-top:10px;">
-          <button class="secondary-action" data-action="open-camera" type="button">scan again</button>
-          <button class="primary-action" data-action="focus-deep" type="button">add ingredient text</button>
+      <details class="drawer capture-preview-drawer" id="captureDrawer">
+        <summary>
+          <div class="capture-strip">
+            <img class="capture-thumb" src="${state.capturedImage}" alt="Captured scan thumbnail">
+            <div>
+              <strong>Image captured</strong>
+              <span>${escapeHtml(state.cameraMessage)} ${state.capturedMeta?`${state.capturedMeta.width} × ${state.capturedMeta.height}px • ${state.capturedMeta.sizeKb} KB`:``}</span>
+            </div>
+            <button class="secondary-action compact-action" data-action="open-camera" type="button">scan again</button>
+          </div>
+        </summary>
+        <div class="drawer-body">
+          <img class="camera-result-preview" src="${state.capturedImage}" alt="Captured scan preview">
+          <div class="capture-actions">
+            <button class="secondary-action" data-action="open-camera" type="button">scan again</button>
+            <button class="primary-action" data-action="focus-deep" type="button">add ingredient text</button>
+          </div>
         </div>
-      </article>
+      </details>
     `:""}
-
-    <div class="viewbar">
-      <div><strong>${state.scanView==="compact"?"Compact View":"Expanded View"}</strong><br><span>${state.scanView==="compact"?"Open sections as needed.":"Sections are open so you can see what this screen does."}</span></div>
-      <button class="secondary-action compact-action" data-action="toggle-view" type="button">${state.scanView==="compact"?"expanded":"compact"}</button>
-    </div>
 
     <section class="input-card quick-card">
       <h3>Quick Read</h3>
@@ -454,13 +531,11 @@ function scanScreen(){
       </div>
       <div class="grid-two" style="margin-top:10px;">
         <button class="primary-action" data-action="quick-read" type="button">quick read</button>
-        <button class="primary-action" data-action="deep-check" type="button">deep check</button>
+        <button class="primary-action" data-action="focus-deep" type="button">deep check</button>
       </div>
     </section>
 
-    ${a?resultCard(a):`<article class="result-card"><h3>No food result yet</h3><p class="small-muted">Scan a package, enter a food clue, or open Deep Check for ingredients.</p></article>`}
-
-    <details class="drawer optional" id="deepDrawer" ${state.scanView==="expanded"?"open":""}>
+    <details class="drawer optional" id="deepDrawer" ${state.ingredientText.trim() || state.scanView==="expanded" ? "open" : ""}>
       <summary><span class="drawer-title">Deep Check — ingredients / recipe text</span></summary>
       <div class="drawer-body">
         <textarea id="ingredientText" placeholder="pasta, cream, cheddar cheese, broccoli, onion powder, garlic powder, xanthan gum">${escapeHtml(state.ingredientText)}</textarea>
@@ -469,7 +544,14 @@ function scanScreen(){
       </div>
     </details>
 
-    <details class="drawer optional" id="personalDrawer" ${state.scanView==="expanded"?"open":""}>
+    ${a?resultCard(a):`
+      <div class="no-result-note">
+        <strong>No food result yet.</strong><br>
+        A camera photo only confirms the image was captured. Add a food name for Quick Read or ingredient text for Deep Check to get a rating.
+      </div>
+    `}
+
+    <details class="drawer optional" id="personalDrawer">
       <summary><span class="drawer-title">Personal Food Memory (${getSavedFoods().length})</span></summary>
       <div class="drawer-body">${savedFoodsList()}</div>
     </details>
@@ -534,8 +616,8 @@ function bindEvents(){
     if(a==="go-flare"){state.activeTab="flare";}
     if(a==="quick-read"){analyze("quick");return;}
     if(a==="deep-check"){analyze("deep");return;}
-    if(a==="clear-scan"){state.foodName="";state.ingredientText="";state.lastAnalysis=null;state.savedNotice="";state.capturedImage="";state.capturedMeta=null;}
-    if(a==="focus-deep"){state.scanView="expanded";localStorage.setItem(VIEW_KEY,state.scanView);render();setTimeout(()=>document.getElementById("ingredientText")?.focus(),120);return;}
+    if(a==="clear-scan"){state.foodName="";state.ingredientText="";state.lastAnalysis=null;state.savedNotice="";state.capturedImage="";state.capturedMeta=null;state.cameraMessage="";}
+    if(a==="focus-deep"){state.scanView="expanded";localStorage.setItem(VIEW_KEY,state.scanView);render();setTimeout(()=>{document.getElementById("deepDrawer")?.scrollIntoView({behavior:"smooth",block:"start"});document.getElementById("ingredientText")?.focus();},120);return;}
     if(a==="save-food"){saveCurrentFood(false);return;}
     if(a==="log-reaction"){saveCurrentFood(true);return;}
     if(a==="load-saved"){const f=getSavedFoods().find(x=>x.id===btn.dataset.id);if(f){state.foodName=f.foodName;state.ingredientText=f.ingredientText||"";state.activeTab="scan";analyze(state.ingredientText?"deep":"quick");return;}}
@@ -580,7 +662,7 @@ function startRecognitionScan(){
     if(elapsed<duration){requestAnimationFrame(tick)}else{
       overlay.classList.remove("collecting");overlay.classList.add("analyzing");setCameraStatus("information collected.");
       const flash=document.getElementById("cameraFlashConfirm");flash.classList.remove("active");void flash.offsetWidth;flash.classList.add("active");if(navigator.vibrate)navigator.vibrate(45);
-      setTimeout(()=>{const last=frames[frames.length-1]||captureFrame(video);state.capturedImage=last.dataUrl;state.capturedMeta={width:last.width,height:last.height,sizeKb:last.sizeKb};state.cameraMessage=`Camera scan captured ${frames.length||1} frame${(frames.length||1)===1?"":"s"}. OCR/barcode connects next.`;state.activeTab="scan";state.scanView="compact";localStorage.setItem(VIEW_KEY,state.scanView);cameraInProgress=false;document.getElementById("cameraScanProduct").disabled=false;closeCameraOverlay();render();setTimeout(()=>window.scrollTo({top:0,behavior:"smooth"}),80);},650);
+      setTimeout(()=>{const last=frames[frames.length-1]||captureFrame(video);state.capturedImage=last.dataUrl;state.capturedMeta={width:last.width,height:last.height,sizeKb:last.sizeKb};state.cameraMessage=`${frames.length||1} frame${(frames.length||1)===1?"":"s"} saved.`;state.activeTab="scan";cameraInProgress=false;document.getElementById("cameraScanProduct").disabled=false;closeCameraOverlay();render();setTimeout(()=>window.scrollTo({top:0,behavior:"smooth"}),80);},650);
     }
   }
   requestAnimationFrame(tick);
