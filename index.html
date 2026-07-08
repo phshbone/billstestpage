@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="theme-color" content="#1b2027" />
-<title>bill's bad belly — v1.0.11 visual-guardrail test</title>
+<title>bill's bad belly — v1.1.0 manual recognition cards</title>
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Baumans&display=swap");
 :root{
@@ -672,6 +672,120 @@ body.flare-active .screen-card{
     rgba(39,32,47,.88) !important;
 }
 
+
+/* ---------- v1.1.0 Manual Recognition Cards ---------- */
+.answer-card{
+  border-color:rgba(159,177,159,.34) !important;
+  background:
+    radial-gradient(circle at 8% 0%, rgba(159,177,159,.11), transparent 34%),
+    linear-gradient(145deg, rgba(58,68,78,.96), rgba(36,43,52,.96)) !important;
+}
+.result-summary-line{
+  margin:10px 0 0;
+  color:#d9ead9;
+  font-size:.92rem;
+  line-height:1.35;
+}
+.result-section{
+  margin-top:12px;
+  padding:12px;
+  border:1px solid rgba(184,154,192,.20);
+  border-radius:18px;
+  background:rgba(22,27,34,.20);
+}
+.result-section h4{
+  margin:0 0 8px;
+  font-family:var(--display-font);
+  color:var(--purple-light);
+  font-size:.96rem;
+  letter-spacing:.02em;
+}
+.detected-grid{
+  display:grid;
+  gap:8px;
+}
+.detected-row{
+  display:grid;
+  grid-template-columns:112px 1fr;
+  gap:8px;
+  align-items:start;
+  padding:8px;
+  border-radius:14px;
+  background:rgba(255,255,255,.025);
+}
+.detected-row strong{
+  color:#f3edf4;
+  font-size:.84rem;
+}
+.detected-row span{
+  color:var(--muted);
+  font-size:.82rem;
+  line-height:1.3;
+}
+.nutrition-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:8px;
+}
+.nutrition-tile{
+  padding:10px;
+  border-radius:15px;
+  border:1px solid rgba(159,177,159,.18);
+  background:rgba(159,177,159,.055);
+}
+.nutrition-tile strong{
+  display:block;
+  color:#d9ead9;
+  font-family:var(--display-font);
+  font-size:.92rem;
+}
+.nutrition-tile span{
+  display:block;
+  margin-top:2px;
+  color:var(--muted);
+  font-size:.78rem;
+}
+.next-action-box{
+  margin-top:12px;
+  padding:12px;
+  border-radius:18px;
+  border:1px solid rgba(159,177,159,.26);
+  background:rgba(159,177,159,.07);
+  color:#d9ead9;
+  line-height:1.35;
+}
+.confidence-tag{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  margin-top:6px;
+  padding:5px 8px;
+  border-radius:999px;
+  border:1px solid rgba(184,154,192,.20);
+  color:var(--muted);
+  background:rgba(17,21,26,.20);
+  font-size:.75rem;
+  font-weight:800;
+}
+.sample-button-row{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:8px;
+  margin-top:10px;
+}
+.sample-button{
+  border:1px solid rgba(159,177,159,.24);
+  border-radius:16px;
+  background:rgba(159,177,159,.08);
+  color:#d9ead9;
+  padding:10px;
+  text-align:left;
+  font-weight:800;
+}
+@media(min-width:390px){
+  .sample-button-row{grid-template-columns:1fr 1fr}
+}
+
 </style>
 </head>
 <body>
@@ -679,7 +793,7 @@ body.flare-active .screen-card{
   <header class="topbar">
     <div class="header-mascot-wrap" aria-hidden="true"><div class="header-mascot-fallback">bb</div></div>
     <div class="brand-title-wrap">
-      <p class="eyebrow">v1.0.11 visual-guardrail test</p>
+      <p class="eyebrow">v1.1.0 manual recognition cards</p>
       <h1>bill's bad belly</h1>
     </div>
     <div class="logo-mark" aria-hidden="true">bb</div>
@@ -841,6 +955,9 @@ function normalizeText(t){return String(t||"").toLowerCase().replace(/[’']/g,"
 function containsTerm(hay,term){const clean=normalizeText(term);if(!clean)return false;const esc=clean.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");return new RegExp("(^|\\s|-)"+esc+"($|\\s|-)","i").test(hay);}
 function unique(a){return [...new Set(a)];}
 function traitLabel(t){return TRAIT_LABELS[t]||t.replaceAll("_"," ");}
+Object.assign(TRAIT_LABELS,{nutrition_high_fiber:"high fiber",nutrition_low_fiber:"low fiber",nutrition_high_fat:"high fat",nutrition_low_fat:"low fat",nutrition_high_sugar:"high sugar",nutrition_added_sugar:"added sugar",nutrition_protein_support:"protein support",nutrition_high_sodium:"high sodium"});
+["nutrition_high_fiber","nutrition_high_fat","nutrition_high_sugar","nutrition_added_sugar","nutrition_high_sodium"].forEach(t=>{RISK_TRAITS.add(t);FLARE_TRAITS.add(t);});
+["nutrition_low_fiber","nutrition_low_fat","nutrition_protein_support"].forEach(t=>GENTLE_TRAITS.add(t));
 function formatConfidence(c){return String(c||"unknown").replaceAll("_"," ").replace(/\b\w/g,s=>s.toUpperCase());}
 function ratingClass(r){if(r==="usually_gentle")return"good";if(r==="likely_rough"||r==="personal_trigger")return"ugly";if(r==="flare_caution")return"flare";return"ehh";}
 function ratingPill(r){return `<span class="rating-pill rating-${ratingClass(r)}">${escapeHtml(RATINGS[r]||"unknown")}</span>`;}
@@ -848,6 +965,92 @@ function findFastCards(text){const hay=normalizeText(text);return MEAL_FAST_CARD
 function findIngredientMatches(text){const hay=normalizeText(text);return INGREDIENT_DICTIONARY.filter(i=>[i.name,...i.aliases].some(t=>containsTerm(hay,t)));}
 function findProducts(text){const hay=normalizeText(text);if(!hay)return[];return PRODUCT_DB.filter(p=>normalizeText(`${p.brand} ${p.name} ${p.category} ${p.notes}`).includes(hay)||hay.split(" ").some(w=>w.length>3&&normalizeText(`${p.name} ${p.category}`).includes(w))).slice(0,4);}
 function applyRulebook(traits,base){const set=new Set(traits);let risk=0,gentle=0,flareRisk=0;set.forEach(t=>{if(RISK_TRAITS.has(t))risk++;if(GENTLE_TRAITS.has(t))gentle++;if(FLARE_TRAITS.has(t))flareRisk++;});let normal=base||"unknown";if(normal==="unknown"){if(risk===0&&gentle>0)normal="usually_gentle";else if(risk>=6)normal="likely_rough";else normal="caution";}if(normal==="usually_gentle"&&risk>=2)normal="caution";if(risk>=7)normal="likely_rough";let flare=normal;if(flareRisk===0&&normal==="usually_gentle")flare="usually_gentle";else if(flareRisk<=2&&normal==="usually_gentle")flare="caution";else if(flareRisk<=4)flare="flare_caution";else flare="likely_rough";return{normal,flare,risk,gentle,flareRisk};}
+function parseNutritionText(text){
+  const src=String(text||"");
+  const hay=normalizeText(src);
+  function grams(patterns){
+    for(const p of patterns){
+      const m=src.match(p);
+      if(m)return Number(m[1]);
+    }
+    return null;
+  }
+  const n={
+    fiber:grams([/dietary\s*fiber[^\d]*(\d+(?:\.\d+)?)\s*g/i,/fiber[^\d]*(\d+(?:\.\d+)?)\s*g/i]),
+    sugar:grams([/total\s*sugars?[^\d]*(\d+(?:\.\d+)?)\s*g/i,/sugars?[^\d]*(\d+(?:\.\d+)?)\s*g/i]),
+    addedSugar:grams([/added\s*sugars?[^\d]*(\d+(?:\.\d+)?)\s*g/i]),
+    fat:grams([/total\s*fat[^\d]*(\d+(?:\.\d+)?)\s*g/i]),
+    satFat:grams([/saturated\s*fat[^\d]*(\d+(?:\.\d+)?)\s*g/i]),
+    protein:grams([/protein[^\d]*(\d+(?:\.\d+)?)\s*g/i]),
+    sodium:null
+  };
+  const sm=src.match(/sodium[^\d]*(\d+(?:\.\d+)?)\s*mg/i);
+  if(sm)n.sodium=Number(sm[1]);
+  const found=Object.entries(n).filter(([k,v])=>v!==null).map(([k,v])=>({key:k,value:v}));
+  const traits=[];
+  const notes=[];
+  if(n.fiber!==null){
+    if(n.fiber>=5){traits.push("added_fiber","nutrition_high_fiber");notes.push(`Fiber is ${n.fiber}g, which strengthens caution in Flare Mode.`);}
+    else if(n.fiber<=2){traits.push("nutrition_low_fiber","low_residue");notes.push(`Fiber is ${n.fiber}g, a lower-residue clue.`);}
+    else notes.push(`Fiber is ${n.fiber}g, moderate support context.`);
+  }
+  if(n.fat!==null){
+    if(n.fat>=12){traits.push("high_fat","nutrition_high_fat");notes.push(`Total fat is ${n.fat}g, which can raise gut load.`);}
+    else if(n.fat<=3){traits.push("nutrition_low_fat");notes.push(`Total fat is ${n.fat}g, a lower-fat clue.`);}
+    else notes.push(`Total fat is ${n.fat}g, moderate support context.`);
+  }
+  if(n.sugar!==null){
+    if(n.sugar>=14){traits.push("nutrition_high_sugar","fruit_sugar");notes.push(`Sugars are ${n.sugar}g, which may matter for diarrhea/fermentation sensitivity.`);}
+    else notes.push(`Sugars are ${n.sugar}g.`);
+  }
+  if(n.addedSugar!==null && n.addedSugar>=8){traits.push("nutrition_added_sugar");notes.push(`Added sugar is ${n.addedSugar}g.`);}
+  if(n.protein!==null){
+    if(n.protein>=10){traits.push("nutrition_protein_support","lean_protein");notes.push(`Protein is ${n.protein}g, useful support if the ingredient list is otherwise simple.`);}
+    else notes.push(`Protein is ${n.protein}g.`);
+  }
+  if(n.sodium!==null){
+    if(n.sodium>=700){traits.push("nutrition_high_sodium","processed_food");notes.push(`Sodium is ${n.sodium}mg, a processed-food clue.`);}
+    else notes.push(`Sodium is ${n.sodium}mg.`);
+  }
+  return {values:n,found,traits:unique(traits),notes,hasNutrition:found.length>0};
+}
+function buildDetectedGroups(hits,nutrition,cards){
+  const rows=[];
+  const names=hits.map(h=>h.name);
+  function has(...terms){return hits.some(h=>terms.includes(h.name)||terms.some(t=>h.traits.includes(t)));}
+  if(names.some(n=>["pasta","small shells","pastina","angel hair","orzo","bow tie pasta","ravioli","whole wheat pasta","chickpea pasta"].includes(n))){
+    const pasta=hits.filter(h=>["pasta","small shells","pastina","angel hair","orzo","bow tie pasta","ravioli","whole wheat pasta","chickpea pasta"].includes(h.name)).map(h=>h.name).join(", ");
+    rows.push(["Pasta / starch",pasta||"pasta", "Shape, density, softness, sauce, and portion matter more than the word pasta alone."]);
+  }
+  if(has("dairy","cream","milk","cheese","lactose_possible"))rows.push(["Dairy / fat",names.filter(n=>["cream","milk","cheese","ravioli"].includes(n)).join(", ")||"dairy clue","Dairy plus fat load raises caution, especially in Flare Mode."]);
+  if(has("garlic_onion","onion","garlic"))rows.push(["Garlic / onion",names.filter(n=>["onion","garlic"].includes(n)).join(", ")||"garlic/onion clue","Powders still count; they can stack gas/pungent risk."]);
+  if(has("cruciferous","broccoli"))rows.push(["Gas vegetable",names.filter(n=>["broccoli"].includes(n)).join(", ")||"cruciferous clue","Broccoli can add fiber/gas risk even when cooked."]);
+  if(has("gum_thickener","xanthan gum"))rows.push(["Gum / thickener",names.filter(n=>["xanthan gum"].includes(n)).join(", ")||"gum clue","Gums and thickeners are processed-food additives that may matter personally."]);
+  if(has("beans_legumes","lentils","beans","chickpea pasta"))rows.push(["Legume / bean",names.filter(n=>["beans","lentils","chickpea pasta"].includes(n)).join(", ")||"legume clue","Legumes can add gas and fiber risk."]);
+  if(has("spicy_heat","pepperoni","sausage","hot sauce"))rows.push(["Spice / processed meat",names.filter(n=>["pepperoni","sausage","hot sauce"].includes(n)).join(", ")||"spicy/processed clue","Spice, fat, and processed meat often stack together."]);
+  if(nutrition?.hasNutrition)rows.push(["Nutrition support",nutrition.notes.slice(0,2).join(" "),"Nutrition adjusts the read; it does not outrank ingredients."]);
+  if(!rows.length && cards.length)rows.push(["Meal template",cards[0].name,cards[0].reason]);
+  return rows;
+}
+function buildPlainWhy(a){
+  const parts=[];
+  const names=a.hits.map(h=>h.name);
+  if(names.includes("pasta")||names.includes("small shells")||names.includes("bow tie pasta")||names.includes("ravioli")||names.includes("whole wheat pasta")||names.includes("chickpea pasta"))parts.push("pasta/starch");
+  if(a.traits.includes("dairy")||a.traits.includes("high_fat"))parts.push("dairy/fat");
+  if(a.traits.includes("cruciferous"))parts.push("cruciferous vegetable fiber/gas risk");
+  if(a.traits.includes("garlic_onion"))parts.push("garlic/onion seasoning");
+  if(a.traits.includes("gum_thickener"))parts.push("gum/thickener");
+  if(a.traits.includes("beans_legumes")||a.traits.includes("legume_gas_risk"))parts.push("bean/legume gas risk");
+  if(a.nutrition?.hasNutrition)parts.push("nutrition support");
+  if(parts.length)return `This read is driven by ${parts.join(", ")}.`;
+  return a.reason||"No strong food traits were detected yet.";
+}
+function buildNextStep(type,a){
+  if(type==="quick")return "Quick Read is a first pass. For packaged foods, run Deep Check with the ingredient list.";
+  if(a.flareRating==="likely_rough"||a.flareRating==="flare_caution")return "In Flare Mode, treat this as a cautious test: smaller portion, simpler sauce, softer texture, or wait until normal mode.";
+  if(a.normalRating==="usually_gentle")return "This looks more workable, but log the portion and reaction so personal history can confirm it.";
+  return "Use a small test portion and log how it went so this can become personal data.";
+}
 function analyze(type){
   captureInputs();
   const quick=state.foodName;
@@ -855,18 +1058,23 @@ function analyze(type){
   const cards=findFastCards(quick);
   const hits=findIngredientMatches(deep);
   const products=findProducts(state.foodName);
-  let traits=[];cards.forEach(c=>traits.push(...c.likelyTraits));hits.forEach(h=>traits.push(...h.traits));traits=unique(traits);
+  const nutrition=parseNutritionText(deep);
+  let traits=[];cards.forEach(c=>traits.push(...c.likelyTraits));hits.forEach(h=>traits.push(...h.traits));traits.push(...nutrition.traits);traits=unique(traits);
   let base=cards[0]?.normalRating||products[0]?.normal||"unknown";
   const rules=applyRulebook(traits,base);
   let confidence="unknown";
-  if(type==="deep"&&hits.length)confidence="ingredient_confirmed";
+  if(type==="deep"&&hits.length&&nutrition.hasNutrition)confidence="ingredient_and_nutrition_confirmed";
+  else if(type==="deep"&&hits.length)confidence="ingredient_confirmed";
+  else if(type==="deep"&&nutrition.hasNutrition)confidence="nutrition_support_only";
   else if(cards.length)confidence="template_based";
   else if(products.length)confidence="product_database_match";
   else if(state.foodName)confidence="preliminary";
-  const detected=cards[0]?.name||products[0]?`${products[0]?.brand||""} ${products[0]?.name||""}`.trim():state.foodName||"Unknown food";
-  const reason=cards.length?(cards[0].reason+(hits.length?` Ingredient words also matched: ${hits.slice(0,6).map(x=>x.name).join(", ")}.`:"")):hits.length?`Ingredient text matched ${hits.slice(0,8).map(x=>x.name).join(", ")}.`:products.length?products[0].notes:"No exact Fast Card yet. Use Deep Check or save this food to personal memory.";
-  const next=type==="quick"&&!state.ingredientText.trim()?"Scan or paste the ingredient list for a deeper check.": "Save this food if you want the app to remember it, then log how it went after eating.";
-  state.lastAnalysis={type,detected,cards,hits,products,traits,normalRating:rules.normal,flareRating:rules.flare,confidence,reason,next};
+  const detected=cards[0]?.name||(products[0]?`${products[0]?.brand||""} ${products[0]?.name||""}`.trim():state.foodName||"Unknown food");
+  const reason=cards.length?(cards[0].reason+(hits.length?` Ingredient words also matched: ${hits.slice(0,6).map(x=>x.name).join(", ")}.`:"")):hits.length?`Ingredient text matched ${hits.slice(0,8).map(x=>x.name).join(", ")}.`:products.length?products[0].notes:nutrition.hasNutrition?"Nutrition facts were detected, but ingredient text is still needed for the best Crohn’s read.":"No exact Fast Card yet. Use Deep Check or save this food to personal memory.";
+  const detectedGroups=buildDetectedGroups(hits,nutrition,cards);
+  const next=buildNextStep(type,{normalRating:rules.normal,flareRating:rules.flare,nutrition,traits});
+  state.lastAnalysis={type,detected,cards,hits,products,traits,normalRating:rules.normal,flareRating:rules.flare,confidence,reason,next,nutrition,detectedGroups,plainWhy:""};
+  state.lastAnalysis.plainWhy=buildPlainWhy(state.lastAnalysis);
   state.savedNotice="";
   render();
 }
@@ -925,6 +1133,10 @@ function scanScreen(){
         <textarea id="ingredientText" placeholder="pasta, cream, cheddar cheese, broccoli, onion powder, garlic powder, xanthan gum">${escapeHtml(state.ingredientText)}</textarea>
         <p class="search-hint">Preferred for packaged foods. This catches hidden triggers the front of the box may not show.</p>
         <button class="primary-action full-width" data-action="deep-check" type="button">run deep check</button>
+        <div class="sample-button-row">
+          <button class="sample-button" data-action="sample-pasta" type="button">test pasta label</button>
+          <button class="sample-button" data-action="sample-nutrition" type="button">test nutrition text</button>
+        </div>
       </div>
     </details>
 
@@ -936,26 +1148,69 @@ function scanScreen(){
     </details>
   </div>`;
 }
+function nutritionTiles(nutrition){
+  if(!nutrition||!nutrition.hasNutrition)return "";
+  const labels={fiber:"fiber",sugar:"sugar",addedSugar:"added sugar",fat:"fat",satFat:"sat fat",protein:"protein",sodium:"sodium"};
+  const units={fiber:"g",sugar:"g",addedSugar:"g",fat:"g",satFat:"g",protein:"g",sodium:"mg"};
+  return `<div class="result-section">
+    <h4>Nutrition support</h4>
+    <div class="nutrition-grid">
+      ${nutrition.found.map(x=>`<div class="nutrition-tile"><strong>${escapeHtml(labels[x.key]||x.key)}: ${escapeHtml(x.value)}${units[x.key]||""}</strong><span>${escapeHtml(nutritionNoteFor(x.key,x.value))}</span></div>`).join("")}
+    </div>
+  </div>`;
+}
+function nutritionNoteFor(key,value){
+  if(key==="fiber")return value>=5?"higher fiber — stronger flare caution":value<=2?"low fiber — lower-residue clue":"moderate fiber";
+  if(key==="fat")return value>=12?"higher fat load":value<=3?"lower fat clue":"moderate fat";
+  if(key==="sugar")return value>=14?"higher sugar clue":"sugar context";
+  if(key==="addedSugar")return value>=8?"added sugar clue":"added sugar context";
+  if(key==="protein")return value>=10?"useful protein support":"protein context";
+  if(key==="sodium")return value>=700?"processed-food clue":"sodium context";
+  return "support context";
+}
 function resultCard(a){
   const active=state.mode==="Flare"?a.flareRating:a.normalRating;
   return `<article class="result-card answer-card">
-    <div class="result-top"><div><h3>${escapeHtml(a.detected)}</h3><span>${state.mode==="Flare"?"Flare Mode":"Normal Mode"} · ${formatConfidence(a.confidence)}</span></div>${ratingPill(active)}</div>
-    <div class="grid-two" style="margin-top:12px;"><div>${ratingPill(a.normalRating)}<p class="small-muted">normal</p></div><div>${ratingPill(a.flareRating)}<p class="small-muted">flare</p></div></div>
-    <details class="drawer optional" id="detailsDrawer" ${state.scanView==="expanded"?"open":""} style="margin-top:12px;">
-      <summary><span class="drawer-title">Detected Details</span></summary>
-      <div class="drawer-body">
-        <div class="chips">${a.traits.length?a.traits.map(t=>`<span class="chip ${GENTLE_TRAITS.has(t)?"gentle":RISK_TRAITS.has(t)?"risk":""}">${escapeHtml(traitLabel(t))}</span>`).join(""):`<span class="chip">none detected yet</span>`}</div>
-        <p class="small-muted">Ingredient words: ${a.hits.length?a.hits.map(x=>x.name).join(", "):"none detected yet"}</p>
+    <div class="result-top">
+      <div>
+        <h3>${escapeHtml(a.detected)}</h3>
+        <span>${state.mode==="Flare"?"Flare Mode":"Normal Mode"}</span>
+        <div class="confidence-tag">${formatConfidence(a.confidence)}</div>
       </div>
-    </details>
-    <div class="why" style="margin-top:12px;"><strong>Why:</strong> ${escapeHtml(a.reason)}</div>
-    <div class="next" style="margin-top:10px;"><strong>Next:</strong> ${escapeHtml(a.next)}</div>
-    <div class="grid-two" style="margin-top:12px;"><button class="secondary-action" data-action="save-food" type="button">save it</button><button class="primary-action" data-action="log-reaction" type="button">ate it</button></div>
-    ${state.savedNotice?`<p class="small-muted" style="margin-top:10px;color:var(--purple-light);font-weight:900;">${escapeHtml(state.savedNotice)}</p>`:""}
+      ${ratingPill(active)}
+    </div>
+
+    <p class="result-summary-line">${escapeHtml(a.plainWhy||a.reason)}</p>
+
+    <div class="grid-two" style="margin-top:12px;">
+      <div>${ratingPill(a.normalRating)}<p class="small-muted">normal</p></div>
+      <div>${ratingPill(a.flareRating)}<p class="small-muted">flare</p></div>
+    </div>
+
+    ${a.detectedGroups?.length?`<div class="result-section">
+      <h4>Detected food clues</h4>
+      <div class="detected-grid">
+        ${a.detectedGroups.map(row=>`<div class="detected-row"><strong>${escapeHtml(row[0])}</strong><span><b>${escapeHtml(row[1])}</b><br>${escapeHtml(row[2])}</span></div>`).join("")}
+      </div>
+    </div>`:""}
+
+    <div class="result-section">
+      <h4>Trait tags</h4>
+      <div class="chips">${a.traits.length?a.traits.map(t=>`<span class="chip ${GENTLE_TRAITS.has(t)?"gentle":RISK_TRAITS.has(t)?"risk":""}">${escapeHtml(traitLabel(t))}</span>`).join(""):`<span class="chip">none detected yet</span>`}</div>
+      <p class="small-muted" style="margin-top:8px;">Ingredient words: ${a.hits.length?a.hits.map(x=>x.name).join(", "):"none detected yet"}</p>
+    </div>
+
+    ${nutritionTiles(a.nutrition)}
+
+    <div class="next-action-box"><strong>Next:</strong> ${escapeHtml(a.next)}</div>
+
+    <div class="grid-two" style="margin-top:12px;">
+      <button class="secondary-action" data-action="save-food" type="button">save food</button>
+      <button class="primary-action" data-action="log-ok" type="button">worked for me</button>
+    </div>
+    ${state.savedNotice?`<p class="save-note">${escapeHtml(state.savedNotice)}</p>`:""}
   </article>`;
 }
-function flareScreen(){return `<div class="screen-content">${screenTitle("Flare","normal and flare-mode food guidance.")}<div class="grid-two"><button class="${state.mode==="normal"?"primary-action":"secondary-action"}" data-action="normal-mode" type="button">normal mode</button><button class="${state.mode==="Flare"?"primary-action":"secondary-action"}" data-action="flare-mode" type="button">flare mode</button></div><article class="food-panel"><h3>Flare logic</h3><p class="small-muted">Flare Mode upgrades mechanical risk, fried/high-fat foods, beans/legumes, dairy, garlic/onion, spice, gums, and processed foods more conservatively.</p></article></div>`;}
-function meScreen(){return `<div class="screen-content">${screenTitle("Me","Personal food profile and records.")}<article class="food-panel"><h3>Saved foods</h3>${savedFoodsList()}</article></div>`;}
 function savedFoodsList(){const foods=getSavedFoods();if(!foods.length)return`<p class="small-muted">No saved foods yet.</p>`;return`<div class="saved-list">${foods.map(f=>`<div class="saved-item"><div class="saved-title">${escapeHtml(f.foodName)}</div><div class="saved-meta">Normal: ${escapeHtml(RATINGS[f.normalRating]||f.normalRating)} · Flare: ${escapeHtml(RATINGS[f.flareRating]||f.flareRating)} · Logs: ${f.reactionHistory?.length||0}</div><div class="grid-two" style="margin-top:8px;"><button class="secondary-action compact-action" data-action="load-saved" data-id="${f.id}" type="button">load</button><button class="secondary-action compact-action" data-action="delete-saved" data-id="${f.id}" type="button">delete</button></div></div>`).join("")}</div>`;}
 function captureInputs(){["foodName","ingredientText"].forEach(id=>{const el=document.getElementById(id);if(el)state[id]=el.value;});}
 function getSavedFoods(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]")}catch(e){return[]}}
@@ -995,6 +1250,8 @@ function bindEvents(){
     if(a==="go-flare"){state.activeTab="flare";}
     if(a==="quick-read"){analyze("quick");return;}
     if(a==="deep-check"){analyze("deep");return;}
+    if(a==="sample-pasta"){state.foodName="broccoli cheddar pasta";state.ingredientText="Ingredients: pasta, cream, cheddar cheese, broccoli, onion powder, garlic powder, xanthan gum. Nutrition Facts: Total Fat 15g, Dietary Fiber 3g, Total Sugars 4g, Protein 12g, Sodium 760mg.";state.scanView="expanded";localStorage.setItem(VIEW_KEY,state.scanView);analyze("deep");return;}
+    if(a==="sample-nutrition"){state.foodName="sample nutrition label";state.ingredientText="Nutrition Facts: Total Fat 2g, Dietary Fiber 1g, Total Sugars 16g, Added Sugars 12g, Protein 10g, Sodium 220mg. Ingredients: rice, chicken broth, chicken.";state.scanView="expanded";localStorage.setItem(VIEW_KEY,state.scanView);analyze("deep");return;}
     if(a==="clear-scan"){state.foodName="";state.ingredientText="";state.lastAnalysis=null;state.savedNotice="";state.capturedImage="";state.capturedMeta=null;state.cameraMessage="";}
     if(a==="focus-deep"){state.scanView="expanded";localStorage.setItem(VIEW_KEY,state.scanView);render();setTimeout(()=>{document.getElementById("deepDrawer")?.scrollIntoView({behavior:"smooth",block:"start"});document.getElementById("ingredientText")?.focus();},120);return;}
     if(a==="save-food"){saveCurrentFood(false);return;}
