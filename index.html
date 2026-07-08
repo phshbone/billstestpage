@@ -261,6 +261,19 @@
     overflow: auto;
   }
 
+  .scan-note {
+    color: var(--muted);
+    font-size: 0.78rem;
+    line-height: 1.35;
+    margin: 0;
+  }
+
+  .mini-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+  }
+
   .hidden { display: none !important; }
 </style>
 </head>
@@ -268,7 +281,7 @@
 <div class="app">
   <header>
     <h1 class="title">bill's bad belly</h1>
-    <p class="subtitle">Phase 3 OCR-first Recognition Engine prototype</p>
+    <p class="subtitle">Phase 3 OCR-first Recognition Engine prototype v2</p>
   </header>
 
   <main class="recognition-stage">
@@ -286,12 +299,14 @@
   <section class="dock">
     <div class="button-row">
       <button id="startCameraBtn">Start Camera</button>
-      <button id="scanBtn" class="secondary" disabled>Scan Text</button>
+      <button id="scanBtn" class="secondary" disabled>Scan Label</button>
     </div>
-    <div class="button-row">
-      <button id="analyzeTextBtn" class="secondary">Analyze Pasted Text</button>
+    <div class="mini-row">
+      <button id="scanIngredientsBtn" class="secondary" disabled>Add Ingredients</button>
+      <button id="analyzeTextBtn" class="secondary">Analyze Paste</button>
       <button id="resetBtn" class="secondary">Reset</button>
     </div>
+    <p class="scan-note">If the first scan only catches Nutrition Facts, point lower at the small ingredients paragraph and tap Add Ingredients. The engine merges the text into one food record.</p>
     <div class="manual-box">
       <textarea id="manualText" placeholder="Optional: paste ingredients or nutrition text here for testing without the camera."></textarea>
     </div>
@@ -325,6 +340,7 @@
   const statusSmall = document.getElementById('statusSmall');
   const startCameraBtn = document.getElementById('startCameraBtn');
   const scanBtn = document.getElementById('scanBtn');
+  const scanIngredientsBtn = document.getElementById('scanIngredientsBtn');
   const analyzeTextBtn = document.getElementById('analyzeTextBtn');
   const resetBtn = document.getElementById('resetBtn');
   const manualText = document.getElementById('manualText');
@@ -333,6 +349,8 @@
   let stream = null;
   let workerReady = false;
   let lastRecord = null;
+  let accumulatedOCRText = '';
+  let lastScanMode = 'label';
 
   const messages = [
     'Looking for label text…',
@@ -382,7 +400,8 @@
       });
       video.srcObject = stream;
       scanBtn.disabled = false;
-      setStatus('Camera ready.', 'Point at ingredients or nutrition facts, then tap Scan Text.');
+      scanIngredientsBtn.disabled = false;
+      setStatus('Camera ready.', 'Point at the label, then tap Scan Label. If ingredients are missed, aim lower and tap Add Ingredients.');
     } catch (err) {
       setStatus('Camera unavailable.', 'Use pasted text below, or check browser camera permissions.');
       console.error(err);
@@ -394,12 +413,96 @@
     const height = video.videoHeight || 720;
     canvas.width = width;
     canvas.height = height;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
     ctx.drawImage(video, 0, 0, width, height);
     return canvas;
   }
 
-  async function runOCRFromCamera() {
+  function makeCanvas(width, height) {
+    const c = document.createElement('canvas');
+    c.width = width;
+    c.height = height;
+    return c;
+  }
+
+  function cropCanvas(source, sx, sy, sw, sh, scale = 2) {
+    const c = makeCanvas(Math.max(1, Math.round(sw * scale)), Math.max(1, Math.round(sh * scale)));
+    const ctx = c.getContext('2d', { willReadFrequently: true });
+    ctx.imageSmoothingEnabled = true;
+    ctx.drawImage(source, sx, sy, sw, sh, 0, 0, c.width, c.height);
+    enhanceForOCR(c);
+    return c;
+  }
+
+  function enhanceForOCR(c) {
+    const ctx = c.getContext('2d', { willReadFrequently: true });
+    const img = ctx.getImageData(0, 0, c.width, c.height);
+    const data = img.data;
+    for (let i = 0; i < data.length; i += 4) {
+      const gray = (data[i] * 0.299) + (data[i + 1] * 0.587) + (data[i + 2] * 0.114);
+      const contrast = Math.max(0, Math.min(255, (gray - 128) * 1.45 + 128));
+      data[i] = data[i + 1] = data[i + 2] = contrast;
+    }
+    ctx.putImageData(img, 0, 0);
+  }
+
+  function getOCRCanvases(mode = 'label') {
+    const frame = captureFrame();
+    const w = frame.width;
+    const h = frame.height;
+
+    if (mode === 'ingredients') {
+      return [
+        { name: 'ingredients lower label', canvas: cropCanvas(frame, 0, h * 0.38, w, h * 0.62, 2.6) },
+        { name: 'ingredients full label', canvas: cropCanvas(frame, 0, 0, w, h, 2.1) }
+      ];
+    }
+
+    return [
+      { name: 'full label', canvas: cropCanvas(frame, 0, 0, w, h, 2.0) },
+      { name: 'lower label', canvas: cropCanvas(frame, 0, h * 0.45, w, h * 0.55, 2.5) },
+      { name: 'center label', canvas: cropCanvas(frame, w * 0.08, h * 0.08, w * 0.84, h * 0.84, 2.2) }
+    ];
+  }
+
+  function mergeOCRText(existing, incoming) {
+    const pieces = [existing || '', incoming || '']
+      .join('\n')
+      .split('\n')
+      .map(line => line.trim())
+      .filter(Boolean);
+
+    const seen = new Set();
+    const merged = [];
+    for (const line of pieces) {
+      const key = line.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+      if (!key || seen.has(key)) continue;
+      seen.add(key);
+      merged.push(line);
+    }
+    return merged.join('\n');
+  }
+
+  async function recognizeCanvasSet(items) {
+    const textParts = [];
+    for (let i = 0; i < items.length; i++) {
+      const item = items[i];
+      setStatus(`Reading ${item.name}…`, `Pass ${i + 1} of ${items.length}. Small ingredients text needs extra OCR passes.`);
+      const result = await Tesseract.recognize(item.canvas, 'eng', {
+        logger: m => {
+          if (m.status === 'recognizing text') {
+            const pct = Math.round((m.progress || 0) * 100);
+            setStatus(`Reading ${item.name}… ${pct}%`, 'Checking ingredients, allergens, serving size, and nutrition fields.');
+          }
+        }
+      });
+      const text = result?.data?.text || '';
+      if (text.trim()) textParts.push(text);
+    }
+    return mergeOCRText('', textParts.join('\n'));
+  }
+
+  async function runOCRFromCamera(mode = 'label') {
     if (!window.Tesseract) {
       setStatus('OCR engine failed to load.', 'Check internet connection. Tesseract.js is loaded from a CDN.');
       return;
@@ -407,20 +510,17 @@
 
     viewport.classList.add('recognizing');
     scanBtn.disabled = true;
+    scanIngredientsBtn.disabled = true;
+    lastScanMode = mode;
     const timer = rotateStatus();
 
     try {
-      const frame = captureFrame();
-      const result = await Tesseract.recognize(frame, 'eng', {
-        logger: m => {
-          if (m.status === 'recognizing text') {
-            const pct = Math.round((m.progress || 0) * 100);
-            setStatus(`Reading label text… ${pct}%`, 'Checking ingredients and nutrition fields.');
-          }
-        }
-      });
-      const text = result?.data?.text || '';
-      completeRecognition(text);
+      const canvases = getOCRCanvases(mode);
+      const newText = await recognizeCanvasSet(canvases);
+      accumulatedOCRText = mode === 'label'
+        ? mergeOCRText('', newText)
+        : mergeOCRText(accumulatedOCRText, newText);
+      completeRecognition(accumulatedOCRText, { mode });
     } catch (err) {
       console.error(err);
       setStatus('Text scan failed.', 'Try better light, flatter label angle, or paste text manually.');
@@ -428,6 +528,7 @@
       clearInterval(timer);
       viewport.classList.remove('recognizing');
       scanBtn.disabled = false;
+      scanIngredientsBtn.disabled = false;
     }
   }
 
@@ -554,13 +655,31 @@
     return { label: 'Likely Gentle / Good', className: 'risk-good' };
   }
 
+
+  function extractIngredients(text) {
+    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+    const startIndex = lines.findIndex(line => /ingredients?\s*[:.]/i.test(line) || /^ingredients?$/i.test(line));
+    if (startIndex === -1) {
+      return extractAfterLabel(
+        text,
+        ['ingredients'],
+        ['nutrition facts', 'contains', 'allergen', 'distributed by', 'manufactured by', 'best by', 'sell by']
+      );
+    }
+
+    const collected = [];
+    for (let i = startIndex; i < lines.length; i++) {
+      let line = lines[i];
+      if (i === startIndex) line = line.replace(/^ingredients?\s*[:.]?\s*/i, '');
+      if (i > startIndex && /^(nutrition facts|contains|allergen|distributed by|manufactured by|best by|sell by|refrigerate|keep refrigerated)/i.test(line)) break;
+      if (line) collected.push(line);
+    }
+    return collected.join(' ').trim();
+  }
+
   function buildUnifiedFoodRecord(rawInput) {
     const rawText = normalizeText(rawInput);
-    const ingredients = extractAfterLabel(
-      rawText,
-      ['ingredients'],
-      ['nutrition facts', 'contains', 'allergen', 'distributed by', 'manufactured by']
-    );
+    const ingredients = extractIngredients(rawText);
     const nutritionFacts = extractNutrition(rawText);
     const allergens = extractAllergens(rawText);
 
@@ -582,7 +701,7 @@
     return record;
   }
 
-  function completeRecognition(text) {
+  function completeRecognition(text, options = {}) {
     const record = buildUnifiedFoodRecord(text);
     const flags = findCrohnsFlags([record.ingredients, record.rawText].join('\n'));
     const rating = rateBadBelly(flags, record.nutritionFacts);
@@ -590,7 +709,8 @@
     record.badBellyAnalysis = {
       rating: rating.label,
       flags,
-      note: 'Prototype rule-based analysis only. This is not medical advice.'
+      note: 'Prototype rule-based analysis only. This is not medical advice.',
+      scanMode: options.mode || lastScanMode
     };
 
     lastRecord = record;
@@ -599,7 +719,11 @@
     viewport.classList.remove('recognizing');
     viewport.classList.add('confirm');
     setTimeout(() => viewport.classList.remove('confirm'), 700);
-    setStatus('Information collected.', 'Unified Food Record created. Analysis is shown below.');
+    if (!record.ingredients) {
+      setStatus('Nutrition found, ingredients not found yet.', 'Point lower at the small ingredients paragraph and tap Add Ingredients.');
+    } else {
+      setStatus('Information collected.', 'Unified Food Record created. Analysis is shown below.');
+    }
   }
 
   function renderResults(record, flags, rating) {
@@ -626,11 +750,13 @@
     document.getElementById('recordJson').textContent = '{}';
     document.getElementById('rawText').textContent = '';
     lastRecord = null;
+    accumulatedOCRText = '';
     setStatus('Ready to scan label text.', 'Point at ingredients or nutrition facts. Start with one clear label panel.');
   }
 
   startCameraBtn.addEventListener('click', startCamera);
-  scanBtn.addEventListener('click', runOCRFromCamera);
+  scanBtn.addEventListener('click', () => runOCRFromCamera('label'));
+  scanIngredientsBtn.addEventListener('click', () => runOCRFromCamera('ingredients'));
   analyzeTextBtn.addEventListener('click', () => {
     const text = manualText.value.trim();
     if (!text) {
@@ -640,7 +766,8 @@
     viewport.classList.add('recognizing');
     setTimeout(() => {
       viewport.classList.remove('recognizing');
-      completeRecognition(text);
+      accumulatedOCRText = text;
+      completeRecognition(text, { mode: 'paste' });
     }, 450);
   });
   resetBtn.addEventListener('click', resetApp);
