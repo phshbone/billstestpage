@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="theme-color" content="#1b2027" />
-<title>bill's bad belly — v1.0.7 cleanup flow test</title>
+<title>bill's bad belly — v1.0.10 locked tab test</title>
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Baumans&display=swap");
 :root{
@@ -400,7 +400,224 @@ body.compact .drawer.optional:not([open]){display:block}
   .camera-countdown{min-width:96px;height:96px;font-size:3.5rem}
 }
 
+
+/* ---------- v1.0.8 anchored bottom tab bar ---------- */
+.app-shell{
+  padding-bottom:calc(112px + env(safe-area-inset-bottom,0px)) !important;
+}
+.bottom-nav{
+  left:50% !important;
+  bottom:0 !important;
+  width:min(100%,430px) !important;
+  max-width:430px !important;
+  transform:translateX(-50%) !important;
+  -webkit-transform:translateX(-50%) !important;
+  border-left:1px solid rgba(184,154,192,.26) !important;
+  border-right:1px solid rgba(184,154,192,.26) !important;
+  border-top:1px solid rgba(184,154,192,.32) !important;
+  border-bottom:0 !important;
+  border-radius:28px 28px 0 0 !important;
+  padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px)) !important;
+  background:rgba(18,23,30,.98) !important;
+  box-shadow:0 -10px 32px rgba(0,0,0,.46), inset 0 1px 0 rgba(255,255,255,.05) !important;
+}
+.nav-button{
+  min-height:62px !important;
+  border-radius:20px !important;
+  padding:8px 4px !important;
+}
+.nav-button.active{
+  background:linear-gradient(145deg,rgba(125,95,134,.96),rgba(94,72,103,.98)) !important;
+  box-shadow:0 8px 18px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.08) !important;
+}
+.nav-button span:last-child{
+  font-size:.76rem !important;
+}
+@media(max-width:360px){
+  .bottom-nav{padding-left:10px !important;padding-right:10px !important}
+  .nav-button{min-height:58px !important}
+}
+
 @media(max-width:360px){.screen-title{padding-right:86px}.grid-two,.search-row{grid-template-columns:1fr}.logo-mark{width:48px;height:48px;flex-basis:48px}.brand-title-wrap h1{font-size:1.62rem}}
+
+/* ---------- v1.0.9 HARD ANCHORED TAB BAR — final override ---------- */
+/* This block is intentionally last so older floating-nav rules cannot win. */
+html, body{
+  min-height:100%;
+}
+body{
+  padding-bottom:0 !important;
+}
+.app-shell{
+  padding-bottom:calc(98px + env(safe-area-inset-bottom,0px)) !important;
+}
+.bottom-nav{
+  position:fixed !important;
+  left:50% !important;
+  right:auto !important;
+  bottom:0 !important;
+  transform:translate3d(-50%,0,0) !important;
+  -webkit-transform:translate3d(-50%,0,0) !important;
+
+  width:min(100vw,430px) !important;
+  max-width:430px !important;
+  margin:0 !important;
+
+  display:grid !important;
+  grid-template-columns:repeat(4,1fr) !important;
+  gap:8px !important;
+
+  padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px)) !important;
+
+  border-radius:26px 26px 0 0 !important;
+  border-top:1px solid rgba(184,154,192,.34) !important;
+  border-left:1px solid rgba(184,154,192,.22) !important;
+  border-right:1px solid rgba(184,154,192,.22) !important;
+  border-bottom:0 !important;
+
+  background:rgba(18,23,30,.985) !important;
+  box-shadow:0 -12px 32px rgba(0,0,0,.48), inset 0 1px 0 rgba(255,255,255,.055) !important;
+  backdrop-filter:blur(14px) !important;
+  -webkit-backdrop-filter:blur(14px) !important;
+
+  z-index:2147483000 !important;
+  contain:layout paint !important;
+}
+.nav-button{
+  min-height:60px !important;
+  border-radius:18px !important;
+  padding:8px 4px !important;
+}
+.nav-button.active{
+  background:linear-gradient(145deg,rgba(125,95,134,.98),rgba(94,72,103,.98)) !important;
+  box-shadow:0 8px 18px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.08) !important;
+}
+.nav-button .icon svg{
+  width:24px !important;
+  height:24px !important;
+}
+.nav-button span{
+  font-size:.76rem !important;
+}
+@supports (height:100dvh){
+  .app-shell{
+    min-height:100dvh !important;
+  }
+}
+@media(max-width:360px){
+  .bottom-nav{
+    padding-left:10px !important;
+    padding-right:10px !important;
+  }
+  .nav-button{
+    min-height:56px !important;
+  }
+}
+
+
+/* ---------- v1.0.10 LOCKED APP SHELL TAB BAR ---------- */
+/* Body no longer scrolls. The screen card scrolls inside the app shell, so the tab bar cannot ride with page content. */
+html,
+body{
+  height:100% !important;
+  min-height:100% !important;
+  overflow:hidden !important;
+}
+body{
+  position:fixed !important;
+  inset:0 !important;
+  width:100% !important;
+  max-width:100% !important;
+  padding:0 !important;
+  overscroll-behavior:none !important;
+}
+.app-shell{
+  position:relative !important;
+  width:min(100%,430px) !important;
+  height:100vh !important;
+  height:100dvh !important;
+  min-height:0 !important;
+  margin:0 auto !important;
+  padding:22px 16px calc(102px + env(safe-area-inset-bottom,0px)) !important;
+  display:flex !important;
+  flex-direction:column !important;
+  overflow:hidden !important;
+}
+.topbar{
+  flex:0 0 auto !important;
+}
+.screen-card{
+  flex:1 1 auto !important;
+  min-height:0 !important;
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+  -webkit-overflow-scrolling:touch !important;
+  overscroll-behavior:contain !important;
+}
+.bottom-nav{
+  position:absolute !important;
+  left:0 !important;
+  right:0 !important;
+  bottom:0 !important;
+  width:100% !important;
+  max-width:none !important;
+  transform:none !important;
+  -webkit-transform:none !important;
+  margin:0 !important;
+
+  display:grid !important;
+  grid-template-columns:repeat(4,1fr) !important;
+  gap:8px !important;
+
+  padding:10px 14px calc(10px + env(safe-area-inset-bottom,0px)) !important;
+
+  border-radius:26px 26px 0 0 !important;
+  border-top:1px solid rgba(184,154,192,.34) !important;
+  border-left:1px solid rgba(184,154,192,.22) !important;
+  border-right:1px solid rgba(184,154,192,.22) !important;
+  border-bottom:0 !important;
+
+  background:rgba(18,23,30,.985) !important;
+  box-shadow:0 -12px 32px rgba(0,0,0,.48), inset 0 1px 0 rgba(255,255,255,.055) !important;
+  backdrop-filter:blur(14px) !important;
+  -webkit-backdrop-filter:blur(14px) !important;
+
+  z-index:2147483000 !important;
+}
+.nav-button{
+  min-height:60px !important;
+  border-radius:18px !important;
+  padding:8px 4px !important;
+}
+.nav-button.active{
+  background:linear-gradient(145deg,rgba(125,95,134,.98),rgba(94,72,103,.98)) !important;
+  box-shadow:0 8px 18px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.08) !important;
+}
+.nav-button .icon svg{
+  width:24px !important;
+  height:24px !important;
+}
+.nav-button span{
+  font-size:.76rem !important;
+}
+.camera-overlay{
+  position:fixed !important;
+  inset:0 !important;
+}
+@media(max-width:360px){
+  .app-shell{
+    padding-left:12px !important;
+    padding-right:12px !important;
+  }
+  .bottom-nav{
+    padding-left:10px !important;
+    padding-right:10px !important;
+  }
+  .nav-button{
+    min-height:56px !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -408,7 +625,7 @@ body.compact .drawer.optional:not([open]){display:block}
   <header class="topbar">
     <div class="header-mascot-wrap" aria-hidden="true"><div class="header-mascot-fallback">bb</div></div>
     <div class="brand-title-wrap">
-      <p class="eyebrow">v1.0.7 cleanup flow test</p>
+      <p class="eyebrow">v1.0.10 locked tab test</p>
       <h1>bill's bad belly</h1>
     </div>
     <div class="logo-mark" aria-hidden="true">bb</div>
