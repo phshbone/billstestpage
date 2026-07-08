@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="theme-color" content="#1b2027" />
-<title>bill's bad belly — v1.1.2 result state cards</title>
+<title>bill's bad belly — v1.1.3 inner-ring card test</title>
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Baumans&display=swap");
 :root{
@@ -920,6 +920,63 @@ body.flare-active .screen-card{
   }
 }
 
+
+/* ---------- v1.1.3 Inner-ring card treatment ---------- */
+/* Keep result meaning in the card ring, not in glowing/colored text. */
+.answer-card{
+  border-color:rgba(184,154,192,.24) !important;
+}
+.answer-card::before{
+  inset:7px !important;
+  border-radius:17px !important;
+  border-width:2px !important;
+  opacity:.92 !important;
+}
+.answer-card.state-good::before{border-color:rgba(159,177,159,.74) !important}
+.answer-card.state-caution::before{border-color:rgba(205,142,84,.78) !important}
+.answer-card.state-ugly::before{border-color:rgba(176,84,103,.78) !important}
+
+.answer-card h3,
+.answer-card.state-good h3,
+.answer-card.state-caution h3,
+.answer-card.state-ugly h3{
+  -webkit-text-stroke:0 !important;
+  color:var(--purple-light) !important;
+  text-shadow:none !important;
+}
+.result-summary-line{
+  color:#e7e0e9 !important;
+}
+.next-action-box{
+  background:rgba(184,154,192,.075) !important;
+  border-color:rgba(184,154,192,.22) !important;
+  color:#e7e0e9 !important;
+}
+.rating-pill,
+.rating-pill.rating-good,
+.rating-pill.rating-ehh,
+.rating-pill.rating-flare,
+.rating-pill.rating-ugly{
+  -webkit-text-stroke:0 !important;
+  text-shadow:none !important;
+  box-shadow:none !important;
+  color:#f3edf4 !important;
+  border-color:rgba(184,154,192,.34) !important;
+  background:rgba(17,21,26,.28) !important;
+}
+.rating-pill.rating-flare{
+  color:#ffd4bf !important;
+  border-color:rgba(215,118,62,.62) !important;
+}
+.state-label{
+  color:#efe7f0 !important;
+  background:rgba(184,154,192,.10) !important;
+  border-color:rgba(184,154,192,.24) !important;
+}
+.state-good .state-label{border-color:rgba(159,177,159,.32) !important}
+.state-caution .state-label{border-color:rgba(205,142,84,.36) !important}
+.state-ugly .state-label{border-color:rgba(176,84,103,.36) !important}
+
 </style>
 </head>
 <body>
@@ -927,7 +984,7 @@ body.flare-active .screen-card{
   <header class="topbar">
     <div class="header-mascot-wrap" aria-hidden="true"><div class="header-mascot-fallback">bb</div></div>
     <div class="brand-title-wrap">
-      <p class="eyebrow">v1.1.2 result state cards</p>
+      <p class="eyebrow">v1.1.3 inner-ring card test</p>
       <h1>bill's bad belly</h1>
     </div>
     <div class="logo-mark" aria-hidden="true">bb</div>
@@ -1086,7 +1143,13 @@ const state={
 
 function escapeHtml(v){return String(v||"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[ch]));}
 function normalizeText(t){return String(t||"").toLowerCase().replace(/[’']/g,"").replace(/[^a-z0-9&\s-]/g," ").replace(/\s+/g," ").trim();}
-function containsTerm(hay,term){const clean=normalizeText(term);if(!clean)return false;const esc=clean.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");return new RegExp("(^|\\s|-)"+esc+"($|\\s|-)","i").test(hay);}
+function containsTerm(hay,term){
+  const clean=normalizeText(term);
+  if(!clean)return false;
+  if(hay.includes(clean))return true;
+  const esc=clean.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+  return new RegExp("(^|\\s|-)"+esc+"($|\\s|-)","i").test(hay);
+}
 function unique(a){return [...new Set(a)];}
 function traitLabel(t){return TRAIT_LABELS[t]||t.replaceAll("_"," ");}
 Object.assign(TRAIT_LABELS,{nutrition_high_fiber:"high fiber",nutrition_low_fiber:"low fiber",nutrition_high_fat:"high fat",nutrition_low_fat:"low fat",nutrition_high_sugar:"high sugar",nutrition_added_sugar:"added sugar",nutrition_protein_support:"protein support",nutrition_high_sodium:"high sodium"});
@@ -1388,6 +1451,41 @@ function render(){
   document.querySelectorAll(".nav-button").forEach(b=>b.classList.toggle("active",b.dataset.tab===state.activeTab));
   bindEvents();
 }
+
+function demoResult(kind){
+  if(kind==="good"){
+    state.foodName="plain chicken and white rice";
+    state.ingredientText="Ingredients: chicken breast, white rice, chicken broth. Nutrition Facts: Total Fat 2g, Dietary Fiber 1g, Total Sugars 0g, Protein 24g, Sodium 280mg.";
+    state.lastAnalysis={
+      type:"demo",detected:"plain chicken and white rice",cards:[],products:[],
+      hits:[ing("chicken",[],["lean_protein","soft_texture"],""),ing("rice",[],["white_starch","low_residue"],""),ing("broth",[],["broth_based"],"")],
+      traits:["lean_protein","soft_texture","white_starch","low_residue","broth_based","nutrition_low_fiber","nutrition_low_fat","nutrition_protein_support"],
+      normalRating:"usually_gentle",flareRating:"usually_gentle",confidence:"demo_result",
+      nutrition:{hasNutrition:true,found:[{key:"fat",value:2},{key:"fiber",value:1},{key:"protein",value:24}],notes:["Low fat, low fiber, and high protein support a gentler read."]},
+      detectedGroups:[["Simple protein / starch","chicken, white rice, broth","Lower-residue starch plus lean protein is usually the cleaner pattern."],["Nutrition support","fat 2g, fiber 1g, protein 24g","Nutrition supports the ingredient read here."]],
+      plainWhy:"This read is driven by lean protein, white rice, low fiber, and low fat.",
+      next:"This looks more workable. Log the portion and reaction so personal history can confirm it."
+    };
+  }
+  if(kind==="caution"){
+    state.foodName="broccoli cheddar pasta";
+    state.ingredientText="Ingredients: pasta, cream, cheddar cheese, broccoli, onion powder, garlic powder, xanthan gum. Nutrition Facts: Total Fat 15g, Dietary Fiber 3g, Total Sugars 4g, Protein 12g, Sodium 760mg.";
+    analyze("deep");
+    return;
+  }
+  if(kind==="ugly"){
+    state.foodName="spicy pepperoni whole wheat bean pasta";
+    state.ingredientText="Ingredients: whole wheat pasta, chickpea pasta, pepperoni, sausage, hot sauce, garlic powder, onion powder, broccoli, xanthan gum. Nutrition Facts: Total Fat 22g, Dietary Fiber 9g, Total Sugars 6g, Protein 18g, Sodium 1180mg.";
+    analyze("deep");
+    return;
+  }
+  state.scanView="expanded";
+  localStorage.setItem(VIEW_KEY,state.scanView);
+  state.savedNotice="";
+  render();
+  setTimeout(()=>document.querySelector(".answer-card")?.scrollIntoView({behavior:"smooth",block:"start"}),80);
+}
+
 function bindEvents(){
   document.querySelectorAll("[data-nav-icon]").forEach(el=>{el.innerHTML=icons[el.dataset.navIcon]||""});
   document.querySelectorAll(".nav-button").forEach(btn=>btn.onclick=()=>{captureInputs();state.activeTab=btn.dataset.tab;state.savedNotice="";render();});
@@ -1404,9 +1502,9 @@ function bindEvents(){
     if(a==="deep-check"){analyze("deep");return;}
     if(a==="sample-pasta"){state.foodName="broccoli cheddar pasta";state.ingredientText="Ingredients: pasta, cream, cheddar cheese, broccoli, onion powder, garlic powder, xanthan gum. Nutrition Facts: Total Fat 15g, Dietary Fiber 3g, Total Sugars 4g, Protein 12g, Sodium 760mg.";state.scanView="expanded";localStorage.setItem(VIEW_KEY,state.scanView);analyze("deep");return;}
     if(a==="sample-nutrition"){state.foodName="sample nutrition label";state.ingredientText="Nutrition Facts: Total Fat 2g, Dietary Fiber 1g, Total Sugars 16g, Added Sugars 12g, Protein 10g, Sodium 220mg. Ingredients: rice, chicken broth, chicken.";state.scanView="expanded";localStorage.setItem(VIEW_KEY,state.scanView);analyze("deep");return;}
-    if(a==="sample-good"){state.foodName="plain chicken and white rice";state.ingredientText="Ingredients: chicken breast, white rice, chicken broth. Nutrition Facts: Total Fat 2g, Dietary Fiber 1g, Total Sugars 0g, Protein 24g, Sodium 280mg.";state.scanView="expanded";localStorage.setItem(VIEW_KEY,state.scanView);analyze("deep");return;}
-    if(a==="sample-caution"){state.foodName="broccoli cheddar pasta";state.ingredientText="Ingredients: pasta, cream, cheddar cheese, broccoli, onion powder, garlic powder, xanthan gum. Nutrition Facts: Total Fat 15g, Dietary Fiber 3g, Total Sugars 4g, Protein 12g, Sodium 760mg.";state.scanView="expanded";localStorage.setItem(VIEW_KEY,state.scanView);analyze("deep");return;}
-    if(a==="sample-ugly"){state.foodName="spicy pepperoni whole wheat bean pasta";state.ingredientText="Ingredients: whole wheat pasta, chickpea pasta, pepperoni, sausage, hot sauce, garlic powder, onion powder, broccoli, xanthan gum. Nutrition Facts: Total Fat 22g, Dietary Fiber 9g, Total Sugars 6g, Protein 18g, Sodium 1180mg.";state.scanView="expanded";localStorage.setItem(VIEW_KEY,state.scanView);analyze("deep");return;}
+    if(a==="sample-good"){demoResult("good");return;}
+    if(a==="sample-caution"){demoResult("caution");return;}
+    if(a==="sample-ugly"){demoResult("ugly");return;}
     if(a==="clear-scan"){state.foodName="";state.ingredientText="";state.lastAnalysis=null;state.savedNotice="";state.capturedImage="";state.capturedMeta=null;state.cameraMessage="";}
     if(a==="focus-deep"){state.scanView="expanded";localStorage.setItem(VIEW_KEY,state.scanView);render();setTimeout(()=>{document.getElementById("deepDrawer")?.scrollIntoView({behavior:"smooth",block:"start"});document.getElementById("ingredientText")?.focus();},120);return;}
     if(a==="save-food"){saveCurrentFood(false);return;}
