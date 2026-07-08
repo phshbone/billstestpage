@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="theme-color" content="#1b2027" />
-<title>bill's bad belly — v1.1.5 pill polish demo fixes</title>
+<title>bill's bad belly — v1.1.6 card layout cleanup</title>
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Baumans&display=swap");
 :root{
@@ -1094,6 +1094,76 @@ body.flare-active .screen-card{
   background:rgba(184,154,192,.08) !important;
 }
 
+
+/* ---------- v1.1.6 Card layout cleanup ---------- */
+/* State color lives in the inner ring only. No top-to-bottom color wash. */
+.answer-card,
+.answer-card.state-good,
+.answer-card.state-caution,
+.answer-card.state-ugly{
+  background:linear-gradient(145deg, rgba(58,68,78,.96), rgba(36,43,52,.96)) !important;
+}
+.answer-card::before{
+  background:none !important;
+}
+.result-verdict{
+  margin-top:14px;
+  padding:4px 0 0;
+  text-align:center;
+}
+.result-verdict .result-summary-line{
+  margin:0 auto 12px !important;
+  max-width:96%;
+  text-align:center !important;
+  color:#f0edf2 !important;
+}
+.rating-compare{
+  margin:0 auto !important;
+  align-items:start;
+}
+.compare-pill-wrap{
+  display:grid;
+  justify-items:center;
+}
+.compare-label{
+  text-align:center !important;
+  color:var(--purple-light) !important;
+}
+.result-card .grid-two:last-of-type button{
+  text-transform:lowercase;
+}
+.result-nutrition-drawer{
+  margin-top:12px;
+  padding:0 !important;
+  background:rgba(31,39,46,.25) !important;
+  border-color:rgba(184,154,192,.20) !important;
+}
+.result-nutrition-drawer summary{
+  min-height:54px !important;
+  padding:12px 48px 12px 14px !important;
+}
+.result-nutrition-drawer .drawer-body{
+  padding:0 14px 14px !important;
+}
+.drawer summary::after,
+.capture-preview-drawer summary::after{
+  display:grid !important;
+  place-items:center !important;
+  line-height:1 !important;
+  text-align:center !important;
+  padding:0 0 2px 0 !important;
+  box-sizing:border-box !important;
+}
+.drawer summary{
+  align-items:center !important;
+}
+.result-top > .rating-pill{
+  min-width:104px !important;
+}
+.state-label{
+  text-align:center !important;
+}
+
 </style>
 </head>
 <body>
@@ -1101,7 +1171,7 @@ body.flare-active .screen-card{
   <header class="topbar">
     <div class="header-mascot-wrap" aria-hidden="true"><div class="header-mascot-fallback">bb</div></div>
     <div class="brand-title-wrap">
-      <p class="eyebrow">v1.1.5 pill polish demo fixes</p>
+      <p class="eyebrow">v1.1.6 card layout cleanup</p>
       <h1>bill's bad belly</h1>
     </div>
     <div class="logo-mark" aria-hidden="true">bb</div>
@@ -1471,12 +1541,14 @@ function nutritionTiles(nutrition){
   if(!nutrition||!nutrition.hasNutrition)return "";
   const labels={fiber:"fiber",sugar:"sugar",addedSugar:"added sugar",fat:"fat",satFat:"sat fat",protein:"protein",sodium:"sodium"};
   const units={fiber:"g",sugar:"g",addedSugar:"g",fat:"g",satFat:"g",protein:"g",sodium:"mg"};
-  return `<div class="result-section">
-    <h4>Nutrition support</h4>
-    <div class="nutrition-grid">
-      ${nutrition.found.map(x=>`<div class="nutrition-tile"><strong>${escapeHtml(labels[x.key]||x.key)}: ${escapeHtml(x.value)}${units[x.key]||""}</strong><span>${escapeHtml(nutritionNoteFor(x.key,x.value))}</span></div>`).join("")}
+  return `<details class="drawer result-nutrition-drawer">
+    <summary><span class="drawer-title">Nutrition support (${nutrition.found.length})</span></summary>
+    <div class="drawer-body">
+      <div class="nutrition-grid">
+        ${nutrition.found.map(x=>`<div class="nutrition-tile"><strong>${escapeHtml(labels[x.key]||x.key)}: ${escapeHtml(x.value)}${units[x.key]||""}</strong><span>${escapeHtml(nutritionNoteFor(x.key,x.value))}</span></div>`).join("")}
+      </div>
     </div>
-  </div>`;
+  </details>`;
 }
 function nutritionNoteFor(key,value){
   if(key==="fiber")return value>=5?"higher fiber — stronger flare caution":value<=2?"low fiber — lower-residue clue":"moderate fiber";
@@ -1512,11 +1584,12 @@ function resultCard(a){
       ${ratingPill(active)}
     </div>
 
-    <p class="result-summary-line">${escapeHtml(a.plainWhy||a.reason)}</p>
-
-    <div class="grid-two rating-compare" style="margin-top:12px;">
-      <div class="compare-pill-wrap">${ratingPill(a.normalRating)}<p class="compare-label">normal</p></div>
-      <div class="compare-pill-wrap">${ratingPill(a.flareRating)}<p class="compare-label">flare</p></div>
+    <div class="result-verdict">
+      <p class="result-summary-line">${escapeHtml(a.plainWhy||a.reason)}</p>
+      <div class="grid-two rating-compare">
+        <div class="compare-pill-wrap">${ratingPill(a.normalRating)}<p class="compare-label">normal</p></div>
+        <div class="compare-pill-wrap">${ratingPill(a.flareRating)}<p class="compare-label">flare</p></div>
+      </div>
     </div>
 
     ${a.detectedGroups?.length?`<div class="result-section">
@@ -1537,8 +1610,8 @@ function resultCard(a){
     <div class="next-action-box"><strong>Next:</strong> ${escapeHtml(a.next)}</div>
 
     <div class="grid-two" style="margin-top:12px;">
-      <button class="secondary-action" data-action="save-food" type="button">save food</button>
-      <button class="primary-action" data-action="log-ok" type="button">worked for me</button>
+      <button class="secondary-action" data-action="save-food" type="button">save it</button>
+      <button class="primary-action" data-action="log-ok" type="button">ate it</button>
     </div>
     ${state.savedNotice?`<p class="save-note">${escapeHtml(state.savedNotice)}</p>`:""}
   </article>`;
