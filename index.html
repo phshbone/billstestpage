@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="theme-color" content="#1b2027" />
-<title>bill's bad belly — v1.1.0 manual recognition cards</title>
+<title>bill's bad belly — v1.1.2 result state cards</title>
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Baumans&display=swap");
 :root{
@@ -786,6 +786,140 @@ body.flare-active .screen-card{
   .sample-button-row{grid-template-columns:1fr 1fr}
 }
 
+
+/* ---------- v1.1.2 Result State Cards + subtle countdown ---------- */
+.camera-countdown{
+  min-width:76px !important;
+  height:76px !important;
+  font-size:2.65rem !important;
+  border-width:1px !important;
+  border-color:rgba(159,177,159,.34) !important;
+  background:rgba(5,7,10,.26) !important;
+  color:rgba(238,247,239,.92) !important;
+  box-shadow:
+    0 0 18px rgba(159,177,159,.16),
+    inset 0 0 14px rgba(159,177,159,.06) !important;
+  text-shadow:
+    0 0 10px rgba(159,177,159,.28),
+    0 2px 10px rgba(0,0,0,.58) !important;
+  backdrop-filter:blur(6px) !important;
+  -webkit-backdrop-filter:blur(6px) !important;
+}
+.camera-overlay.collecting .camera-countdown{
+  animation:countdownPulseSubtle 1s ease-in-out infinite !important;
+}
+@keyframes countdownPulseSubtle{
+  0%,100%{transform:translate(-50%,-50%) scale(.96);opacity:.72}
+  50%{transform:translate(-50%,-50%) scale(1);opacity:.94}
+}
+
+.answer-card{
+  position:relative;
+  overflow:hidden;
+}
+.answer-card::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:22px;
+  pointer-events:none;
+  border:2px solid transparent;
+  opacity:.95;
+}
+.answer-card.state-good::before{border-color:rgba(159,177,159,.78)}
+.answer-card.state-caution::before{border-color:rgba(215,151,92,.82)}
+.answer-card.state-ugly::before{border-color:rgba(176,84,103,.84)}
+.answer-card.state-good{
+  background:
+    radial-gradient(circle at 8% 0%, rgba(159,177,159,.13), transparent 35%),
+    linear-gradient(145deg, rgba(58,68,78,.96), rgba(36,43,52,.96)) !important;
+}
+.answer-card.state-caution{
+  background:
+    radial-gradient(circle at 8% 0%, rgba(215,151,92,.14), transparent 35%),
+    linear-gradient(145deg, rgba(58,68,78,.96), rgba(36,43,52,.96)) !important;
+}
+.answer-card.state-ugly{
+  background:
+    radial-gradient(circle at 8% 0%, rgba(176,84,103,.14), transparent 35%),
+    linear-gradient(145deg, rgba(58,68,78,.96), rgba(36,43,52,.96)) !important;
+}
+.answer-card.state-good h3{
+  -webkit-text-stroke:.35px rgba(159,177,159,.72);
+  text-shadow:none !important;
+}
+.answer-card.state-caution h3{
+  -webkit-text-stroke:.35px rgba(215,151,92,.78);
+  text-shadow:none !important;
+}
+.answer-card.state-ugly h3{
+  -webkit-text-stroke:.35px rgba(176,84,103,.82);
+  text-shadow:none !important;
+}
+
+.rating-pill{
+  text-shadow:none !important;
+  box-shadow:none !important;
+  border-width:1.5px !important;
+}
+.rating-pill.rating-good{
+  border-color:rgba(159,177,159,.80) !important;
+  color:#e0f0df !important;
+  -webkit-text-stroke:.25px rgba(159,177,159,.70);
+}
+.rating-pill.rating-ehh,
+.rating-pill.rating-flare{
+  border-color:rgba(215,151,92,.84) !important;
+  color:#f5ddc8 !important;
+  -webkit-text-stroke:.25px rgba(215,151,92,.76);
+}
+.rating-pill.rating-ugly{
+  border-color:rgba(176,84,103,.86) !important;
+  color:#f2d3da !important;
+  -webkit-text-stroke:.25px rgba(176,84,103,.78);
+}
+.state-label{
+  display:inline-flex;
+  margin-top:7px;
+  padding:5px 9px;
+  border-radius:999px;
+  font-size:.72rem;
+  font-weight:900;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  font-family:var(--body-font);
+}
+.state-good .state-label{
+  color:#dcefdc;
+  background:rgba(159,177,159,.12);
+  border:1px solid rgba(159,177,159,.34);
+}
+.state-caution .state-label{
+  color:#f2dbc1;
+  background:rgba(215,151,92,.12);
+  border:1px solid rgba(215,151,92,.36);
+}
+.state-ugly .state-label{
+  color:#f1ced6;
+  background:rgba(176,84,103,.13);
+  border:1px solid rgba(176,84,103,.38);
+}
+.sample-button-row.demo-states{
+  grid-template-columns:1fr;
+}
+@media(min-width:390px){
+  .sample-button-row.demo-states{
+    grid-template-columns:1fr 1fr 1fr;
+  }
+}
+@media(max-width:360px){
+  .camera-countdown{
+    min-width:68px !important;
+    height:68px !important;
+    font-size:2.35rem !important;
+  }
+}
+
 </style>
 </head>
 <body>
@@ -793,7 +927,7 @@ body.flare-active .screen-card{
   <header class="topbar">
     <div class="header-mascot-wrap" aria-hidden="true"><div class="header-mascot-fallback">bb</div></div>
     <div class="brand-title-wrap">
-      <p class="eyebrow">v1.1.0 manual recognition cards</p>
+      <p class="eyebrow">v1.1.2 result state cards</p>
       <h1>bill's bad belly</h1>
     </div>
     <div class="logo-mark" aria-hidden="true">bb</div>
@@ -1137,6 +1271,11 @@ function scanScreen(){
           <button class="sample-button" data-action="sample-pasta" type="button">test pasta label</button>
           <button class="sample-button" data-action="sample-nutrition" type="button">test nutrition text</button>
         </div>
+        <div class="sample-button-row demo-states">
+          <button class="sample-button" data-action="sample-good" type="button">good card</button>
+          <button class="sample-button" data-action="sample-caution" type="button">caution card</button>
+          <button class="sample-button" data-action="sample-ugly" type="button">ugly card</button>
+        </div>
       </div>
     </details>
 
@@ -1168,13 +1307,26 @@ function nutritionNoteFor(key,value){
   if(key==="sodium")return value>=700?"processed-food clue":"sodium context";
   return "support context";
 }
+function resultStateClass(rating){
+  if(rating==="usually_gentle")return "state-good";
+  if(rating==="likely_rough"||rating==="personal_trigger")return "state-ugly";
+  return "state-caution";
+}
+function resultStateLabel(rating){
+  if(rating==="usually_gentle")return "good read";
+  if(rating==="likely_rough"||rating==="personal_trigger")return "rough read";
+  if(rating==="flare_caution")return "flare caution";
+  return "caution read";
+}
 function resultCard(a){
   const active=state.mode==="Flare"?a.flareRating:a.normalRating;
-  return `<article class="result-card answer-card">
+  const stateClass=resultStateClass(active);
+  return `<article class="result-card answer-card ${stateClass}">
     <div class="result-top">
       <div>
         <h3>${escapeHtml(a.detected)}</h3>
         <span>${state.mode==="Flare"?"Flare Mode":"Normal Mode"}</span>
+        <div class="state-label">${escapeHtml(resultStateLabel(active))}</div>
         <div class="confidence-tag">${formatConfidence(a.confidence)}</div>
       </div>
       ${ratingPill(active)}
@@ -1252,6 +1404,9 @@ function bindEvents(){
     if(a==="deep-check"){analyze("deep");return;}
     if(a==="sample-pasta"){state.foodName="broccoli cheddar pasta";state.ingredientText="Ingredients: pasta, cream, cheddar cheese, broccoli, onion powder, garlic powder, xanthan gum. Nutrition Facts: Total Fat 15g, Dietary Fiber 3g, Total Sugars 4g, Protein 12g, Sodium 760mg.";state.scanView="expanded";localStorage.setItem(VIEW_KEY,state.scanView);analyze("deep");return;}
     if(a==="sample-nutrition"){state.foodName="sample nutrition label";state.ingredientText="Nutrition Facts: Total Fat 2g, Dietary Fiber 1g, Total Sugars 16g, Added Sugars 12g, Protein 10g, Sodium 220mg. Ingredients: rice, chicken broth, chicken.";state.scanView="expanded";localStorage.setItem(VIEW_KEY,state.scanView);analyze("deep");return;}
+    if(a==="sample-good"){state.foodName="plain chicken and white rice";state.ingredientText="Ingredients: chicken breast, white rice, chicken broth. Nutrition Facts: Total Fat 2g, Dietary Fiber 1g, Total Sugars 0g, Protein 24g, Sodium 280mg.";state.scanView="expanded";localStorage.setItem(VIEW_KEY,state.scanView);analyze("deep");return;}
+    if(a==="sample-caution"){state.foodName="broccoli cheddar pasta";state.ingredientText="Ingredients: pasta, cream, cheddar cheese, broccoli, onion powder, garlic powder, xanthan gum. Nutrition Facts: Total Fat 15g, Dietary Fiber 3g, Total Sugars 4g, Protein 12g, Sodium 760mg.";state.scanView="expanded";localStorage.setItem(VIEW_KEY,state.scanView);analyze("deep");return;}
+    if(a==="sample-ugly"){state.foodName="spicy pepperoni whole wheat bean pasta";state.ingredientText="Ingredients: whole wheat pasta, chickpea pasta, pepperoni, sausage, hot sauce, garlic powder, onion powder, broccoli, xanthan gum. Nutrition Facts: Total Fat 22g, Dietary Fiber 9g, Total Sugars 6g, Protein 18g, Sodium 1180mg.";state.scanView="expanded";localStorage.setItem(VIEW_KEY,state.scanView);analyze("deep");return;}
     if(a==="clear-scan"){state.foodName="";state.ingredientText="";state.lastAnalysis=null;state.savedNotice="";state.capturedImage="";state.capturedMeta=null;state.cameraMessage="";}
     if(a==="focus-deep"){state.scanView="expanded";localStorage.setItem(VIEW_KEY,state.scanView);render();setTimeout(()=>{document.getElementById("deepDrawer")?.scrollIntoView({behavior:"smooth",block:"start"});document.getElementById("ingredientText")?.focus();},120);return;}
     if(a==="save-food"){saveCurrentFood(false);return;}
