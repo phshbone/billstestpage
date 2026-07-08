@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<title>bill's bad belly — OCR Recognition Engine</title>
+<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<style>
+  :root {
+    --bg1: #10072b;
+    --bg2: #1e1148;
+    --panel: rgba(16, 18, 27, 0.82);
+    --gunmetal: linear-gradient(145deg, #2d3338, #11161a 55%, #050708);
+    --green: #89a982;
+    --green-bright: #bff0b1;
+    --amber: #d99d55;
+    --red: #d86161;
+    --cream: #f4ecd8;
+    --muted: #b9b5c8;
+    --purple: #8c71ff;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    min-height: 100%;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    color: var(--cream);
+    background:
+      radial-gradient(circle at 20% 15%, rgba(140, 113, 255, 0.32), transparent 28%),
+      radial-gradient(circle at 75% 20%, rgba(99, 64, 170, 0.24), transparent 30%),
+      linear-gradient(160deg, var(--bg1), var(--bg2) 50%, #080616);
+    overflow-x: hidden;
+  }
+
+  .app {
+    min-height: 100vh;
+    padding: env(safe-area-inset-top) 14px env(safe-area-inset-bottom);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  header {
+    padding: 14px 4px 2px;
+    text-align: center;
+  }
+
+  .title {
+    margin: 0;
+    font-size: clamp(1.35rem, 5vw, 2.1rem);
+    letter-spacing: 0.02em;
+    font-weight: 800;
+    text-transform: lowercase;
+  }
+
+  .subtitle {
+    margin: 5px 0 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  .recognition-stage {
+    position: relative;
+    width: 100%;
+    max-width: 720px;
+    margin: 0 auto;
+    border-radius: 28px;
+    padding: 10px;
+    background: rgba(255,255,255,0.06);
+    box-shadow: 0 18px 50px rgba(0,0,0,0.42);
+  }
+
+  .viewport {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    max-height: 66vh;
+    overflow: hidden;
+    border-radius: 24px;
+    background: #030405;
+    border: 3px solid rgba(137,169,130,0.65);
+  }
+
+  .viewport.recognizing {
+    animation: softGreen 2.4s ease-in-out infinite;
+  }
+
+  .viewport.confirm {
+    animation: confirmPulse 620ms ease-out 1;
+  }
+
+  @keyframes softGreen {
+    0%, 100% { box-shadow: 0 0 0 rgba(137,169,130,0.1), inset 0 0 18px rgba(137,169,130,0.08); border-color: rgba(137,169,130,0.55); }
+    50% { box-shadow: 0 0 28px rgba(137,169,130,0.38), inset 0 0 26px rgba(137,169,130,0.16); border-color: rgba(137,169,130,0.95); }
+  }
+
+  @keyframes confirmPulse {
+    0% { box-shadow: 0 0 0 rgba(191,240,177,0); border-color: rgba(137,169,130,0.8); }
+    45% { box-shadow: 0 0 48px rgba(191,240,177,0.75), inset 0 0 28px rgba(191,240,177,0.22); border-color: var(--green-bright); }
+    100% { box-shadow: 0 0 0 rgba(191,240,177,0); border-color: rgba(137,169,130,0.65); }
+  }
+
+  video, canvas {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  canvas { display: none; }
+
+  .reticle {
+    pointer-events: none;
+    position: absolute;
+    inset: 11%;
+    border: 1px dashed rgba(244,236,216,0.32);
+    border-radius: 18px;
+  }
+
+  .hint-card {
+    position: absolute;
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    padding: 12px 14px;
+    border-radius: 18px;
+    background: rgba(3, 4, 8, 0.72);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.09);
+  }
+
+  .status {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 700;
+  }
+
+  .small {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 0.78rem;
+    line-height: 1.35;
+  }
+
+  .dock {
+    width: min(720px, 100%);
+    margin: 0 auto;
+    padding: 14px;
+    border-radius: 26px;
+    background: var(--gunmetal);
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.16),
+      inset 0 -18px 28px rgba(0,0,0,0.42),
+      0 12px 34px rgba(0,0,0,0.34);
+    border: 1px solid rgba(255,255,255,0.11);
+    display: grid;
+    gap: 10px;
+  }
+
+  .button-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  button {
+    border: 0;
+    border-radius: 16px;
+    padding: 14px 14px;
+    font-size: 1rem;
+    font-weight: 800;
+    color: #111;
+    background: linear-gradient(180deg, #f4ecd8, #cfc3a8);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.62), 0 5px 12px rgba(0,0,0,0.26);
+  }
+
+  button.secondary {
+    color: var(--cream);
+    background: linear-gradient(180deg, #343c42, #171c20);
+    border: 1px solid rgba(255,255,255,0.12);
+  }
+
+  button:disabled {
+    opacity: 0.52;
+  }
+
+  .manual-box {
+    display: grid;
+    gap: 8px;
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 120px;
+    resize: vertical;
+    border-radius: 16px;
+    padding: 12px;
+    font-size: 0.95rem;
+    color: var(--cream);
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,255,255,0.12);
+  }
+
+  .results {
+    width: min(720px, 100%);
+    margin: 0 auto 20px;
+    padding: 14px;
+    border-radius: 24px;
+    background: rgba(6, 8, 15, 0.72);
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 12px 34px rgba(0,0,0,0.24);
+  }
+
+  .results h2, .results h3 {
+    margin: 0 0 8px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+    gap: 10px;
+    margin: 12px 0;
+  }
+
+  .tile {
+    border-radius: 16px;
+    padding: 12px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .label {
+    color: var(--muted);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .value {
+    margin-top: 5px;
+    font-weight: 800;
+    word-break: break-word;
+  }
+
+  .risk-good { color: #bff0b1; }
+  .risk-caution { color: var(--amber); }
+  .risk-avoid { color: var(--red); }
+
+  pre {
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: #e8e0cf;
+    background: rgba(0,0,0,0.28);
+    border-radius: 16px;
+    padding: 12px;
+    max-height: 260px;
+    overflow: auto;
+  }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1 class="title">bill's bad belly</h1>
+    <p class="subtitle">Phase 3 OCR-first Recognition Engine prototype</p>
+  </header>
+
+  <main class="recognition-stage">
+    <section id="viewport" class="viewport">
+      <video id="video" autoplay playsinline muted></video>
+      <canvas id="canvas"></canvas>
+      <div class="reticle"></div>
+      <div class="hint-card">
+        <p id="status" class="status">Ready to scan label text.</p>
+        <p id="statusSmall" class="small">Point at ingredients or nutrition facts. Start with one clear label panel.</p>
+      </div>
+    </section>
+  </main>
+
+  <section class="dock">
+    <div class="button-row">
+      <button id="startCameraBtn">Start Camera</button>
+      <button id="scanBtn" class="secondary" disabled>Scan Text</button>
+    </div>
+    <div class="button-row">
+      <button id="analyzeTextBtn" class="secondary">Analyze Pasted Text</button>
+      <button id="resetBtn" class="secondary">Reset</button>
+    </div>
+    <div class="manual-box">
+      <textarea id="manualText" placeholder="Optional: paste ingredients or nutrition text here for testing without the camera."></textarea>
+    </div>
+  </section>
+
+  <section id="results" class="results hidden">
+    <h2>Recognition Result</h2>
+    <div class="grid">
+      <div class="tile"><div class="label">Product</div><div id="productName" class="value">Unknown</div></div>
+      <div class="tile"><div class="label">Brand</div><div id="brand" class="value">Unknown</div></div>
+      <div class="tile"><div class="label">Confidence</div><div id="confidence" class="value">0%</div></div>
+      <div class="tile"><div class="label">Bad Belly Rating</div><div id="rating" class="value">Pending</div></div>
+    </div>
+
+    <h3>Detected Crohn's Flags</h3>
+    <pre id="flags">None yet.</pre>
+
+    <h3>Unified Food Record</h3>
+    <pre id="recordJson">{}</pre>
+
+    <h3>Raw OCR Text</h3>
+    <pre id="rawText"></pre>
+  </section>
+</div>
+
+<script>
+  const video = document.getElementById('video');
+  const canvas = document.getElementById('canvas');
+  const viewport = document.getElementById('viewport');
+  const statusEl = document.getElementById('status');
+  const statusSmall = document.getElementById('statusSmall');
+  const startCameraBtn = document.getElementById('startCameraBtn');
+  const scanBtn = document.getElementById('scanBtn');
+  const analyzeTextBtn = document.getElementById('analyzeTextBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const manualText = document.getElementById('manualText');
+  const results = document.getElementById('results');
+
+  let stream = null;
+  let workerReady = false;
+  let lastRecord = null;
+
+  const messages = [
+    'Looking for label text…',
+    'Checking ingredients…',
+    'Checking nutrition…',
+    'Identifying product…',
+    'Building food record…'
+  ];
+
+  const crohnsFlags = [
+    { key: 'corn', terms: ['corn', 'cornmeal', 'corn syrup'], severity: 'caution', reason: 'Corn can be rough for some Crohn\'s users, especially during flare mode.' },
+    { key: 'seeds', terms: ['sesame seed', 'poppy seed', 'chia seed', 'flaxseed', 'sunflower seed', 'seeds'], severity: 'caution', reason: 'Seeds may be harder to tolerate during flares or narrowing/stricture periods.' },
+    { key: 'nuts', terms: ['almond', 'walnut', 'cashew', 'peanut', 'pecan', 'hazelnut', 'nuts'], severity: 'caution', reason: 'Nuts can be physically rough and higher fat.' },
+    { key: 'beans', terms: ['bean', 'lentil', 'chickpea', 'soybean'], severity: 'caution', reason: 'Beans and legumes may increase gas/fiber load.' },
+    { key: 'whole grain', terms: ['whole wheat', 'whole grain', 'bran', 'oat bran', 'wheat bran'], severity: 'caution', reason: 'High-fiber grains may be harder during flare mode.' },
+    { key: 'dairy', terms: ['milk', 'cream', 'cheese', 'whey', 'casein', 'lactose'], severity: 'caution', reason: 'Dairy can be a trigger for some users.' },
+    { key: 'sugar alcohols', terms: ['sorbitol', 'xylitol', 'mannitol', 'maltitol', 'erythritol'], severity: 'avoid', reason: 'Sugar alcohols may cause diarrhea, gas, or cramping.' },
+    { key: 'artificial sweeteners', terms: ['sucralose', 'aspartame', 'acesulfame potassium', 'acesulfame k'], severity: 'caution', reason: 'Artificial sweeteners can bother some users.' },
+    { key: 'emulsifiers', terms: ['carrageenan', 'polysorbate 80', 'carboxymethylcellulose', 'cellulose gum'], severity: 'caution', reason: 'Some emulsifiers are worth flagging for sensitive users.' },
+    { key: 'spicy ingredients', terms: ['jalapeno', 'chili pepper', 'cayenne', 'hot sauce', 'spices'], severity: 'caution', reason: 'Spicy ingredients may be irritating for some users.' },
+    { key: 'fried/oily', terms: ['fried', 'hydrogenated oil', 'shortening', 'palm oil'], severity: 'caution', reason: 'Higher-fat foods may be harder to tolerate.' }
+  ];
+
+  function setStatus(main, small = '') {
+    statusEl.textContent = main;
+    statusSmall.textContent = small;
+  }
+
+  function rotateStatus() {
+    let i = 0;
+    setStatus(messages[0], 'Hold steady. Good lighting helps OCR.');
+    return setInterval(() => {
+      i = (i + 1) % messages.length;
+      setStatus(messages[i], 'The engine is collecting text, not saving a photo.');
+    }, 1200);
+  }
+
+  async function startCamera() {
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: {
+          facingMode: { ideal: 'environment' },
+          width: { ideal: 1280 },
+          height: { ideal: 1920 }
+        },
+        audio: false
+      });
+      video.srcObject = stream;
+      scanBtn.disabled = false;
+      setStatus('Camera ready.', 'Point at ingredients or nutrition facts, then tap Scan Text.');
+    } catch (err) {
+      setStatus('Camera unavailable.', 'Use pasted text below, or check browser camera permissions.');
+      console.error(err);
+    }
+  }
+
+  function captureFrame() {
+    const width = video.videoWidth || 1280;
+    const height = video.videoHeight || 720;
+    canvas.width = width;
+    canvas.height = height;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, width, height);
+    return canvas;
+  }
+
+  async function runOCRFromCamera() {
+    if (!window.Tesseract) {
+      setStatus('OCR engine failed to load.', 'Check internet connection. Tesseract.js is loaded from a CDN.');
+      return;
+    }
+
+    viewport.classList.add('recognizing');
+    scanBtn.disabled = true;
+    const timer = rotateStatus();
+
+    try {
+      const frame = captureFrame();
+      const result = await Tesseract.recognize(frame, 'eng', {
+        logger: m => {
+          if (m.status === 'recognizing text') {
+            const pct = Math.round((m.progress || 0) * 100);
+            setStatus(`Reading label text… ${pct}%`, 'Checking ingredients and nutrition fields.');
+          }
+        }
+      });
+      const text = result?.data?.text || '';
+      completeRecognition(text);
+    } catch (err) {
+      console.error(err);
+      setStatus('Text scan failed.', 'Try better light, flatter label angle, or paste text manually.');
+    } finally {
+      clearInterval(timer);
+      viewport.classList.remove('recognizing');
+      scanBtn.disabled = false;
+    }
+  }
+
+  function normalizeText(text) {
+    return (text || '')
+      .replace(/\r/g, '\n')
+      .replace(/[“”]/g, '"')
+      .replace(/[’]/g, "'")
+      .replace(/\s+\n/g, '\n')
+      .replace(/\n\s+/g, '\n')
+      .replace(/[ \t]+/g, ' ')
+      .trim();
+  }
+
+  function extractAfterLabel(text, labels, stopLabels = []) {
+    const lower = text.toLowerCase();
+    let bestIndex = -1;
+    let matched = '';
+
+    for (const label of labels) {
+      const idx = lower.indexOf(label.toLowerCase());
+      if (idx !== -1 && (bestIndex === -1 || idx < bestIndex)) {
+        bestIndex = idx;
+        matched = label;
+      }
+    }
+
+    if (bestIndex === -1) return '';
+
+    let start = bestIndex + matched.length;
+    let end = text.length;
+    const searchFrom = lower.slice(start);
+
+    for (const stop of stopLabels) {
+      const idx = searchFrom.indexOf(stop.toLowerCase());
+      if (idx !== -1) end = Math.min(end, start + idx);
+    }
+
+    return text.slice(start, end).replace(/^[:\s]+/, '').trim();
+  }
+
+  function extractNutrition(text) {
+    const fields = [
+      ['calories', /calories\s*([0-9]+)/i],
+      ['totalFat', /total fat\s*([0-9.]+\s*g)/i],
+      ['saturatedFat', /saturated fat\s*([0-9.]+\s*g)/i],
+      ['sodium', /sodium\s*([0-9.]+\s*mg)/i],
+      ['totalCarbohydrate', /total carbohydrate\s*([0-9.]+\s*g)/i],
+      ['dietaryFiber', /dietary fiber\s*([0-9.]+\s*g)/i],
+      ['totalSugars', /total sugars\s*([0-9.]+\s*g)/i],
+      ['protein', /protein\s*([0-9.]+\s*g)/i]
+    ];
+
+    const nutrition = {};
+    for (const [key, regex] of fields) {
+      const match = text.match(regex);
+      if (match) nutrition[key] = match[1];
+    }
+    return nutrition;
+  }
+
+  function guessProductName(text) {
+    const lines = text.split('\n').map(l => l.trim()).filter(Boolean);
+    const badStarts = ['nutrition facts', 'ingredients', 'serving size', 'amount per serving', 'calories'];
+    const candidate = lines.find(line => {
+      const lower = line.toLowerCase();
+      return line.length >= 4 && line.length <= 60 && !badStarts.some(s => lower.includes(s));
+    });
+    return candidate || 'Unknown product';
+  }
+
+  function extractAllergens(text) {
+    const allergenText = extractAfterLabel(text, ['contains'], ['distributed by', 'manufactured by']);
+    if (!allergenText) return [];
+    return allergenText
+      .split(/[,.]/)
+      .map(x => x.trim())
+      .filter(Boolean)
+      .slice(0, 12);
+  }
+
+  function findCrohnsFlags(text) {
+    const lower = text.toLowerCase();
+    const found = [];
+
+    for (const flag of crohnsFlags) {
+      const matchedTerms = flag.terms.filter(term => lower.includes(term));
+      if (matchedTerms.length) {
+        found.push({
+          category: flag.key,
+          severity: flag.severity,
+          matchedTerms,
+          reason: flag.reason
+        });
+      }
+    }
+    return found;
+  }
+
+  function scoreConfidence(record, rawText) {
+    let score = 0;
+    if (rawText.length > 40) score += 20;
+    if (record.productName && record.productName !== 'Unknown product') score += 15;
+    if (record.ingredients) score += 30;
+    if (Object.keys(record.nutritionFacts).length) score += 25;
+    if (record.allergens.length) score += 10;
+    return Math.min(100, score);
+  }
+
+  function rateBadBelly(flags, nutrition) {
+    const avoid = flags.some(f => f.severity === 'avoid');
+    const cautionCount = flags.filter(f => f.severity === 'caution').length;
+
+    const fiberText = nutrition.dietaryFiber || '';
+    const fiberNum = parseFloat(fiberText.replace(/[^0-9.]/g, ''));
+    const highFiber = !Number.isNaN(fiberNum) && fiberNum >= 5;
+
+    if (avoid || cautionCount >= 4 || highFiber) {
+      return { label: 'Avoid / Ugly', className: 'risk-avoid' };
+    }
+    if (cautionCount >= 1) {
+      return { label: 'Caution / Bad', className: 'risk-caution' };
+    }
+    return { label: 'Likely Gentle / Good', className: 'risk-good' };
+  }
+
+  function buildUnifiedFoodRecord(rawInput) {
+    const rawText = normalizeText(rawInput);
+    const ingredients = extractAfterLabel(
+      rawText,
+      ['ingredients'],
+      ['nutrition facts', 'contains', 'allergen', 'distributed by', 'manufactured by']
+    );
+    const nutritionFacts = extractNutrition(rawText);
+    const allergens = extractAllergens(rawText);
+
+    const record = {
+      barcode: '',
+      productName: guessProductName(rawText),
+      brand: 'Unknown brand',
+      ingredients,
+      nutritionFacts,
+      servingSize: (rawText.match(/serving size\s*([^\n]+)/i) || [])[1] || '',
+      allergens,
+      confidenceScore: 0,
+      scanTimestamp: new Date().toISOString(),
+      source: 'ocr-first-prototype',
+      rawText
+    };
+
+    record.confidenceScore = scoreConfidence(record, rawText);
+    return record;
+  }
+
+  function completeRecognition(text) {
+    const record = buildUnifiedFoodRecord(text);
+    const flags = findCrohnsFlags([record.ingredients, record.rawText].join('\n'));
+    const rating = rateBadBelly(flags, record.nutritionFacts);
+
+    record.badBellyAnalysis = {
+      rating: rating.label,
+      flags,
+      note: 'Prototype rule-based analysis only. This is not medical advice.'
+    };
+
+    lastRecord = record;
+    renderResults(record, flags, rating);
+
+    viewport.classList.remove('recognizing');
+    viewport.classList.add('confirm');
+    setTimeout(() => viewport.classList.remove('confirm'), 700);
+    setStatus('Information collected.', 'Unified Food Record created. Analysis is shown below.');
+  }
+
+  function renderResults(record, flags, rating) {
+    document.getElementById('productName').textContent = record.productName || 'Unknown';
+    document.getElementById('brand').textContent = record.brand || 'Unknown';
+    document.getElementById('confidence').textContent = `${record.confidenceScore}%`;
+
+    const ratingEl = document.getElementById('rating');
+    ratingEl.textContent = rating.label;
+    ratingEl.className = `value ${rating.className}`;
+
+    document.getElementById('flags').textContent = flags.length
+      ? flags.map(f => `• ${f.category.toUpperCase()} (${f.severity})\n  matched: ${f.matchedTerms.join(', ')}\n  ${f.reason}`).join('\n\n')
+      : 'No Crohn\'s caution flags detected from the captured text.';
+
+    document.getElementById('recordJson').textContent = JSON.stringify(record, null, 2);
+    document.getElementById('rawText').textContent = record.rawText || '(No text found)';
+    results.classList.remove('hidden');
+  }
+
+  function resetApp() {
+    manualText.value = '';
+    results.classList.add('hidden');
+    document.getElementById('recordJson').textContent = '{}';
+    document.getElementById('rawText').textContent = '';
+    lastRecord = null;
+    setStatus('Ready to scan label text.', 'Point at ingredients or nutrition facts. Start with one clear label panel.');
+  }
+
+  startCameraBtn.addEventListener('click', startCamera);
+  scanBtn.addEventListener('click', runOCRFromCamera);
+  analyzeTextBtn.addEventListener('click', () => {
+    const text = manualText.value.trim();
+    if (!text) {
+      setStatus('No pasted text found.', 'Paste ingredients or nutrition text, then tap Analyze Pasted Text.');
+      return;
+    }
+    viewport.classList.add('recognizing');
+    setTimeout(() => {
+      viewport.classList.remove('recognizing');
+      completeRecognition(text);
+    }, 450);
+  });
+  resetBtn.addEventListener('click', resetApp);
+</script>
+</body>
+</html>
