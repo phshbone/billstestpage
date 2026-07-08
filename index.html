@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="theme-color" content="#1b2027" />
-<title>bill's bad belly — v1.0.10 locked tab test</title>
+<title>bill's bad belly — v1.0.11 visual-guardrail test</title>
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Baumans&display=swap");
 :root{
@@ -618,6 +618,60 @@ body{
   }
 }
 
+
+/* ---------- v1.0.11 VISUAL GUARDRAIL ---------- */
+/* Purpose: keep v1.0.10 behavior, but prevent prototype patches from drifting the app darker. */
+body{
+  background:
+    radial-gradient(circle at 50% 0%, rgba(76,89,108,.98) 0%, rgba(36,43,52,.98) 42%, rgba(22,27,34,.98) 100%) !important;
+}
+.screen-card{
+  background:
+    radial-gradient(circle at 12% 0%, rgba(184,154,192,.08), transparent 34%),
+    rgba(42,50,60,.84) !important;
+  border-color:rgba(184,154,192,.28) !important;
+  box-shadow:0 16px 38px rgba(0,0,0,.30) !important;
+}
+.input-card,
+.result-card,
+.food-panel,
+.camera-launch-card,
+.belly-meter,
+.drawer{
+  background:
+    linear-gradient(145deg, rgba(57,67,80,.94), rgba(35,42,51,.94)) !important;
+  border-color:rgba(184,154,192,.24) !important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.065), 0 10px 22px rgba(0,0,0,.12) !important;
+}
+.camera-priority-card{
+  background:
+    radial-gradient(circle at 10% 0%, rgba(159,177,159,.12), transparent 34%),
+    linear-gradient(145deg, rgba(59,70,80,.96), rgba(36,45,53,.95)) !important;
+}
+.capture-preview-drawer{
+  background:
+    linear-gradient(145deg, rgba(52,62,72,.88), rgba(35,43,51,.88)) !important;
+  border-color:rgba(159,177,159,.28) !important;
+}
+.capture-strip{
+  background:
+    radial-gradient(circle at 8% 12%, rgba(159,177,159,.10), transparent 30%),
+    rgba(31,39,46,.34) !important;
+}
+.no-result-note,
+.next-step-note{
+  background:rgba(31,39,46,.20) !important;
+}
+.bottom-nav{
+  background:rgba(30,36,44,.985) !important;
+  box-shadow:0 -10px 26px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.06) !important;
+}
+body.flare-active .screen-card{
+  background:
+    radial-gradient(circle at 8% 12%,rgba(197,138,233,.14),transparent 28%),
+    rgba(39,32,47,.88) !important;
+}
+
 </style>
 </head>
 <body>
@@ -625,7 +679,7 @@ body{
   <header class="topbar">
     <div class="header-mascot-wrap" aria-hidden="true"><div class="header-mascot-fallback">bb</div></div>
     <div class="brand-title-wrap">
-      <p class="eyebrow">v1.0.10 locked tab test</p>
+      <p class="eyebrow">v1.0.11 visual-guardrail test</p>
       <h1>bill's bad belly</h1>
     </div>
     <div class="logo-mark" aria-hidden="true">bb</div>
