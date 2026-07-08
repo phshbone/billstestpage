@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="theme-color" content="#1b2027" />
-<title>bill's bad belly — v1.0.4 recognition merge</title>
+<title>bill's bad belly — v1.0.5 camera-first test</title>
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Baumans&display=swap");
 :root{
@@ -29,7 +29,7 @@ h1,h2,h3,.eyebrow,.nav-button,.primary-action,.secondary-action,.compact-action,
 }
 .app-shell{
   width:min(100%,430px);min-height:100vh;margin:0 auto;
-  padding:22px 16px calc(168px + env(safe-area-inset-bottom,0px));position:relative;
+  padding:22px 16px calc(230px + env(safe-area-inset-bottom,0px));position:relative;
 }
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;min-height:76px}
 .header-mascot-wrap{
@@ -164,6 +164,58 @@ body.compact .drawer.optional:not([open]){display:block}
 .camera-error-box{position:absolute;left:18px;right:18px;top:50%;transform:translateY(-50%);display:none;gap:12px;padding:16px;border-radius:22px;background:rgba(27,32,39,.96);border:1px solid rgba(215,118,62,.38);box-shadow:0 18px 42px rgba(0,0,0,.54);z-index:10}
 .camera-error-box.active{display:grid}
 .camera-result-preview{display:block;width:100%;height:auto;max-height:360px;object-fit:contain;border-radius:16px;border:1px solid rgba(184,154,192,.22);background:rgba(17,21,26,.45)}
+
+/* ---------- v1.0.5 camera-first layout polish ---------- */
+.camera-priority-card{
+  border-color:rgba(184,154,192,.34);
+  background:
+    radial-gradient(circle at 92% 8%,rgba(197,138,233,.12),transparent 28%),
+    linear-gradient(145deg,rgba(54,63,76,.98),rgba(28,34,42,.98));
+  box-shadow:0 14px 34px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.06);
+}
+.camera-priority-card h3{margin:0;color:#efe8f4;font-size:1.22rem}
+.camera-priority-card .camera-subhead{margin:4px 0 0;color:var(--purple-light);font-size:.86rem;font-weight:900}
+.scan-captured-card{
+  border-color:rgba(159,177,159,.38);
+  background:
+    radial-gradient(circle at 8% 12%,rgba(159,177,159,.10),transparent 30%),
+    linear-gradient(145deg,rgba(42,52,57,.98),rgba(22,29,34,.98));
+}
+.scan-captured-card h3{margin:0;color:#d9ead9;font-size:1.08rem}
+.input-card.quick-card{
+  border-color:rgba(184,154,192,.28);
+  background:linear-gradient(145deg,rgba(45,53,65,.98),rgba(23,29,37,.98));
+}
+.result-card.answer-card{
+  border-color:rgba(184,154,192,.36);
+  background:
+    radial-gradient(circle at 96% 5%,rgba(215,118,62,.07),transparent 26%),
+    linear-gradient(145deg,rgba(34,40,50,.99),rgba(17,21,28,.99));
+  box-shadow:0 16px 38px rgba(0,0,0,.26), inset 0 1px 0 rgba(255,255,255,.06);
+}
+.drawer{
+  background:rgba(31,38,48,.78);
+  border-color:rgba(184,154,192,.20);
+  box-shadow:none;
+}
+.drawer[open]{
+  border-color:rgba(184,154,192,.34);
+  background:linear-gradient(145deg,rgba(43,52,64,.92),rgba(25,31,39,.92));
+}
+.viewbar{
+  background:rgba(17,21,26,.25);
+  border-style:dashed;
+}
+.section-kicker{
+  margin:0;
+  color:var(--muted);
+  font-size:.84rem;
+  line-height:1.35;
+}
+.camera-result-preview{
+  margin-top:10px;
+}
+
 @media(max-width:360px){.screen-title{padding-right:86px}.grid-two,.search-row{grid-template-columns:1fr}.logo-mark{width:48px;height:48px;flex-basis:48px}.brand-title-wrap h1{font-size:1.62rem}}
 </style>
 </head>
@@ -172,7 +224,7 @@ body.compact .drawer.optional:not([open]){display:block}
   <header class="topbar">
     <div class="header-mascot-wrap" aria-hidden="true"><div class="header-mascot-fallback">bb</div></div>
     <div class="brand-title-wrap">
-      <p class="eyebrow">v1.0.4 recognition merge</p>
+      <p class="eyebrow">v1.0.5 camera-first test</p>
       <h1>bill's bad belly</h1>
     </div>
     <div class="logo-mark" aria-hidden="true">bb</div>
@@ -235,10 +287,10 @@ const icons={
 };
 
 const RATINGS={usually_gentle:"good",caution:"ehh",flare_caution:"flare caution",likely_rough:"ugly",personal_trigger:"personal trigger",unknown:"unknown"};
-const RISK_TRAITS=new Set(["mechanical_risk","seeds","skins","hulls","nuts_seeds","raw_roughage","corn_kernel","popcorn_hull","high_fat","fried","breaded_fried","processed_meat","sugar_alcohol","added_fiber","beans_legumes","gas_risk","garlic_onion","spicy_heat","acidic","tomato_acid","gum_thickener","processed_food","dairy","lactose_possible","cruciferous","heavy_syrup"]);
-const FLARE_TRAITS=new Set(["mechanical_risk","seeds","skins","hulls","nuts_seeds","raw_roughage","corn_kernel","popcorn_hull","beans_legumes","gas_risk","garlic_onion","fried","breaded_fried","high_fat","dairy","lactose_possible","spicy_heat","gum_thickener","processed_food","processed_meat","added_fiber","sugar_alcohol","cruciferous","heavy_syrup"]);
-const GENTLE_TRAITS=new Set(["soft_texture","broth_based","lean_protein","white_starch","well_cooked","peeled","pureed","strained","low_residue","smooth_form"]);
-const TRAIT_LABELS={mechanical_risk:"mechanical risk",seeds:"seeds",skins:"skins",hulls:"hulls",nuts_seeds:"nuts/seeds",raw_roughage:"raw roughage",corn_kernel:"corn kernels",popcorn_hull:"popcorn hulls",high_fat:"fat load",fried:"fried",breaded_fried:"breaded/fried",processed_meat:"processed meat",sugar_alcohol:"sugar alcohol",added_fiber:"added fiber",beans_legumes:"beans/legumes",gas_risk:"gas risk",garlic_onion:"garlic/onion",spicy_heat:"spicy heat",acidic:"acidic",tomato_acid:"tomato acid",gum_thickener:"gum/thickener",processed_food:"processed food",dairy:"dairy",lactose_possible:"lactose possible",cruciferous:"cruciferous",heavy_syrup:"heavy syrup",soft_texture:"soft texture",broth_based:"broth based",lean_protein:"lean protein",white_starch:"white starch",well_cooked:"well cooked",peeled:"peeled",pureed:"pureed",strained:"strained",low_residue:"low residue",smooth_form:"smooth form",refined_grain:"refined grain",fruit_sugar:"fruit sugar"};
+const RISK_TRAITS=new Set(["mechanical_risk","seeds","skins","hulls","nuts_seeds","raw_roughage","corn_kernel","popcorn_hull","high_fat","fried","breaded_fried","processed_meat","sugar_alcohol","added_fiber","beans_legumes","gas_risk","garlic_onion","spicy_heat","acidic","tomato_acid","gum_thickener","processed_food","dairy","lactose_possible","cruciferous","heavy_syrup","dense_pasta","thick_center","stuffed_pasta","whole_grain","legume_gas_risk"]);
+const FLARE_TRAITS=new Set(["mechanical_risk","seeds","skins","hulls","nuts_seeds","raw_roughage","corn_kernel","popcorn_hull","beans_legumes","gas_risk","garlic_onion","fried","breaded_fried","high_fat","dairy","lactose_possible","spicy_heat","gum_thickener","processed_food","processed_meat","added_fiber","sugar_alcohol","cruciferous","heavy_syrup","dense_pasta","thick_center","stuffed_pasta","whole_grain","legume_gas_risk"]);
+const GENTLE_TRAITS=new Set(["soft_texture","broth_based","lean_protein","white_starch","well_cooked","peeled","pureed","strained","low_residue","smooth_form","soft_pasta"]);
+const TRAIT_LABELS={mechanical_risk:"mechanical risk",seeds:"seeds",skins:"skins",hulls:"hulls",nuts_seeds:"nuts/seeds",raw_roughage:"raw roughage",corn_kernel:"corn kernels",popcorn_hull:"popcorn hulls",high_fat:"fat load",fried:"fried",breaded_fried:"breaded/fried",processed_meat:"processed meat",sugar_alcohol:"sugar alcohol",added_fiber:"added fiber",beans_legumes:"beans/legumes",gas_risk:"gas risk",garlic_onion:"garlic/onion",spicy_heat:"spicy heat",acidic:"acidic",tomato_acid:"tomato acid",gum_thickener:"gum/thickener",processed_food:"processed food",dairy:"dairy",lactose_possible:"lactose possible",cruciferous:"cruciferous",heavy_syrup:"heavy syrup",soft_texture:"soft texture",broth_based:"broth based",lean_protein:"lean protein",white_starch:"white starch",well_cooked:"well cooked",peeled:"peeled",pureed:"pureed",strained:"strained",low_residue:"low residue",smooth_form:"smooth form",refined_grain:"refined grain",fruit_sugar:"fruit sugar",sauce_dependent:"sauce dependent",personal_tolerance_candidate:"personal tolerance",soft_pasta:"soft pasta",dense_pasta:"dense pasta",thick_center:"thick center",stuffed_pasta:"stuffed pasta",whole_grain:"whole grain",legume_gas_risk:"legume gas risk"};
 
 const MEAL_FAST_CARDS=[
   card("minestrone soup",["minestrone","vegetable minestrone"],"soup",["beans","tomato","onion","garlic","pasta","mixed vegetables"],["beans_legumes","tomato_acid","garlic_onion","mixed_vegetable_fiber","broth_based","white_starch"],"caution","likely_rough","Minestrone commonly includes beans, tomato, onion, garlic, pasta, and mixed vegetables, which can stack gas, acid, and fiber concerns."),
@@ -288,6 +340,16 @@ const INGREDIENT_DICTIONARY=[
   ing("breaded",["breading","crispy coating"],["breaded_fried","processed_food"],"Breading is a processed/fried-food clue."),
   ing("hot sauce",["buffalo sauce","jalapeno","jalapeño","cayenne"],["spicy_heat","acidic"],"Hot sauce or hot peppers add heat and acidity."),
   ing("vinegar",["distilled vinegar","white vinegar"],["acidic"],"Vinegar adds acidity."),
+
+  ing("pasta",["semolina pasta","macaroni product","egg pasta"],["white_starch","sauce_dependent","personal_tolerance_candidate"],"Pasta is often a refined starch, but tolerance depends on shape, density, cooking softness, sauce, and portion."),
+  ing("small shells",["small shell pasta","shells","mini shells"],["white_starch","soft_pasta","personal_tolerance_candidate"],"Small shells may be easier for some people than thicker pasta shapes."),
+  ing("pastina",["stelline","tiny pasta"],["white_starch","soft_pasta","personal_tolerance_candidate"],"Pastina is small and often easier to tolerate when cooked soft."),
+  ing("angel hair",["angel hair pasta","capellini"],["white_starch","soft_pasta","personal_tolerance_candidate"],"Angel hair is thin and may be easier when cooked a little softer than al dente."),
+  ing("orzo",["orzo pasta"],["white_starch","dense_pasta","personal_tolerance_candidate"],"Orzo is small but can be dense; tolerance can be hit or miss."),
+  ing("bow tie pasta",["farfalle","bowties"],["white_starch","dense_pasta","thick_center","personal_tolerance_candidate"],"Bow tie/farfalle can be thicker in the center, which may be harder for some people."),
+  ing("ravioli",["tortellini","stuffed shells","stuffed pasta"],["white_starch","stuffed_pasta","dairy","high_fat"],"Stuffed pasta often adds density plus cheese/dairy or sauce concerns."),
+  ing("whole wheat pasta",["whole grain pasta"],["whole_grain","mechanical_risk","raw_roughage"],"Whole wheat pasta adds more fiber and roughage."),
+  ing("chickpea pasta",["lentil pasta","black bean pasta","legume pasta"],["beans_legumes","gas_risk","legume_gas_risk"],"Legume-based pasta may be gassier than wheat pasta."),
   ing("chicken",["chicken breast","white meat chicken"],["lean_protein","soft_texture"],"Plain chicken is lean protein."),
   ing("rice",["white rice","jasmine rice","basmati rice"],["white_starch","low_residue"],"White rice is a lower-residue starch."),
   ing("broth",["chicken broth","vegetable broth","stock"],["broth_based"],"Broth is a soup clue; sodium may matter.")
@@ -357,9 +419,33 @@ function homeScreen(){return `<div class="screen-content">${screenTitle("BB","To
 function scanScreen(){
   const a=state.lastAnalysis;
   return `<div class="screen-content">
-    ${screenTitle("Scan","Quick Read first. Deep Check when you need the ingredient truth.")}
-    <div class="viewbar"><div><strong>${state.scanView==="compact"?"Compact View":"Expanded View"}</strong><br><span>${state.scanView==="compact"?"Open sections as needed.":"Sections are open so you can see what this screen does."}</span></div><button class="secondary-action compact-action" data-action="toggle-view" type="button">${state.scanView==="compact"?"expanded":"compact"}</button></div>
-    <section class="input-card">
+    ${screenTitle("Scan","Camera first. Quick Read and Deep Check underneath.")}
+
+    <section class="camera-launch-card camera-priority-card">
+      <h3>Camera Scan</h3>
+      <p class="camera-subhead">Package capture test</p>
+      <p class="section-kicker">Use the camera first when you are holding a label. This build captures frames and stores the preview; OCR/barcode wiring comes next.</p>
+      <button class="primary-action full-width" data-action="open-camera" type="button"><span class="icon">${icons.camera}</span> scan product</button>
+    </section>
+
+    ${state.capturedImage?`
+      <article class="result-card scan-captured-card">
+        <h3>Camera scan captured</h3>
+        <img class="camera-result-preview" src="${state.capturedImage}" alt="Captured scan preview">
+        <p class="small-muted">${escapeHtml(state.cameraMessage)} ${state.capturedMeta?`Image: ${state.capturedMeta.width} × ${state.capturedMeta.height}px • ${state.capturedMeta.sizeKb} KB`:``}</p>
+        <div class="grid-two" style="margin-top:10px;">
+          <button class="secondary-action" data-action="open-camera" type="button">scan again</button>
+          <button class="primary-action" data-action="focus-deep" type="button">add ingredient text</button>
+        </div>
+      </article>
+    `:""}
+
+    <div class="viewbar">
+      <div><strong>${state.scanView==="compact"?"Compact View":"Expanded View"}</strong><br><span>${state.scanView==="compact"?"Open sections as needed.":"Sections are open so you can see what this screen does."}</span></div>
+      <button class="secondary-action compact-action" data-action="toggle-view" type="button">${state.scanView==="compact"?"expanded":"compact"}</button>
+    </div>
+
+    <section class="input-card quick-card">
       <h3>Quick Read</h3>
       <p class="search-hint">Use a food name, package front, menu item, or recipe title for a fast preliminary read.</p>
       <div class="search-row" style="margin-top:10px;">
@@ -371,23 +457,18 @@ function scanScreen(){
         <button class="primary-action" data-action="deep-check" type="button">deep check</button>
       </div>
     </section>
-    ${a?resultCard(a):`<article class="result-card"><h3>No scan yet</h3><p class="small-muted">Enter a food clue and tap Quick Read, or open Deep Check for ingredients.</p></article>`}
+
+    ${a?resultCard(a):`<article class="result-card"><h3>No food result yet</h3><p class="small-muted">Scan a package, enter a food clue, or open Deep Check for ingredients.</p></article>`}
+
     <details class="drawer optional" id="deepDrawer" ${state.scanView==="expanded"?"open":""}>
       <summary><span class="drawer-title">Deep Check — ingredients / recipe text</span></summary>
       <div class="drawer-body">
-        <textarea id="ingredientText" placeholder="cream, cheddar cheese, broccoli, onion powder, garlic powder, xanthan gum">${escapeHtml(state.ingredientText)}</textarea>
+        <textarea id="ingredientText" placeholder="pasta, cream, cheddar cheese, broccoli, onion powder, garlic powder, xanthan gum">${escapeHtml(state.ingredientText)}</textarea>
         <p class="search-hint">Preferred for packaged foods. This catches hidden triggers the front of the box may not show.</p>
         <button class="primary-action full-width" data-action="deep-check" type="button">run deep check</button>
       </div>
     </details>
-    <details class="drawer optional" id="cameraDrawer" ${state.scanView==="expanded"?"open":""}>
-      <summary><span class="drawer-title">Camera Scan</span></summary>
-      <div class="drawer-body">
-        <p class="search-hint">Use the camera to test package capture. OCR/barcode wiring comes next; this build confirms camera flow and stores the preview.</p>
-        <button class="primary-action full-width" data-action="open-camera" type="button"><span class="icon">${icons.camera}</span> scan product</button>
-        ${state.capturedImage?`<img class="camera-result-preview" src="${state.capturedImage}" alt="Captured scan preview"><p class="small-muted">${escapeHtml(state.cameraMessage)} ${state.capturedMeta?`Image: ${state.capturedMeta.width} × ${state.capturedMeta.height}px • ${state.capturedMeta.sizeKb} KB`:``}</p>`:""}
-      </div>
-    </details>
+
     <details class="drawer optional" id="personalDrawer" ${state.scanView==="expanded"?"open":""}>
       <summary><span class="drawer-title">Personal Food Memory (${getSavedFoods().length})</span></summary>
       <div class="drawer-body">${savedFoodsList()}</div>
@@ -396,7 +477,7 @@ function scanScreen(){
 }
 function resultCard(a){
   const active=state.mode==="Flare"?a.flareRating:a.normalRating;
-  return `<article class="result-card">
+  return `<article class="result-card answer-card">
     <div class="result-top"><div><h3>${escapeHtml(a.detected)}</h3><span>${state.mode==="Flare"?"Flare Mode":"Normal Mode"} · ${formatConfidence(a.confidence)}</span></div>${ratingPill(active)}</div>
     <div class="grid-two" style="margin-top:12px;"><div>${ratingPill(a.normalRating)}<p class="small-muted">normal</p></div><div>${ratingPill(a.flareRating)}<p class="small-muted">flare</p></div></div>
     <details class="drawer optional" id="detailsDrawer" ${state.scanView==="expanded"?"open":""} style="margin-top:12px;">
@@ -454,6 +535,7 @@ function bindEvents(){
     if(a==="quick-read"){analyze("quick");return;}
     if(a==="deep-check"){analyze("deep");return;}
     if(a==="clear-scan"){state.foodName="";state.ingredientText="";state.lastAnalysis=null;state.savedNotice="";state.capturedImage="";state.capturedMeta=null;}
+    if(a==="focus-deep"){state.scanView="expanded";localStorage.setItem(VIEW_KEY,state.scanView);render();setTimeout(()=>document.getElementById("ingredientText")?.focus(),120);return;}
     if(a==="save-food"){saveCurrentFood(false);return;}
     if(a==="log-reaction"){saveCurrentFood(true);return;}
     if(a==="load-saved"){const f=getSavedFoods().find(x=>x.id===btn.dataset.id);if(f){state.foodName=f.foodName;state.ingredientText=f.ingredientText||"";state.activeTab="scan";analyze(state.ingredientText?"deep":"quick");return;}}
@@ -498,7 +580,7 @@ function startRecognitionScan(){
     if(elapsed<duration){requestAnimationFrame(tick)}else{
       overlay.classList.remove("collecting");overlay.classList.add("analyzing");setCameraStatus("information collected.");
       const flash=document.getElementById("cameraFlashConfirm");flash.classList.remove("active");void flash.offsetWidth;flash.classList.add("active");if(navigator.vibrate)navigator.vibrate(45);
-      setTimeout(()=>{const last=frames[frames.length-1]||captureFrame(video);state.capturedImage=last.dataUrl;state.capturedMeta={width:last.width,height:last.height,sizeKb:last.sizeKb};state.cameraMessage=`Camera scan captured ${frames.length||1} frame${(frames.length||1)===1?"":"s"}. OCR/barcode connects next.`;state.activeTab="scan";cameraInProgress=false;document.getElementById("cameraScanProduct").disabled=false;closeCameraOverlay();render();},650);
+      setTimeout(()=>{const last=frames[frames.length-1]||captureFrame(video);state.capturedImage=last.dataUrl;state.capturedMeta={width:last.width,height:last.height,sizeKb:last.sizeKb};state.cameraMessage=`Camera scan captured ${frames.length||1} frame${(frames.length||1)===1?"":"s"}. OCR/barcode connects next.`;state.activeTab="scan";state.scanView="compact";localStorage.setItem(VIEW_KEY,state.scanView);cameraInProgress=false;document.getElementById("cameraScanProduct").disabled=false;closeCameraOverlay();render();setTimeout(()=>window.scrollTo({top:0,behavior:"smooth"}),80);},650);
     }
   }
   requestAnimationFrame(tick);
