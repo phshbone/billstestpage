@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="theme-color" content="#1b2027" />
-<title>bill's bad belly — v1.1.3 inner-ring card test</title>
+<title>bill's bad belly — v1.1.4 neutral-text ring cards</title>
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Baumans&display=swap");
 :root{
@@ -977,6 +977,68 @@ body.flare-active .screen-card{
 .state-caution .state-label{border-color:rgba(205,142,84,.36) !important}
 .state-ugly .state-label{border-color:rgba(176,84,103,.36) !important}
 
+
+/* ---------- v1.1.4 Neutral text + state ring only ---------- */
+/* The card state is carried by the inner ring and small pill borders, not by colored body text. */
+.answer-card h3,
+.answer-card.state-good h3,
+.answer-card.state-caution h3,
+.answer-card.state-ugly h3{
+  color:var(--purple-light) !important;
+  -webkit-text-stroke:0 !important;
+  text-shadow:none !important;
+}
+.result-summary-line,
+.next-action-box,
+.detected-row strong,
+.detected-row span,
+.nutrition-tile strong,
+.nutrition-tile span,
+.result-section p,
+.small-muted{
+  color:#e8e2ea !important;
+  -webkit-text-stroke:0 !important;
+  text-shadow:none !important;
+}
+.result-section h4{
+  color:var(--purple-light) !important;
+}
+.rating-pill,
+.rating-pill.rating-good,
+.rating-pill.rating-ehh,
+.rating-pill.rating-ugly{
+  color:#f3edf4 !important;
+  border-color:rgba(184,154,192,.42) !important;
+  background:rgba(17,21,26,.30) !important;
+  -webkit-text-stroke:0 !important;
+  text-shadow:none !important;
+  box-shadow:none !important;
+}
+.rating-pill.rating-flare{
+  color:#ffd8c6 !important;
+  border-color:rgba(215,118,62,.66) !important;
+  background:rgba(17,21,26,.30) !important;
+}
+.chip,
+.chip.gentle,
+.chip.risk{
+  color:#f3edf4 !important;
+  border-color:rgba(184,154,192,.32) !important;
+  background:rgba(17,21,26,.28) !important;
+  -webkit-text-stroke:0 !important;
+  text-shadow:none !important;
+}
+.state-label{
+  color:#f3edf4 !important;
+  background:rgba(184,154,192,.10) !important;
+}
+.state-good .state-label{border-color:rgba(159,177,159,.42) !important}
+.state-caution .state-label{border-color:rgba(205,142,84,.46) !important}
+.state-ugly .state-label{border-color:rgba(176,84,103,.46) !important}
+.answer-card.state-good::before{border-color:rgba(159,177,159,.76) !important}
+.answer-card.state-caution::before{border-color:rgba(205,142,84,.80) !important}
+.answer-card.state-ugly::before{border-color:rgba(176,84,103,.80) !important}
+
 </style>
 </head>
 <body>
@@ -984,7 +1046,7 @@ body.flare-active .screen-card{
   <header class="topbar">
     <div class="header-mascot-wrap" aria-hidden="true"><div class="header-mascot-fallback">bb</div></div>
     <div class="brand-title-wrap">
-      <p class="eyebrow">v1.1.3 inner-ring card test</p>
+      <p class="eyebrow">v1.1.4 neutral-text ring cards</p>
       <h1>bill's bad belly</h1>
     </div>
     <div class="logo-mark" aria-hidden="true">bb</div>
