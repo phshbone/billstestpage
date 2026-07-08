@@ -2,40 +2,516 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="theme-color" content="#13072f" />
-<title>bill’s bad belly — Recognition Engine v6</title>
+<meta name="theme-color" content="#1b2027" />
+<title>bill's bad belly — v1.0.4 recognition merge</title>
 <style>
-:root{--bg:#09051f;--panel:#17102e;--line:rgba(255,255,255,.14);--text:#f6f1ff;--muted:#c7b9e8;--purple:#8d5cff;--purple2:#c9a8ff;--green:#4ade80;--chip:#2d1e55;--shadow:0 18px 50px rgba(0,0,0,.45);--radius:22px}*{box-sizing:border-box}html,body{margin:0;min-height:100%;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:radial-gradient(circle at top,#30105c 0%,#13072f 35%,#060316 100%);color:var(--text)}body{padding:18px;padding-bottom:calc(22px + env(safe-area-inset-bottom))}.app{max-width:1100px;margin:0 auto}header{display:flex;gap:14px;align-items:center;justify-content:space-between;margin-bottom:16px}.brand{display:flex;align-items:center;gap:12px}.logo{width:54px;height:54px;border-radius:18px;background:linear-gradient(145deg,#7c3aed,#f97316);display:grid;place-items:center;font-size:28px;font-weight:900;box-shadow:0 0 32px rgba(141,92,255,.35)}h1{font-size:1.35rem;line-height:1.05;margin:0;text-transform:lowercase;letter-spacing:.02em}.subtitle{font-size:.82rem;color:var(--muted);margin-top:5px}.mode{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.08);border:1px solid var(--line);padding:8px;border-radius:999px;box-shadow:var(--shadow)}.mode button{border:0;border-radius:999px;padding:10px 14px;font-weight:800;color:var(--muted);background:transparent}.mode button.active{background:linear-gradient(135deg,#7c3aed,#fb923c);color:white;box-shadow:0 6px 20px rgba(0,0,0,.32)}.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,.92fr);gap:16px}.panel{background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.04));border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}.panel h2{font-size:1.05rem;margin:0;padding:16px 16px 4px}.panel .hint{padding:0 16px 14px;color:var(--muted);font-size:.88rem;line-height:1.35}.section{padding:14px 16px;border-top:1px solid var(--line)}label{display:block;font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--purple2);font-weight:900;margin:0 0 7px}input,textarea,select{width:100%;border:1px solid rgba(255,255,255,.15);border-radius:16px;background:rgba(0,0,0,.22);color:var(--text);padding:13px 14px;font-size:1rem;outline:none}textarea{min-height:110px;resize:vertical;line-height:1.35}input:focus,textarea:focus,select:focus{border-color:var(--purple2);box-shadow:0 0 0 3px rgba(141,92,255,.18)}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}button{-webkit-tap-highlight-color:transparent;cursor:pointer}.btn{border:0;border-radius:16px;padding:14px 12px;font-weight:900;color:white;background:linear-gradient(135deg,#6d28d9,#8b5cf6);box-shadow:0 10px 24px rgba(0,0,0,.28);font-size:.95rem}.btn.secondary{background:linear-gradient(135deg,#334155,#1e293b);color:#e5e7eb;border:1px solid rgba(255,255,255,.13)}.btn.orange{background:linear-gradient(135deg,#ea580c,#fb923c)}.btn.green{background:linear-gradient(135deg,#15803d,#22c55e)}.btn.red{background:linear-gradient(135deg,#be123c,#f43f5e)}.mini{padding:9px 11px;border-radius:12px;font-size:.78rem}.result-card{padding:16px}.status{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:8px 11px;font-weight:950;font-size:.82rem;margin-bottom:12px;border:1px solid rgba(255,255,255,.18)}.status.usually_gentle{background:rgba(74,222,128,.15);color:#bbf7d0}.status.caution{background:rgba(250,204,21,.15);color:#fde68a}.status.flare_caution{background:rgba(251,146,60,.18);color:#fed7aa}.status.likely_rough,.status.personal_trigger{background:rgba(251,113,133,.18);color:#fecdd3}.status.unknown{background:rgba(148,163,184,.18);color:#e2e8f0}.big-rating{font-size:1.6rem;font-weight:950;margin:0 0 4px}.subline{color:var(--muted);font-size:.9rem;margin-bottom:12px}.cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}.metric{background:rgba(0,0,0,.22);border:1px solid var(--line);border-radius:16px;padding:12px}.metric .k{color:var(--muted);font-size:.75rem;font-weight:900;text-transform:uppercase;letter-spacing:.08em}.metric .v{margin-top:4px;font-weight:900}.chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}.chip{background:var(--chip);border:1px solid rgba(255,255,255,.12);color:#eee6ff;border-radius:999px;padding:7px 10px;font-size:.78rem;font-weight:800}.chip.gentle{background:rgba(34,197,94,.14);color:#bbf7d0}.chip.risk{background:rgba(251,146,60,.15);color:#fed7aa}.why{line-height:1.45;color:#eadfff;background:rgba(0,0,0,.20);border:1px solid var(--line);border-radius:16px;padding:13px;margin-top:12px}.next{line-height:1.4;color:#dbeafe;background:rgba(96,165,250,.10);border:1px solid rgba(96,165,250,.28);border-radius:16px;padding:13px;margin-top:12px}.saved-list{display:grid;gap:10px;max-height:420px;overflow:auto;padding-right:2px}.saved-item{background:rgba(0,0,0,.20);border:1px solid var(--line);border-radius:16px;padding:12px}.saved-title{font-weight:950;margin-bottom:4px}.saved-meta{color:var(--muted);font-size:.82rem;margin-bottom:9px}.saved-actions{display:flex;gap:8px;flex-wrap:wrap}.footer-note{font-size:.78rem;color:var(--muted);line-height:1.35;padding:14px 16px;border-top:1px solid var(--line)}.empty{color:var(--muted);font-size:.92rem;line-height:1.4;padding:14px;border:1px dashed rgba(255,255,255,.18);border-radius:16px;background:rgba(0,0,0,.14)}.sample-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.sample{border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#eee6ff;border-radius:999px;padding:8px 10px;font-weight:800;font-size:.78rem}dialog{border:1px solid var(--line);border-radius:22px;background:#130b2b;color:var(--text);max-width:540px;width:calc(100% - 28px);box-shadow:var(--shadow)}dialog::backdrop{background:rgba(0,0,0,.65)}.dialog-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}.dialog-head h3{margin:0;font-size:1.05rem}.x{background:rgba(255,255,255,.08);border:1px solid var(--line);color:white;border-radius:12px;padding:8px 10px;font-weight:900}@media (max-width:860px){body{padding:12px}header{align-items:flex-start;flex-direction:column}.grid{grid-template-columns:1fr}.mode{width:100%}.mode button{flex:1}}@media (max-width:520px){.actions,.row,.cards{grid-template-columns:1fr}.logo{width:48px;height:48px}h1{font-size:1.18rem}}
+@import url("https://fonts.googleapis.com/css2?family=Baumans&display=swap");
+:root{
+  --display-font:"ITC Bauhaus","Bauhaus","Bauhaus 93","Baumans","Arial Rounded MT Bold","Trebuchet MS",sans-serif;
+  --body-font:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --gunmetal:#1b2027;--gunmetal-soft:#242b34;--gunmetal-light:#303946;
+  --purple:#7d5f86;--purple-light:#b89ac0;--cream:#f3edf4;--muted:#b8b0ba;
+  --green:#9fb19f;--amber:#d7763e;--red:#b05467;--shadow:rgba(0,0,0,.35);
+}
+*{box-sizing:border-box}
+html{touch-action:manipulation;-webkit-text-size-adjust:100%}
+body{
+  margin:0;min-height:100vh;background:radial-gradient(circle at top,#303946 0%,var(--gunmetal) 45%,#11151a 100%);
+  color:var(--cream);font-family:var(--body-font);overscroll-behavior-y:none;padding-bottom:env(safe-area-inset-bottom,0px);
+}
+button,input,textarea{font:inherit}
+button{cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+h1,h2,h3,.eyebrow,.nav-button,.primary-action,.secondary-action,.compact-action,.rating-pill,.mode-status-pill,.drawer-title{
+  font-family:var(--display-font);letter-spacing:.02em;
+}
+.app-shell{
+  width:min(100%,430px);min-height:100vh;margin:0 auto;
+  padding:22px 16px calc(168px + env(safe-area-inset-bottom,0px));position:relative;
+}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;min-height:76px}
+.header-mascot-wrap{
+  width:60px;height:82px;flex:0 0 60px;display:flex;align-items:flex-end;justify-content:center;filter:drop-shadow(0 10px 12px rgba(0,0,0,.42));
+}
+.header-mascot-fallback{
+  width:58px;height:58px;border-radius:19px;display:grid;place-items:center;background:linear-gradient(145deg,var(--purple),#513d59);
+  box-shadow:0 14px 30px var(--shadow),inset 0 1px 0 rgba(255,255,255,.2);font-family:var(--display-font);font-size:1.35rem;font-weight:900;color:white;
+}
+.brand-title-wrap{flex:1;min-width:0}
+.eyebrow{margin:0 0 4px;color:var(--purple-light);font-size:.78rem;letter-spacing:.14em}
+h1{margin:0;font-size:2rem;line-height:1;letter-spacing:-.04em;text-transform:lowercase;color:#9b6fa6;text-shadow:0 1px 0 #5e4867,0 3px 0 #33213c,0 10px 18px rgba(0,0,0,.54),0 0 16px rgba(155,111,166,.22)}
+.logo-mark{width:54px;height:54px;flex:0 0 54px;border-radius:18px;display:grid;place-items:center;background:linear-gradient(145deg,var(--purple),#513d59);box-shadow:0 14px 30px var(--shadow),inset 0 1px 0 rgba(255,255,255,.2);font-weight:900;letter-spacing:-.08em;text-transform:lowercase}
+.screen-card{
+  min-height:calc(100vh - 142px);background:rgba(36,43,52,.78);border:1px solid rgba(184,154,192,.25);
+  border-radius:28px;padding:18px;box-shadow:0 20px 50px var(--shadow);backdrop-filter:blur(12px);position:relative;overflow:hidden;isolation:isolate;
+}
+.screen-card>*{position:relative;z-index:1}
+body.flare-active .screen-card{
+  border-color:rgba(215,118,62,.36);background:radial-gradient(circle at 8% 12%,rgba(197,138,233,.16),transparent 28%),rgba(30,24,37,.88);
+  animation:flareAmberHeartbeat 15s ease-in-out infinite;
+}
+@keyframes flareAmberHeartbeat{
+  0%,62%,100%{box-shadow:0 20px 50px rgba(0,0,0,.35),0 0 0 1px rgba(215,118,62,.08),0 0 10px rgba(215,118,62,.04)}
+  69%{box-shadow:0 20px 50px rgba(0,0,0,.35),0 0 0 1px rgba(215,118,62,.24),0 0 24px rgba(215,118,62,.18),0 0 42px rgba(215,118,62,.08)}
+}
+@media (prefers-reduced-motion:reduce){body.flare-active .screen-card{animation:none}}
+.screen-content{display:grid;gap:16px}
+.screen-title{position:relative;padding-right:104px;min-height:42px}
+.screen-title p{margin:0 0 6px;color:var(--purple-light);font-weight:700}
+.screen-title h2{margin:0;font-size:1.35rem;line-height:1.2;letter-spacing:-.03em}
+.mode-status-pill{
+  position:absolute;top:0;right:0;z-index:6;display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:6px 9px;border:1px solid rgba(184,154,192,.26);
+  border-radius:999px;color:var(--cream);background:linear-gradient(145deg,rgba(48,57,70,.98),rgba(27,32,39,.96));
+  box-shadow:0 10px 22px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.08);font-size:.72rem;font-weight:900;line-height:1;
+}
+.mode-flame{width:14px;height:18px;display:inline-block;flex:0 0 13px;border-radius:70% 55% 70% 55%;transform:rotate(45deg)}
+.mode-status-pill.normal .mode-flame{background:radial-gradient(circle at 63% 70%,rgba(216,226,212,.9) 0 13%,transparent 18%),linear-gradient(145deg,#9fb19f 12%,#6f846f 58%,#4a5b51 100%)}
+.mode-status-pill.flare .mode-flame{background:radial-gradient(circle at 66% 68%,rgba(255,154,76,.92) 0 16%,transparent 21%),linear-gradient(145deg,#c58ae9 10%,#7d5f86 55%,#e88036 100%);box-shadow:0 0 11px rgba(197,138,233,.45)}
+.input-card,.result-card,.food-panel,.camera-launch-card,.belly-meter,.drawer{
+  border:1px solid rgba(184,154,192,.22);background:linear-gradient(145deg,rgba(48,57,70,.96),rgba(27,32,39,.95));border-radius:22px;box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
+}
+.input-card,.result-card,.food-panel,.camera-launch-card{padding:14px}
+.belly-meter{display:flex;gap:16px;align-items:center;padding:18px}
+.belly-meter p,.belly-meter strong,.belly-meter span{display:block}
+.belly-meter p{margin:0 0 3px;color:var(--muted)}
+.belly-meter strong{font-size:1.8rem;line-height:1}
+.belly-meter span{margin-top:6px;color:var(--muted);font-size:.9rem}
+.primary-action,.secondary-action,.compact-action{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;border-radius:16px;padding:12px 16px;color:var(--cream);text-transform:lowercase;font-weight:900;
+}
+.primary-action{border:0;background:linear-gradient(145deg,var(--purple),#5e4867);box-shadow:0 10px 24px rgba(125,95,134,.28)}
+.secondary-action{border:1px solid rgba(184,154,192,.28);background:rgba(17,21,26,.5)}
+.compact-action{min-height:40px;padding:8px 10px;border-radius:13px;font-size:.84rem}
+.full-width{width:100%}
+.button-stack{display:grid;gap:10px}
+.grid-two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.search-row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center}
+input,textarea{
+  width:100%;border:1px solid rgba(184,154,192,.22);border-radius:16px;padding:12px;background:rgba(17,21,26,.5);color:var(--cream);outline:none;
+}
+input::placeholder,textarea::placeholder{color:var(--muted)}
+textarea{min-height:96px;resize:vertical}
+.search-hint,.small-muted{margin:0;color:var(--muted);font-size:.86rem;line-height:1.35}
+.viewbar{
+  display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;padding:12px;border:1px solid rgba(184,154,192,.22);border-radius:18px;background:rgba(17,21,26,.38);
+}
+.viewbar strong{color:var(--purple-light)}
+.viewbar span{color:var(--muted);font-size:.82rem}
+.drawer{overflow:hidden}
+.drawer summary{list-style:none;cursor:pointer;padding:14px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--cream);font-weight:900}
+.drawer summary::-webkit-details-marker{display:none}
+.drawer summary::after{content:"+";width:28px;height:28px;border-radius:999px;display:grid;place-items:center;background:rgba(17,21,26,.48);border:1px solid rgba(184,154,192,.25);color:var(--purple-light);font-family:var(--display-font)}
+.drawer[open] summary::after{content:"−"}
+.drawer-body{display:grid;gap:12px;padding:0 14px 14px}
+body.compact .drawer.optional:not([open]){display:block}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{border:1px solid rgba(184,154,192,.22);background:rgba(17,21,26,.44);border-radius:999px;padding:7px 10px;color:var(--cream);font-size:.78rem;font-weight:800}
+.chip.risk{text-shadow:0 0 6px rgba(215,118,62,.28)}
+.chip.gentle{text-shadow:0 0 6px rgba(159,177,159,.28)}
+.rating-pill{
+  display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:7px 11px;min-width:72px;font-weight:900;font-size:.78rem;text-transform:none;background:rgba(17,21,26,.38);border:1px solid rgba(184,154,192,.30);color:var(--purple-light);
+}
+.rating-good{text-shadow:0 0 1px rgba(159,177,159,.55),0 0 6px rgba(159,177,159,.26)}
+.rating-ehh{text-shadow:0 0 1px rgba(201,130,84,.55),0 0 6px rgba(201,130,84,.24)}
+.rating-ugly{text-shadow:0 0 1px rgba(176,84,103,.55),0 0 6px rgba(176,84,103,.24)}
+.rating-flare{text-shadow:0 0 1px rgba(215,118,62,.62),0 0 7px rgba(215,118,62,.28)}
+.result-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.result-top h3{margin:0;color:var(--purple-light);font-size:1.06rem}
+.result-top span{display:block;margin-top:3px;color:var(--muted);font-size:.82rem}
+.why{line-height:1.42;color:#eadfff;background:rgba(0,0,0,.16);border:1px solid rgba(184,154,192,.17);border-radius:16px;padding:12px}
+.next{line-height:1.38;color:#e4d8ea;background:rgba(125,95,134,.14);border:1px solid rgba(184,154,192,.24);border-radius:16px;padding:12px}
+.saved-list{display:grid;gap:10px}
+.saved-item{padding:12px;border-radius:16px;border:1px solid rgba(184,154,192,.18);background:rgba(17,21,26,.38)}
+.saved-title{font-weight:900}
+.saved-meta{color:var(--muted);font-size:.8rem;margin-top:3px}
+.bottom-nav{
+  position:fixed;left:50%;bottom:calc(10px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(calc(100% - 24px),430px);
+  display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:10px;border:1px solid rgba(184,154,192,.28);border-radius:24px;
+  background:rgba(27,32,39,.94);box-shadow:0 18px 50px rgba(0,0,0,.55);backdrop-filter:blur(14px);z-index:9999;
+}
+.nav-button{display:grid;place-items:center;gap:4px;border:0;border-radius:17px;padding:10px 4px;background:transparent;color:var(--muted);text-transform:lowercase}
+.nav-button span:last-child{font-size:.74rem;font-weight:700}
+.nav-button.active{color:white;background:linear-gradient(145deg,var(--purple),#5e4867)}
+.icon svg{width:22px;height:22px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.camera-overlay{position:fixed;inset:0;z-index:100000;display:none;background:#05070a;color:var(--cream);overflow:hidden}
+.camera-overlay.active{display:block}
+.camera-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#05070a}
+.camera-safe-top{position:absolute;top:calc(12px + env(safe-area-inset-top,0px));left:12px;right:12px;z-index:8;display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.camera-hint{max-width:250px;padding:10px 12px;border-radius:16px;background:rgba(27,32,39,.70);border:1px solid rgba(184,154,192,.20);color:rgba(243,237,244,.88);backdrop-filter:blur(12px);font-size:.82rem;line-height:1.32}
+.camera-close,.camera-flip{min-width:44px;min-height:44px;border:1px solid rgba(255,255,255,.18);border-radius:999px;background:rgba(5,7,10,.58);color:white;backdrop-filter:blur(12px)}
+.camera-lens-shell,.camera-progress-frame{position:absolute;left:12px;right:12px;top:calc(74px + env(safe-area-inset-top,0px));bottom:calc(164px + env(safe-area-inset-bottom,0px));border-radius:30px 30px 34px 34px;pointer-events:none;z-index:3}
+.camera-lens-shell{border:2px solid rgba(48,57,70,.88);box-shadow:0 0 0 1px rgba(184,154,192,.12),inset 0 0 0 1px rgba(255,255,255,.08),0 18px 42px rgba(0,0,0,.36)}
+.camera-corner{position:absolute;width:42px;height:42px;opacity:.72}
+.camera-corner.tl{left:14px;top:14px;border-left:3px solid rgba(184,154,192,.60);border-top:3px solid rgba(184,154,192,.60);border-radius:14px 0 0 0}
+.camera-corner.tr{right:14px;top:14px;border-right:3px solid rgba(184,154,192,.60);border-top:3px solid rgba(184,154,192,.60);border-radius:0 14px 0 0}
+.camera-corner.bl{left:14px;bottom:14px;border-left:3px solid rgba(184,154,192,.60);border-bottom:3px solid rgba(184,154,192,.60);border-radius:0 0 0 14px}
+.camera-corner.br{right:14px;bottom:14px;border-right:3px solid rgba(184,154,192,.60);border-bottom:3px solid rgba(184,154,192,.60);border-radius:0 0 14px 0}
+.camera-progress-frame{opacity:0;transition:opacity .22s ease}
+.collecting .camera-lens-shell,.analyzing .camera-lens-shell{border-color:rgba(159,177,159,.82);box-shadow:0 0 0 2px rgba(159,177,159,.34),0 0 28px rgba(159,177,159,.42),0 0 58px rgba(159,177,159,.22),inset 0 0 0 1px rgba(255,255,255,.12);animation:recognitionFullGreenPulse .95s ease-in-out infinite}
+.collecting .camera-progress-frame,.analyzing .camera-progress-frame{opacity:1;border:3px solid rgba(183,205,183,.82);box-shadow:0 0 0 1px rgba(159,177,159,.30),0 0 30px rgba(159,177,159,.38),inset 0 0 22px rgba(159,177,159,.14);animation:recognitionFullGreenPulse .95s ease-in-out infinite}
+@keyframes recognitionFullGreenPulse{0%,100%{filter:saturate(.92) brightness(.95);opacity:.78}50%{filter:saturate(1.28) brightness(1.26);opacity:1}}
+.camera-dock{position:absolute;left:12px;right:12px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:7;display:grid;gap:8px;padding:12px;border-radius:26px;border:1px solid rgba(184,154,192,.24);background:linear-gradient(145deg,rgba(48,57,70,.94),rgba(27,32,39,.96));box-shadow:0 18px 50px rgba(0,0,0,.52),inset 0 1px 0 rgba(255,255,255,.06);backdrop-filter:blur(16px)}
+.recognition-status{min-height:24px;color:var(--purple-light);font-size:.82rem;font-weight:900;text-align:center}
+.recognition-scan-button{width:100%;min-height:54px;border:0;border-radius:18px;color:var(--cream);background:linear-gradient(145deg,var(--purple),#5e4867);box-shadow:0 12px 26px rgba(125,95,134,.32);font-size:1.05rem;font-weight:900;font-family:var(--display-font)}
+.recognition-scan-button:disabled{opacity:.54}
+.recognition-helper{margin:0;color:var(--muted);text-align:center;font-size:.84rem;line-height:1.28}
+.recognition-cancel{min-height:38px;border:1px solid rgba(184,154,192,.22);border-radius:14px;color:var(--cream);background:rgba(17,21,26,.42);font-weight:900;font-family:var(--display-font)}
+.camera-flash-confirm{position:absolute;inset:0;z-index:4;pointer-events:none;background:rgba(255,255,255,.82);opacity:0}
+.camera-flash-confirm.active{animation:cameraCaptureFlash .22s ease-out}
+@keyframes cameraCaptureFlash{0%{opacity:0}35%{opacity:.65}100%{opacity:0}}
+.camera-error-box{position:absolute;left:18px;right:18px;top:50%;transform:translateY(-50%);display:none;gap:12px;padding:16px;border-radius:22px;background:rgba(27,32,39,.96);border:1px solid rgba(215,118,62,.38);box-shadow:0 18px 42px rgba(0,0,0,.54);z-index:10}
+.camera-error-box.active{display:grid}
+.camera-result-preview{display:block;width:100%;height:auto;max-height:360px;object-fit:contain;border-radius:16px;border:1px solid rgba(184,154,192,.22);background:rgba(17,21,26,.45)}
+@media(max-width:360px){.screen-title{padding-right:86px}.grid-two,.search-row{grid-template-columns:1fr}.logo-mark{width:48px;height:48px;flex-basis:48px}.brand-title-wrap h1{font-size:1.62rem}}
 </style>
 </head>
 <body>
-<div class="app">
-<header><div class="brand"><div class="logo">b</div><div><h1>bill’s bad belly</h1><div class="subtitle">Recognition Engine v6 · Food clues → traits → normal / flare result</div></div></div><div class="mode"><button id="normalBtn" class="active" type="button">Normal</button><button id="flareBtn" type="button">Flare Mode</button></div></header>
-<div class="grid">
-<main class="panel"><h2>Food scanner test bench</h2><div class="hint">Quick Read uses the food name/front label. Deep Check uses ingredients. Camera/OCR can feed these boxes later.</div><div class="section"><label for="foodName">Food name / front label</label><input id="foodName" placeholder="Example: pepperoni pizza, minestrone soup, Whole Foods Tuscan White Bean & Kale Soup" /><div class="sample-row"><button class="sample" data-sample="pepperoni pizza">pepperoni pizza</button><button class="sample" data-sample="minestrone soup">minestrone soup</button><button class="sample" data-sample="broccoli cheddar soup">broccoli cheddar soup</button><button class="sample" data-sample="Whole Foods Tuscan White Bean & Kale Soup">unknown soup</button></div></div><div class="section"><label for="ingredients">Ingredient list / recipe text</label><textarea id="ingredients" placeholder="Paste or scan ingredients here. Example: cream, cheddar cheese, broccoli, onion powder, garlic powder, xanthan gum"></textarea></div><div class="section"><label for="notes">Notes / source</label><div class="row"><input id="brand" placeholder="Brand/source, optional" /><input id="notes" placeholder="Notes, optional" /></div></div><div class="section"><div class="actions"><button id="quickBtn" class="btn" type="button">Quick Read</button><button id="deepBtn" class="btn orange" type="button">Deep Check</button><button id="saveBtn" class="btn green" type="button">Save as New Food</button><button id="clearBtn" class="btn secondary" type="button">Clear</button></div></div><div class="footer-note">Quick Read = fast but less complete. Deep Check = preferred for packaged foods because hidden ingredients are usually on the back label.</div></main>
-<aside class="panel"><h2>Result</h2><div id="result" class="result-card"><div class="empty">Enter a food name, front-label text, or ingredients. Then tap Quick Read or Deep Check.</div></div></aside>
+<main class="app-shell">
+  <header class="topbar">
+    <div class="header-mascot-wrap" aria-hidden="true"><div class="header-mascot-fallback">bb</div></div>
+    <div class="brand-title-wrap">
+      <p class="eyebrow">v1.0.4 recognition merge</p>
+      <h1>bill's bad belly</h1>
+    </div>
+    <div class="logo-mark" aria-hidden="true">bb</div>
+  </header>
+
+  <section class="screen-card" id="screen"></section>
+
+  <nav class="bottom-nav" aria-label="Main navigation">
+    <button class="nav-button active" data-tab="home" type="button"><span class="icon" data-nav-icon="home"></span><span>Home</span></button>
+    <button class="nav-button" data-tab="scan" type="button"><span class="icon" data-nav-icon="camera"></span><span>Scan</span></button>
+    <button class="nav-button" data-tab="flare" type="button"><span class="icon" data-nav-icon="activity"></span><span>Flare</span></button>
+    <button class="nav-button" data-tab="me" type="button"><span class="icon" data-nav-icon="user"></span><span>Me</span></button>
+  </nav>
+</main>
+
+<div class="camera-overlay" id="cameraOverlay" aria-hidden="true">
+  <video class="camera-video" id="cameraVideo" autoplay playsinline muted></video>
+  <div class="camera-safe-top">
+    <div class="camera-hint" id="cameraHint">Center the package, front label, or ingredients. Rotate cans slowly if needed.</div>
+    <div style="display:flex;gap:8px;">
+      <button class="camera-flip" id="cameraFlip" type="button" aria-label="Switch camera">↻</button>
+      <button class="camera-close" id="cameraClose" type="button" aria-label="Close camera">×</button>
+    </div>
+  </div>
+  <div class="camera-lens-shell" aria-hidden="true">
+    <div class="camera-corner tl"></div><div class="camera-corner tr"></div><div class="camera-corner bl"></div><div class="camera-corner br"></div>
+  </div>
+  <div class="camera-progress-frame" aria-hidden="true"></div>
+  <div class="camera-flash-confirm" id="cameraFlashConfirm" aria-hidden="true"></div>
+  <div class="camera-error-box" id="cameraErrorBox">
+    <h3>Camera unavailable</h3>
+    <p id="cameraErrorText">Camera access could not start. You can retry or use manual search.</p>
+    <button class="primary-action" id="cameraRetry" type="button">retry camera</button>
+    <button class="secondary-action" id="cameraManualSearch" type="button">manual search</button>
+  </div>
+  <div class="camera-dock">
+    <div class="recognition-status" id="cameraStatus">starting camera…</div>
+    <button class="recognition-scan-button" id="cameraScanProduct" type="button">scan product</button>
+    <p class="recognition-helper" id="recognitionHelper">This test collects frames. OCR/barcode wiring comes next.</p>
+    <button class="recognition-cancel" id="cameraCancelDock" type="button">cancel</button>
+  </div>
 </div>
-<section class="panel" style="margin-top:16px;"><h2>Personal Food Memory</h2><div class="hint">Saved foods stay on this device with localStorage. Use this to build your own food database.</div><div class="section"><div id="savedList" class="saved-list"></div></div></section>
-</div>
-<dialog id="reactionDialog"><div class="dialog-head"><h3>Log reaction</h3><button class="x" id="closeDialog" type="button">×</button></div><input type="hidden" id="reactionFoodId" /><div style="display:grid;gap:12px;"><div><label for="portion">Portion</label><input id="portion" placeholder="small bowl, half slice, full meal..." /></div><div><label for="reaction">Reaction</label><select id="reaction"><option value="worked">Worked for me</option><option value="mild">Mild issue</option><option value="bad">Bad reaction</option><option value="personal_trigger">Personal trigger</option><option value="small_amount_ok">Okay in small amount</option><option value="normal_not_flare">Okay normal, not flare</option></select></div><div><label for="reactionNotes">Notes</label><textarea id="reactionNotes" placeholder="Timing, symptoms, prep, substitute, anything useful..."></textarea></div><button id="saveReactionBtn" class="btn green" type="button">Save Reaction</button></div></dialog>
+
 <script>
-const STORAGE_KEY="bbb_v6_saved_foods";let currentMode="normal";let lastAnalysis=null;const RATINGS={usually_gentle:"Usually Gentle",caution:"Use Caution",flare_caution:"Flare Caution",likely_rough:"Likely Rough",personal_trigger:"Personal Trigger",unknown:"Unknown"};const RISK_TRAITS=new Set(["mechanical_risk","seeds","skins","hulls","nuts_seeds","raw_roughage","stringy_fiber","corn_kernel","popcorn_hull","high_fat","fried","breaded_fried","processed_meat","sugar_alcohol","added_fiber","beans_legumes","gas_risk","garlic_onion","spicy_heat","acidic","tomato_acid","gum_thickener","processed_food","ultra_processed","dairy","lactose_possible","cruciferous","dried_fruit","heavy_syrup"]);const FLARE_TRAITS=new Set(["mechanical_risk","seeds","skins","hulls","nuts_seeds","raw_roughage","stringy_fiber","corn_kernel","popcorn_hull","beans_legumes","gas_risk","garlic_onion","fried","breaded_fried","high_fat","dairy","lactose_possible","spicy_heat","gum_thickener","processed_food","processed_meat","added_fiber","sugar_alcohol","cruciferous","dried_fruit","heavy_syrup"]);const GENTLE_TRAITS=new Set(["soft_texture","broth_based","lean_protein","white_starch","well_cooked","peeled","pureed","strained","low_residue","smooth_form"]);const TRAIT_LABELS={mechanical_risk:"mechanical risk",seeds:"seeds",skins:"skins",hulls:"hulls",nuts_seeds:"nuts/seeds",raw_roughage:"raw roughage",stringy_fiber:"stringy fiber",corn_kernel:"corn kernels",popcorn_hull:"popcorn hulls",high_fat:"fat load",fried:"fried",breaded_fried:"breaded/fried",processed_meat:"processed meat",sugar_alcohol:"sugar alcohol",added_fiber:"added fiber",beans_legumes:"beans/legumes",gas_risk:"gas risk",garlic_onion:"garlic/onion",spicy_heat:"spicy heat",acidic:"acidic",tomato_acid:"tomato acid",gum_thickener:"gum/thickener",processed_food:"processed food",ultra_processed:"ultra-processed",dairy:"dairy",lactose_possible:"lactose possible",cruciferous:"cruciferous vegetable",dried_fruit:"dried fruit",heavy_syrup:"heavy syrup",soft_texture:"soft texture",broth_based:"broth based",lean_protein:"lean protein",white_starch:"white starch",well_cooked:"well cooked",peeled:"peeled",pureed:"pureed",strained:"strained",low_residue:"low residue",smooth_form:"smooth form",refined_grain:"refined grain",cheese_dairy:"cheese/dairy",egg:"egg",sodium:"sodium",tomato_possible:"tomato likely",creamy:"creamy",leafy_green_fiber:"leafy green fiber",mixed_vegetable_fiber:"mixed vegetable fiber",fruit_sugar:"fruit sugar",preservatives:"preservatives",sweetener:"sweetener",vinegar:"vinegar",high_fiber:"high fiber",whole_grain:"whole grain",pungent:"pungent"};
-const MEAL_FAST_CARDS=[{name:"minestrone soup",aliases:["minestrone","vegetable minestrone"],foodType:"soup",expectedIngredients:["beans","tomato","onion","garlic","celery","carrots","pasta","zucchini","cabbage"],likelyTraits:["beans_legumes","tomato_acid","garlic_onion","mixed_vegetable_fiber","broth_based","white_starch"],normalRating:"caution",flareRating:"likely_rough",reason:"Minestrone commonly includes beans, tomato, onion, garlic, pasta, and mixed vegetables, which can stack gas, acid, and fiber concerns."},{name:"chicken noodle soup",aliases:["chicken noodle","chicken soup with noodles"],foodType:"soup",expectedIngredients:["chicken","noodles","broth","carrot","celery","onion"],likelyTraits:["broth_based","lean_protein","white_starch","sodium","garlic_onion"],normalRating:"usually_gentle",flareRating:"caution",reason:"Chicken noodle soup is often broth-based with lean protein and refined noodles, but onion, garlic, fat, sodium, or additives can still matter."},{name:"broccoli cheddar soup",aliases:["broccoli cheese soup","broccoli cheddar"],foodType:"soup",expectedIngredients:["broccoli","cheddar","cream","milk","onion"],likelyTraits:["dairy","high_fat","cruciferous","garlic_onion","creamy"],normalRating:"caution",flareRating:"flare_caution",reason:"Broccoli cheddar soup commonly combines dairy, fat load, cruciferous vegetable fiber, and onion/garlic seasoning."},{name:"tomato soup",aliases:["cream of tomato soup","tomato bisque"],foodType:"soup",expectedIngredients:["tomato","cream","milk","sugar","onion"],likelyTraits:["tomato_acid","acidic","dairy","high_fat","garlic_onion"],normalRating:"caution",flareRating:"flare_caution",reason:"Tomato soup is often acidic and may include dairy, sugar, onion, garlic, or thickeners."},{name:"split pea soup",aliases:["pea soup","green split pea soup"],foodType:"soup",expectedIngredients:["split peas","ham","onion","garlic"],likelyTraits:["beans_legumes","gas_risk","high_fiber","processed_meat","garlic_onion"],normalRating:"caution",flareRating:"likely_rough",reason:"Split pea soup is legume-heavy and can add gas/fiber concerns, sometimes with ham or other processed meat."},{name:"bean soup",aliases:["white bean soup","black bean soup","navy bean soup"],foodType:"soup",expectedIngredients:["beans","onion","garlic","broth"],likelyTraits:["beans_legumes","gas_risk","garlic_onion","mixed_vegetable_fiber"],normalRating:"caution",flareRating:"likely_rough",reason:"Bean soups commonly carry legume gas/fiber concerns, especially during sensitive periods."},{name:"pepperoni pizza",aliases:["pepperoni pizza","pizza with pepperoni"],foodType:"pizza",expectedIngredients:["pepperoni","cheese","tomato sauce","wheat crust"],likelyTraits:["processed_meat","dairy","high_fat","tomato_acid","spicy_heat","processed_food","refined_grain"],normalRating:"caution",flareRating:"likely_rough",reason:"Pepperoni pizza commonly combines processed meat, cheese/dairy, fat load, tomato acidity, spice, and processed-food traits."},{name:"cheese pizza",aliases:["four cheese pizza","plain cheese pizza","pizza cheese"],foodType:"pizza",expectedIngredients:["cheese","tomato sauce","wheat crust"],likelyTraits:["dairy","high_fat","tomato_acid","processed_food","refined_grain"],normalRating:"caution",flareRating:"flare_caution",reason:"Cheese pizza commonly includes dairy, fat load, tomato acidity, refined crust, and processed-food traits."},{name:"mac and cheese",aliases:["macaroni and cheese","mac & cheese","mac cheese"],foodType:"pasta",expectedIngredients:["pasta","cheese","milk","butter","cream"],likelyTraits:["dairy","high_fat","white_starch","creamy","processed_food"],normalRating:"caution",flareRating:"flare_caution",reason:"Mac and cheese usually combines refined starch with dairy and fat load; boxed or frozen versions may add thickeners."},{name:"chicken alfredo",aliases:["chicken fettuccine alfredo","alfredo chicken"],foodType:"pasta",expectedIngredients:["chicken","cream","cheese","pasta","garlic"],likelyTraits:["lean_protein","dairy","high_fat","garlic_onion","white_starch","creamy"],normalRating:"caution",flareRating:"flare_caution",reason:"Chicken alfredo includes lean protein but usually has cream, cheese, garlic, and a heavy fat load."},{name:"breakfast burrito",aliases:["sausage breakfast burrito","egg cheese burrito","breakfast wrap"],foodType:"breakfast",expectedIngredients:["tortilla","egg","cheese","sausage","pepper","onion"],likelyTraits:["egg","dairy","processed_meat","high_fat","garlic_onion","spicy_heat","refined_grain"],normalRating:"caution",flareRating:"flare_caution",reason:"Breakfast burritos often combine egg, cheese, processed meat, fat, tortilla, and sometimes peppers/onions."},{name:"sausage egg cheese sandwich",aliases:["sausage egg and cheese","sausage egg cheese muffin","sausage croissant"],foodType:"breakfast",expectedIngredients:["sausage","egg","cheese","bread","croissant"],likelyTraits:["processed_meat","egg","dairy","high_fat","refined_grain","processed_food"],normalRating:"caution",flareRating:"flare_caution",reason:"This sandwich usually combines processed meat, egg, cheese/dairy, refined bread, and fat load."},{name:"chili",aliases:["beef chili","bean chili","chili con carne"],foodType:"stew",expectedIngredients:["beans","tomato","beef","onion","garlic","chili powder"],likelyTraits:["beans_legumes","gas_risk","tomato_acid","garlic_onion","spicy_heat","high_fat"],normalRating:"caution",flareRating:"likely_rough",reason:"Chili commonly stacks beans, tomato acidity, onion/garlic, spice, and sometimes fatty meat."},{name:"fried chicken",aliases:["breaded fried chicken","chicken tenders","chicken nuggets"],foodType:"chicken",expectedIngredients:["chicken","breading","oil","spices"],likelyTraits:["fried","breaded_fried","high_fat","processed_food","spicy_heat"],normalRating:"caution",flareRating:"likely_rough",reason:"Fried chicken adds fat load and breading, with possible spice and processing concerns."},{name:"plain grilled chicken",aliases:["grilled chicken","plain chicken breast","chicken breast"],foodType:"chicken",expectedIngredients:["chicken"],likelyTraits:["lean_protein","soft_texture"],normalRating:"usually_gentle",flareRating:"usually_gentle",reason:"Plain grilled chicken is a lean protein and is often one of the simpler foods to test, depending on seasoning and portion."}];
-function e(name,aliases,group,subgroup,traits,reason){return{name,aliases,group,subgroup,traits,reason}}
-const INGREDIENT_DICTIONARY=[e("onion",["onions","dehydrated onion"],"seasoning","allium",["garlic_onion","gas_risk"],"Onion can be a gas/pungent trigger for some people."),e("onion powder",["powdered onion","dried onion"],"seasoning","allium",["garlic_onion","gas_risk","processed_food"],"Onion powder is a hidden allium seasoning."),e("garlic",["garlic cloves","minced garlic"],"seasoning","allium",["garlic_onion","gas_risk","pungent"],"Garlic can be a gas/pungent trigger."),e("garlic powder",["powdered garlic","dried garlic"],"seasoning","allium",["garlic_onion","gas_risk","processed_food"],"Garlic powder is a common hidden seasoning."),e("cream",["heavy cream","whipping cream"],"dairy","high_fat_dairy",["dairy","lactose_possible","high_fat","creamy"],"Cream adds dairy and fat load."),e("milk",["whole milk","skim milk","reduced fat milk"],"dairy","milk",["dairy","lactose_possible"],"Milk may matter for lactose or dairy tolerance."),e("cheese",["cheddar","mozzarella","parmesan","american cheese","provolone"],"dairy","cheese",["dairy","high_fat","cheese_dairy"],"Cheese adds dairy and fat load."),e("butter",["butterfat"],"dairy","fat",["dairy","high_fat"],"Butter adds fat load and dairy."),e("wheat flour",["enriched wheat flour","flour"],"grain","refined",["white_starch","refined_grain"],"Refined flour is lower mechanical risk than bran/whole grains."),e("whole wheat",["whole wheat flour"],"grain","whole_grain",["mechanical_risk","whole_grain"],"Whole grains may add rough fiber."),e("bran",["wheat bran","oat bran"],"grain","bran",["mechanical_risk","hulls","raw_roughage"],"Bran is rough fiber."),e("tomato paste",["tomato puree","tomato concentrate"],"vegetable","tomato",["tomato_acid","acidic"],"Tomato can add acidity."),e("tomato sauce",["marinara","pizza sauce"],"vegetable","tomato",["tomato_acid","acidic","garlic_onion"],"Tomato sauce may add acidity and garlic/onion."),e("beans",["white beans","black beans","kidney beans","navy beans"],"legume","beans",["beans_legumes","gas_risk"],"Beans can add gas and fiber concerns."),e("lentils",["red lentils","green lentils"],"legume","lentils",["beans_legumes","gas_risk"],"Lentils are legumes and can add gas/fiber concerns."),e("chickpeas",["garbanzo beans"],"legume","chickpeas",["beans_legumes","gas_risk"],"Chickpeas are legumes and can add gas/fiber concerns."),e("broccoli",["broccoli florets"],"vegetable","cruciferous",["cruciferous","gas_risk","mixed_vegetable_fiber"],"Broccoli can add gas/fiber concerns."),e("cabbage",["red cabbage","green cabbage"],"vegetable","cruciferous",["cruciferous","gas_risk","raw_roughage"],"Cabbage can be rough or gas-forming."),e("kale",["leafy kale"],"vegetable","leafy_green",["leafy_green_fiber","raw_roughage","mixed_vegetable_fiber"],"Kale can add leafy green fiber/roughage."),e("corn",["corn kernels","whole kernel corn"],"vegetable","corn_kernel",["corn_kernel","hulls","mechanical_risk"],"Corn kernels can carry hull/mechanical risk."),e("popcorn",["popped corn"],"snack","corn",["popcorn_hull","hulls","mechanical_risk"],"Popcorn hulls can be rough."),e("corn starch",["cornstarch"],"starch","refined",["white_starch"],"Corn starch has low mechanical risk."),e("nuts",["tree nuts"],"nuts_seeds","whole_nuts",["nuts_seeds","mechanical_risk","high_fat"],"Whole nuts combine texture, fiber, and fat load."),e("almonds",["almond"],"nuts_seeds","whole_nuts",["nuts_seeds","mechanical_risk","high_fat"],"Whole almonds can be mechanically rough."),e("peanuts",["peanut"],"nuts_seeds","whole_nuts",["nuts_seeds","mechanical_risk","high_fat"],"Whole peanuts can be mechanically rough."),e("peanut butter",["smooth peanut butter","creamy peanut butter"],"nuts_seeds","smooth_butter",["nuts_seeds","high_fat","smooth_form"],"Smooth nut butter lowers texture risk but still has fat load."),e("seeds",["seed"],"nuts_seeds","seeds",["seeds","mechanical_risk","nuts_seeds"],"Seeds can add mechanical risk."),e("strawberries",["strawberry"],"fruit","small_seed",["seeds","skins","fruit_sugar"],"Berries have small seeds and skins."),e("raspberries",["raspberry"],"fruit","small_seed",["seeds","skins","fruit_sugar"],"Raspberries have small seeds."),e("apple",["apples","apple skin","apple peel"],"fruit","skin_fruit",["skins","fruit_sugar"],"Apple skin can bother some people."),e("applesauce",["apple sauce"],"fruit","soft_peeled",["soft_texture","peeled","low_residue","fruit_sugar"],"Applesauce is softer and peeled."),e("banana",["bananas"],"fruit","soft",["soft_texture","low_residue","fruit_sugar"],"Banana is a soft fruit for many people."),e("mandarin oranges",["canned mandarin oranges","mandarins"],"fruit","soft_canned",["soft_texture","peeled","acidic","fruit_sugar"],"Mandarin oranges are peeled/soft but still acidic/sugary."),e("heavy syrup",["in heavy syrup","corn syrup"],"sweetener","syrup",["heavy_syrup","fruit_sugar"],"Heavy syrup adds sugar load."),e("pineapple",["pineapple chunks"],"fruit","acidic",["acidic","fruit_sugar"],"Pineapple is acidic and may be tolerated personally."),e("watermelon",["water melon"],"fruit","melon",["soft_texture","fruit_sugar"],"Watermelon flesh is soft; seeds change the concern."),e("watermelon seeds",["seeded watermelon"],"fruit","melon_seeds",["seeds","mechanical_risk"],"Watermelon seeds add mechanical risk."),e("sorbitol",["sorbitol syrup"],"sweetener","sugar_alcohol",["sugar_alcohol"],"Sugar alcohols can be rough for sensitive guts."),e("xylitol",["xylitol sweetener"],"sweetener","sugar_alcohol",["sugar_alcohol"],"Sugar alcohols can be rough for sensitive guts."),e("erythritol",["erythritol sweetener"],"sweetener","sugar_alcohol",["sugar_alcohol"],"Sugar alcohols can bother some people."),e("inulin",["chicory root fiber","chicory root extract"],"fiber","added_fiber",["added_fiber","gas_risk"],"Inulin/chicory fiber can be gas-forming."),e("xanthan gum",["xanthan"],"additive","gum",["gum_thickener","processed_food"],"Gums/thickeners may matter for some people."),e("guar gum",["guar"],"additive","gum",["gum_thickener","processed_food"],"Gums/thickeners may matter for some people."),e("carrageenan",["carrageenan gum"],"additive","gum",["gum_thickener","processed_food"],"Carrageenan is a common thickener/additive."),e("soy lecithin",["lecithin"],"additive","emulsifier",["processed_food"],"Emulsifiers are processed-food clues."),e("natural flavor",["natural flavors"],"additive","flavor",["processed_food"],"Natural flavors indicate processing and hidden flavoring."),e("preservatives",["sodium nitrite","sodium nitrate"],"additive","preservative",["processed_food","preservatives"],"Preservatives are processing clues."),e("pepperoni",["pepperoni slices"],"meat","processed_meat",["processed_meat","high_fat","spicy_heat"],"Pepperoni adds processed meat, fat, and spice."),e("sausage",["pork sausage","breakfast sausage"],"meat","processed_meat",["processed_meat","high_fat","spicy_heat"],"Sausage adds processed meat and fat load."),e("bacon",["bacon bits"],"meat","processed_meat",["processed_meat","high_fat","preservatives"],"Bacon adds processed meat, fat, and preservatives."),e("ham",["smoked ham"],"meat","processed_meat",["processed_meat","preservatives"],"Ham is processed meat."),e("fried",["deep fried","fryer"],"prep","fried",["fried","high_fat"],"Fried prep adds fat load."),e("breaded",["breading","crispy coating"],"prep","breaded",["breaded_fried","processed_food"],"Breading is a processed/fried-food clue."),e("hot sauce",["buffalo sauce"],"seasoning","hot",["spicy_heat","acidic","vinegar"],"Hot sauce adds heat and acidity."),e("jalapeño",["jalapeno","jalapeños"],"seasoning","hot_pepper",["spicy_heat"],"Hot peppers add spice risk."),e("cayenne",["cayenne pepper"],"seasoning","hot_pepper",["spicy_heat"],"Cayenne adds spice heat."),e("black pepper",["pepper"],"seasoning","pepper",["spicy_heat"],"Pepper may bother some people."),e("vinegar",["distilled vinegar","white vinegar","apple cider vinegar"],"acid","vinegar",["acidic","vinegar"],"Vinegar adds acidity."),e("egg",["eggs","egg whites"],"protein","egg",["egg"],"Egg is a protein clue; tolerance is personal."),e("chicken",["chicken breast","white meat chicken"],"protein","lean",["lean_protein","soft_texture"],"Plain chicken is lean protein."),e("fish",["cod","haddock","tilapia"],"protein","lean_fish",["lean_protein","soft_texture"],"Lean fish is often a softer protein."),e("salmon",["atlantic salmon"],"protein","fatty_fish",["lean_protein","soft_texture","high_fat"],"Salmon is soft protein with more fat than white fish."),e("rice",["white rice"],"starch","white_starch",["white_starch","low_residue"],"White rice is a lower-residue starch."),e("potato",["peeled potato","mashed potato"],"starch","soft",["white_starch","soft_texture"],"Peeled/soft potato can be gentle depending on toppings."),e("broth",["chicken broth","vegetable broth","stock"],"liquid","broth",["broth_based"],"Broth is a soup clue; sodium may matter."),e("carrots",["carrot"],"vegetable","cooked_root",["well_cooked"],"Cooked carrots can be easier than raw roughage.")];
-function normalizeText(text){return(text||"").toLowerCase().replace(/[’']/g,"").replace(/[^a-z0-9&\s-]/g," ").replace(/\s+/g," ").trim()}function containsTerm(haystack,term){const cleanTerm=normalizeText(term);if(!cleanTerm)return false;const esc=cleanTerm.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");return new RegExp("(^|\\s|-)"+esc+"($|\\s|-)","i").test(haystack)}function findFastCards(text){const hay=normalizeText(text);if(!hay)return[];return MEAL_FAST_CARDS.filter(card=>containsTerm(hay,card.name)||card.aliases.some(a=>containsTerm(hay,a)))}function findIngredientMatches(text){const hay=normalizeText(text);if(!hay)return[];const hits=[];INGREDIENT_DICTIONARY.forEach(item=>{if([item.name,...item.aliases].some(t=>containsTerm(hay,t)))hits.push(item)});return hits}function traitLabel(t){return TRAIT_LABELS[t]||t.replaceAll("_"," ")}function unique(arr){return[...new Set(arr)]}
-function applyRulebook(traits,preferredBase){const set=new Set(traits);let risk=0,gentle=0;set.forEach(t=>{if(RISK_TRAITS.has(t))risk++;if(GENTLE_TRAITS.has(t))gentle++});let normal="unknown";if(preferredBase&&preferredBase!=="unknown")normal=preferredBase;else if(risk===0&&gentle>0)normal="usually_gentle";else if(risk<=2&&gentle>=risk)normal="caution";else if(risk>=6)normal="likely_rough";else normal="caution";if(normal==="usually_gentle"&&risk>=2)normal="caution";if(risk>=7)normal="likely_rough";let flareRisk=0;set.forEach(t=>{if(FLARE_TRAITS.has(t))flareRisk++});let flare=normal;if(flareRisk===0&&normal==="usually_gentle")flare="usually_gentle";else if(flareRisk<=2&&normal==="usually_gentle")flare="caution";else if(flareRisk<=4)flare="flare_caution";else flare="likely_rough";return{normal,flare,risk,gentle,flareRisk}}
-function buildReason(o){const{cards,ingredientHits,traits,inputType}=o;if(cards.length&&ingredientHits.length)return`${cards[0].reason} The ingredient list also confirmed ${ingredientHits.slice(0,7).map(x=>x.name).join(", ")}.`;if(cards.length)return cards[0].reason;if(ingredientHits.length){const key=ingredientHits.slice(0,8).map(x=>x.name).join(", ");const riskTraits=traits.filter(t=>RISK_TRAITS.has(t)).slice(0,8).map(traitLabel).join(", ");return`The ingredient text matched ${key}. Main concerns detected: ${riskTraits||"none obvious from the starter dictionary"}.`}if(inputType==="quick")return"No exact Fast Card was found. The app could not detect enough food words for a stronger read yet.";return"No strong ingredient matches were found from the starter dictionary. Add more ingredient text or save this as a new food for personal tracking."}function nextStep(o){const{cards,ingredientHits,inputType,ingredientText}=o;if(inputType==="quick"&&!ingredientText.trim())return"Scan or paste the ingredient list for a deeper check.";if(!cards.length&&!ingredientHits.length)return"Add an ingredient list, adjust the food name, or save this as a new food and log your reaction after testing.";if(inputType==="deep")return"Save this food if you want the app to remember it, then log how it went after eating.";return"Use Deep Check to confirm hidden ingredients, then save/log if this is a food you may eat again."}
-function analyze(inputType){const foodName=document.getElementById("foodName").value.trim(),ingredientText=document.getElementById("ingredients").value.trim(),brand=document.getElementById("brand").value.trim(),notes=document.getElementById("notes").value.trim();const deepText=inputType==="deep"?`${foodName} ${ingredientText}`:foodName;const cards=findFastCards(foodName);const ingredientHits=findIngredientMatches(deepText);let traits=[],expectedIngredients=[];cards.forEach(c=>{traits.push(...c.likelyTraits);expectedIngredients.push(...c.expectedIngredients)});ingredientHits.forEach(i=>traits.push(...i.traits));traits=unique(traits);expectedIngredients=unique(expectedIngredients);const rules=applyRulebook(traits,cards[0]?.normalRating||"unknown");let confidence="unknown";if(inputType==="deep"&&ingredientHits.length)confidence="ingredient_confirmed";else if(cards.length)confidence="template_based";else if(foodName)confidence="preliminary";lastAnalysis={id:cryptoId(),timestamp:new Date().toISOString(),inputType,foodName,brand,notes,ingredientText,detectedFood:cards[0]?.name||foodName||(ingredientHits.length?"Ingredient-based food":"Unknown food"),cards,ingredientHits,expectedIngredients,traits,normalRating:rules.normal,flareRating:rules.flare,activeRating:currentMode==="flare"?rules.flare:rules.normal,confidence,reason:buildReason({cards,ingredientHits,traits,inputType}),next:nextStep({cards,ingredientHits,inputType,foodName,ingredientText}),rules};renderResult(lastAnalysis)}
-function renderResult(a){const rating=currentMode==="flare"?a.flareRating:a.normalRating;const matchedNames=a.ingredientHits.map(x=>x.name);const fastCardName=a.cards[0]?.name||"None";document.getElementById("result").innerHTML=`<div class="status ${rating}">${RATINGS[rating]||"Unknown"}</div><div class="big-rating">${escapeHtml(a.detectedFood||"Unknown Food")}</div><div class="subline">${currentMode==="flare"?"Flare Mode result":"Normal Mode result"} · ${formatConfidence(a.confidence)}</div><div class="cards"><div class="metric"><div class="k">Normal</div><div class="v">${RATINGS[a.normalRating]||"Unknown"}</div></div><div class="metric"><div class="k">Flare</div><div class="v">${RATINGS[a.flareRating]||"Unknown"}</div></div><div class="metric"><div class="k">Fast Card</div><div class="v">${escapeHtml(fastCardName)}</div></div><div class="metric"><div class="k">Confidence</div><div class="v">${formatConfidence(a.confidence)}</div></div></div><label>Detected traits</label><div class="chips">${a.traits.length?a.traits.map(t=>`<span class="chip ${GENTLE_TRAITS.has(t)?"gentle":RISK_TRAITS.has(t)?"risk":""}">${escapeHtml(traitLabel(t))}</span>`).join(""):`<span class="chip">none detected yet</span>`}</div><label style="margin-top:14px;">Matched ingredient words</label><div class="chips">${matchedNames.length?matchedNames.map(n=>`<span class="chip">${escapeHtml(n)}</span>`).join(""):`<span class="chip">none detected yet</span>`}</div><div class="why"><strong>Why:</strong> ${escapeHtml(a.reason)}</div><div class="next"><strong>Next:</strong> ${escapeHtml(a.next)}</div>`}
-function formatConfidence(c){return(c||"unknown").replaceAll("_"," ").replace(/\b\w/g,s=>s.toUpperCase())}function cryptoId(){return window.crypto&&crypto.randomUUID?crypto.randomUUID():"id_"+Date.now()+"_"+Math.random().toString(16).slice(2)}function getSavedFoods(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]")}catch(e){return[]}}function setSavedFoods(foods){localStorage.setItem(STORAGE_KEY,JSON.stringify(foods))}
-function saveAsNewFood(){if(!lastAnalysis)analyze(document.getElementById("ingredients").value.trim()?"deep":"quick");if(!lastAnalysis)return;const foods=getSavedFoods();const name=document.getElementById("foodName").value.trim()||lastAnalysis.detectedFood||"Unnamed food";const record={id:cryptoId(),foodName:name,brandOrSource:document.getElementById("brand").value.trim(),foodType:lastAnalysis.cards[0]?.foodType||"",frontText:document.getElementById("foodName").value.trim(),ingredientText:document.getElementById("ingredients").value.trim(),detectedTraits:lastAnalysis.traits,normalRating:lastAnalysis.normalRating,flareRating:lastAnalysis.flareRating,confidence:"user_saved_food",userNotes:document.getElementById("notes").value.trim(),reactionHistory:[],createdAt:new Date().toISOString()};foods.unshift(record);setSavedFoods(foods);renderSavedFoods();lastAnalysis.confidence="user_saved_food";lastAnalysis.detectedFood=name;renderResult(lastAnalysis)}
-function renderSavedFoods(){const foods=getSavedFoods(),box=document.getElementById("savedList");if(!foods.length){box.innerHTML=`<div class="empty">No saved foods yet. Run a scan, then tap “Save as New Food.”</div>`;return}box.innerHTML=foods.map(food=>`<div class="saved-item"><div class="saved-title">${escapeHtml(food.foodName)}</div><div class="saved-meta">${escapeHtml(food.brandOrSource||"No source")} · Normal: ${RATINGS[food.normalRating]||"Unknown"} · Flare: ${RATINGS[food.flareRating]||"Unknown"} · Logs: ${food.reactionHistory?.length||0}</div><div class="chips">${(food.detectedTraits||[]).slice(0,8).map(t=>`<span class="chip">${escapeHtml(traitLabel(t))}</span>`).join("")}</div><div class="saved-actions" style="margin-top:10px;"><button class="btn mini secondary" onclick="loadFood('${food.id}')">Load</button><button class="btn mini green" onclick="openReaction('${food.id}')">Log Reaction</button><button class="btn mini red" onclick="deleteFood('${food.id}')">Delete</button></div></div>`).join("")}
-function loadFood(id){const food=getSavedFoods().find(f=>f.id===id);if(!food)return;document.getElementById("foodName").value=food.frontText||food.foodName||"";document.getElementById("ingredients").value=food.ingredientText||"";document.getElementById("brand").value=food.brandOrSource||"";document.getElementById("notes").value=food.userNotes||"";analyze(food.ingredientText?"deep":"quick");if(lastAnalysis){lastAnalysis.confidence=food.reactionHistory?.length?"personal_history_confirmed":"user_saved_food";if(food.reactionHistory?.some(r=>r.reaction==="personal_trigger")){lastAnalysis.normalRating="personal_trigger";lastAnalysis.flareRating="personal_trigger";lastAnalysis.reason+=" Personal history marks this as a personal trigger."}renderResult(lastAnalysis)}window.scrollTo({top:0,behavior:"smooth"})}function deleteFood(id){setSavedFoods(getSavedFoods().filter(f=>f.id!==id));renderSavedFoods()}function openReaction(id){document.getElementById("reactionFoodId").value=id;document.getElementById("portion").value="";document.getElementById("reaction").value="worked";document.getElementById("reactionNotes").value="";document.getElementById("reactionDialog").showModal()}function saveReaction(){const id=document.getElementById("reactionFoodId").value;const foods=getSavedFoods();const food=foods.find(f=>f.id===id);if(!food)return;food.reactionHistory=food.reactionHistory||[];food.reactionHistory.unshift({date:new Date().toISOString(),mode:currentMode,portion:document.getElementById("portion").value.trim(),reaction:document.getElementById("reaction").value,notes:document.getElementById("reactionNotes").value.trim()});if(food.reactionHistory.some(r=>r.reaction==="personal_trigger")){food.normalRating="personal_trigger";food.flareRating="personal_trigger"}setSavedFoods(foods);document.getElementById("reactionDialog").close();renderSavedFoods()}function escapeHtml(str){return String(str||"").replace(/[&<>"']/g,s=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[s]))}function clearAll(){["foodName","ingredients","brand","notes"].forEach(id=>document.getElementById(id).value="");lastAnalysis=null;document.getElementById("result").innerHTML=`<div class="empty">Enter a food name, front-label text, or ingredients. Then tap Quick Read or Deep Check.</div>`}
-document.getElementById("normalBtn").addEventListener("click",()=>{currentMode="normal";normalBtn.classList.add("active");flareBtn.classList.remove("active");if(lastAnalysis)renderResult(lastAnalysis)});document.getElementById("flareBtn").addEventListener("click",()=>{currentMode="flare";flareBtn.classList.add("active");normalBtn.classList.remove("active");if(lastAnalysis)renderResult(lastAnalysis)});quickBtn.addEventListener("click",()=>analyze("quick"));deepBtn.addEventListener("click",()=>analyze("deep"));saveBtn.addEventListener("click",saveAsNewFood);clearBtn.addEventListener("click",clearAll);closeDialog.addEventListener("click",()=>reactionDialog.close());saveReactionBtn.addEventListener("click",saveReaction);document.querySelectorAll(".sample").forEach(btn=>btn.addEventListener("click",()=>{const s=btn.dataset.sample;foodName.value=s;if(s.includes("Whole Foods"))ingredients.value="white beans, kale, vegetable broth, onion, garlic, tomato paste, olive oil, spices";else if(s==="broccoli cheddar soup")ingredients.value="cream, cheddar cheese, broccoli, onion powder, garlic powder, xanthan gum";else ingredients.value="";analyze(ingredients.value?"deep":"quick")}));renderSavedFoods();
+const STORAGE_KEY="bbb_v104_saved_foods";
+const VIEW_KEY="bbb_v104_scan_view";
+const MODE_KEY="bbb_v104_mode";
+
+function svg(paths){return `<svg viewBox="0 0 24 24" aria-hidden="true">${paths}</svg>`;}
+const icons={
+  home:svg('<path d="M3 11.5 12 4l9 7.5"></path><path d="M5.5 10.5V20h5v-5h3v5h5v-9.5"></path>'),
+  camera:svg('<path d="M4 8h3l1.5-2h7L17 8h3v10H4z"></path><circle cx="12" cy="13" r="3"></circle>'),
+  activity:svg('<path d="M3 12h4l2-7 4 14 2-7h6"></path>'),
+  user:svg('<circle cx="12" cy="8" r="3.2"></circle><path d="M5 20c1.2-4 12.8-4 14 0"></path>'),
+  gauge:svg('<path d="M4 15a8 8 0 1 1 16 0"></path><path d="M12 15l4-4"></path><path d="M6.5 15h.1"></path><path d="M17.5 15h.1"></path>'),
+  shield:svg('<path d="M12 3 19 6v5c0 5-3.5 8.5-7 10-3.5-1.5-7-5-7-10V6z"></path><path d="m9 12 2 2 4-5"></path>'),
+  ban:svg('<circle cx="12" cy="12" r="8"></circle><path d="M7 7l10 10"></path>'),
+  clipboard:svg('<rect x="6" y="5" width="12" height="16" rx="2"></rect><path d="M9 5a3 3 0 0 1 6 0"></path><path d="M9 11h6"></path><path d="M9 15h6"></path>'),
+  search:svg('<circle cx="11" cy="11" r="6"></circle><path d="m16 16 4 4"></path>')
+};
+
+const RATINGS={usually_gentle:"good",caution:"ehh",flare_caution:"flare caution",likely_rough:"ugly",personal_trigger:"personal trigger",unknown:"unknown"};
+const RISK_TRAITS=new Set(["mechanical_risk","seeds","skins","hulls","nuts_seeds","raw_roughage","corn_kernel","popcorn_hull","high_fat","fried","breaded_fried","processed_meat","sugar_alcohol","added_fiber","beans_legumes","gas_risk","garlic_onion","spicy_heat","acidic","tomato_acid","gum_thickener","processed_food","dairy","lactose_possible","cruciferous","heavy_syrup"]);
+const FLARE_TRAITS=new Set(["mechanical_risk","seeds","skins","hulls","nuts_seeds","raw_roughage","corn_kernel","popcorn_hull","beans_legumes","gas_risk","garlic_onion","fried","breaded_fried","high_fat","dairy","lactose_possible","spicy_heat","gum_thickener","processed_food","processed_meat","added_fiber","sugar_alcohol","cruciferous","heavy_syrup"]);
+const GENTLE_TRAITS=new Set(["soft_texture","broth_based","lean_protein","white_starch","well_cooked","peeled","pureed","strained","low_residue","smooth_form"]);
+const TRAIT_LABELS={mechanical_risk:"mechanical risk",seeds:"seeds",skins:"skins",hulls:"hulls",nuts_seeds:"nuts/seeds",raw_roughage:"raw roughage",corn_kernel:"corn kernels",popcorn_hull:"popcorn hulls",high_fat:"fat load",fried:"fried",breaded_fried:"breaded/fried",processed_meat:"processed meat",sugar_alcohol:"sugar alcohol",added_fiber:"added fiber",beans_legumes:"beans/legumes",gas_risk:"gas risk",garlic_onion:"garlic/onion",spicy_heat:"spicy heat",acidic:"acidic",tomato_acid:"tomato acid",gum_thickener:"gum/thickener",processed_food:"processed food",dairy:"dairy",lactose_possible:"lactose possible",cruciferous:"cruciferous",heavy_syrup:"heavy syrup",soft_texture:"soft texture",broth_based:"broth based",lean_protein:"lean protein",white_starch:"white starch",well_cooked:"well cooked",peeled:"peeled",pureed:"pureed",strained:"strained",low_residue:"low residue",smooth_form:"smooth form",refined_grain:"refined grain",fruit_sugar:"fruit sugar"};
+
+const MEAL_FAST_CARDS=[
+  card("minestrone soup",["minestrone","vegetable minestrone"],"soup",["beans","tomato","onion","garlic","pasta","mixed vegetables"],["beans_legumes","tomato_acid","garlic_onion","mixed_vegetable_fiber","broth_based","white_starch"],"caution","likely_rough","Minestrone commonly includes beans, tomato, onion, garlic, pasta, and mixed vegetables, which can stack gas, acid, and fiber concerns."),
+  card("chicken noodle soup",["chicken noodle","chicken soup with noodles"],"soup",["chicken","noodles","broth","carrot","celery","onion"],["broth_based","lean_protein","white_starch","garlic_onion"],"usually_gentle","caution","Chicken noodle soup is often broth-based with lean protein and refined noodles, but onion, garlic, fat, sodium, or additives can still matter."),
+  card("broccoli cheddar soup",["broccoli cheese soup","broccoli cheddar"],"soup",["broccoli","cheddar","cream","milk","onion"],["dairy","high_fat","cruciferous","garlic_onion","creamy"],"caution","flare_caution","Broccoli cheddar soup commonly combines dairy, fat load, cruciferous vegetable fiber, and onion/garlic seasoning."),
+  card("tomato soup",["cream of tomato soup","tomato bisque"],"soup",["tomato","cream","milk","sugar","onion"],["tomato_acid","acidic","dairy","high_fat","garlic_onion"],"caution","flare_caution","Tomato soup is often acidic and may include dairy, sugar, onion, garlic, or thickeners."),
+  card("pepperoni pizza",["pizza with pepperoni"],"pizza",["pepperoni","cheese","tomato sauce","wheat crust"],["processed_meat","dairy","high_fat","tomato_acid","spicy_heat","processed_food","refined_grain"],"caution","likely_rough","Pepperoni pizza commonly combines processed meat, cheese/dairy, fat load, tomato acidity, spice, and processed-food traits."),
+  card("cheese pizza",["four cheese pizza","plain cheese pizza"],"pizza",["cheese","tomato sauce","wheat crust"],["dairy","high_fat","tomato_acid","processed_food","refined_grain"],"caution","flare_caution","Cheese pizza commonly includes dairy, fat load, tomato acidity, refined crust, and processed-food traits."),
+  card("mac and cheese",["macaroni and cheese","mac & cheese"],"pasta",["pasta","cheese","milk","butter","cream"],["dairy","high_fat","white_starch","processed_food"],"caution","flare_caution","Mac and cheese usually combines refined starch with dairy and fat load; boxed or frozen versions may add thickeners."),
+  card("breakfast burrito",["sausage breakfast burrito","egg cheese burrito"],"breakfast",["tortilla","egg","cheese","sausage","pepper","onion"],["dairy","processed_meat","high_fat","garlic_onion","spicy_heat","refined_grain"],"caution","flare_caution","Breakfast burritos often combine egg, cheese, processed meat, fat, tortilla, and sometimes peppers/onions."),
+  card("plain grilled chicken",["grilled chicken","plain chicken breast","chicken breast"],"chicken",["chicken"],["lean_protein","soft_texture"],"usually_gentle","usually_gentle","Plain grilled chicken is a lean protein and is often one of the simpler foods to test, depending on seasoning and portion.")
+];
+function card(name,aliases,foodType,expectedIngredients,likelyTraits,normalRating,flareRating,reason){return{name,aliases,foodType,expectedIngredients,likelyTraits,normalRating,flareRating,reason};}
+
+const INGREDIENT_DICTIONARY=[
+  ing("onion",["onions","onion powder","dehydrated onion"],["garlic_onion","gas_risk"],"Onion can be a gas/pungent trigger."),
+  ing("garlic",["garlic powder","minced garlic"],["garlic_onion","gas_risk"],"Garlic can be a gas/pungent trigger."),
+  ing("cream",["heavy cream","whipping cream"],["dairy","lactose_possible","high_fat"],"Cream adds dairy and fat load."),
+  ing("milk",["whole milk","skim milk"],["dairy","lactose_possible"],"Milk may matter for lactose or dairy tolerance."),
+  ing("cheese",["cheddar","mozzarella","parmesan","american cheese"],["dairy","high_fat"],"Cheese adds dairy and fat load."),
+  ing("wheat flour",["enriched wheat flour","flour"],["white_starch","refined_grain"],"Refined flour is lower mechanical risk than bran/whole grains."),
+  ing("whole wheat",["whole wheat flour","bran"],["mechanical_risk","raw_roughage"],"Whole grains/bran may add rough fiber."),
+  ing("tomato",["tomato paste","tomato sauce","marinara"],["tomato_acid","acidic"],"Tomato can add acidity."),
+  ing("beans",["white beans","black beans","kidney beans","navy beans"],["beans_legumes","gas_risk"],"Beans can add gas and fiber concerns."),
+  ing("lentils",["red lentils","green lentils"],["beans_legumes","gas_risk"],"Lentils are legumes and can add gas/fiber concerns."),
+  ing("broccoli",["broccoli florets"],["cruciferous","gas_risk"],"Broccoli can add gas/fiber concerns."),
+  ing("kale",["leafy kale"],["raw_roughage","mixed_vegetable_fiber"],"Kale can add leafy green fiber/roughage."),
+  ing("corn",["corn kernels","whole kernel corn"],["corn_kernel","hulls","mechanical_risk"],"Corn kernels can carry hull/mechanical risk."),
+  ing("popcorn",["popped corn"],["popcorn_hull","hulls","mechanical_risk"],"Popcorn hulls can be rough."),
+  ing("nuts",["almonds","peanuts","cashews","walnuts","pecans"],["nuts_seeds","mechanical_risk","high_fat"],"Whole nuts combine texture, fiber, and fat load."),
+  ing("peanut butter",["smooth peanut butter","creamy peanut butter"],["nuts_seeds","high_fat","smooth_form"],"Smooth nut butter lowers texture risk but still has fat load."),
+  ing("seeds",["sunflower seeds","poppy seeds","sesame seeds"],["seeds","mechanical_risk","nuts_seeds"],"Seeds can add mechanical risk."),
+  ing("berries",["strawberries","raspberries","blackberries"],["seeds","skins","fruit_sugar"],"Berries have small seeds and skins."),
+  ing("apple",["apples","apple skin","apple peel"],["skins","fruit_sugar"],"Apple skin can bother some people."),
+  ing("applesauce",["apple sauce"],["soft_texture","peeled","low_residue","fruit_sugar"],"Applesauce is softer and peeled."),
+  ing("banana",["bananas"],["soft_texture","low_residue","fruit_sugar"],"Banana is a soft fruit for many people."),
+  ing("mandarin oranges",["canned mandarin oranges","mandarins"],["soft_texture","peeled","acidic","fruit_sugar"],"Mandarin oranges are peeled/soft but still acidic/sugary."),
+  ing("heavy syrup",["in heavy syrup","corn syrup"],["heavy_syrup","fruit_sugar"],"Heavy syrup adds sugar load."),
+  ing("sorbitol",["xylitol","erythritol","maltitol"],["sugar_alcohol"],"Sugar alcohols can be rough for sensitive guts."),
+  ing("inulin",["chicory root fiber","chicory root extract"],["added_fiber","gas_risk"],"Inulin/chicory fiber can be gas-forming."),
+  ing("xanthan gum",["guar gum","carrageenan"],["gum_thickener","processed_food"],"Gums/thickeners may matter for some people."),
+  ing("natural flavor",["natural flavors","soy lecithin"],["processed_food"],"Processing/additive clue."),
+  ing("pepperoni",["pepperoni slices"],["processed_meat","high_fat","spicy_heat"],"Pepperoni adds processed meat, fat, and spice."),
+  ing("sausage",["pork sausage","breakfast sausage"],["processed_meat","high_fat","spicy_heat"],"Sausage adds processed meat and fat load."),
+  ing("bacon",["bacon bits"],["processed_meat","high_fat"],"Bacon adds processed meat and fat."),
+  ing("fried",["deep fried","fryer"],["fried","high_fat"],"Fried prep adds fat load."),
+  ing("breaded",["breading","crispy coating"],["breaded_fried","processed_food"],"Breading is a processed/fried-food clue."),
+  ing("hot sauce",["buffalo sauce","jalapeno","jalapeño","cayenne"],["spicy_heat","acidic"],"Hot sauce or hot peppers add heat and acidity."),
+  ing("vinegar",["distilled vinegar","white vinegar"],["acidic"],"Vinegar adds acidity."),
+  ing("chicken",["chicken breast","white meat chicken"],["lean_protein","soft_texture"],"Plain chicken is lean protein."),
+  ing("rice",["white rice","jasmine rice","basmati rice"],["white_starch","low_residue"],"White rice is a lower-residue starch."),
+  ing("broth",["chicken broth","vegetable broth","stock"],["broth_based"],"Broth is a soup clue; sodium may matter.")
+];
+function ing(name,aliases,traits,reason){return{name,aliases,traits,reason};}
+
+const PRODUCT_DB=[
+  {brand:"Campbell's",name:"Chicken Noodle Soup",category:"Soups",normal:"caution",flare:"caution",notes:"Soup can be useful but ingredients such as onion/garlic/cream/beans matter."},
+  {brand:"Wegmans",name:"Tomato Soup",category:"Soups",normal:"caution",flare:"caution",notes:"Tomato acidity and dairy/cream are the main checks."},
+  {brand:"Stouffer's",name:"Mac and Cheese",category:"Frozen Meals",normal:"caution",flare:"likely_rough",notes:"Prepared/complex food; ingredient label preferred."},
+  {brand:"Wegmans",name:"Jasmine Rice",category:"Rice",normal:"usually_gentle",flare:"usually_gentle",notes:"Plain white rice is a common lower-residue starch."},
+  {brand:"Wegmans",name:"Fresh Salmon Fillet",category:"Fish",normal:"usually_gentle",flare:"caution",notes:"Base protein; verify seasoning/sauce."},
+  {brand:"Wegmans",name:"Everything Bagels",category:"Bagels",normal:"caution",flare:"likely_rough",notes:"Seeds, onion/garlic, and whole grains can matter."}
+];
+
+const state={
+  activeTab:"home",
+  mode:localStorage.getItem(MODE_KEY)||"normal",
+  scanView:localStorage.getItem(VIEW_KEY)||"expanded",
+  foodName:"",
+  ingredientText:"",
+  notes:"",
+  brand:"",
+  capturedImage:"",
+  capturedMeta:null,
+  cameraMessage:"",
+  lastAnalysis:null,
+  savedNotice:""
+};
+
+function escapeHtml(v){return String(v||"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[ch]));}
+function normalizeText(t){return String(t||"").toLowerCase().replace(/[’']/g,"").replace(/[^a-z0-9&\s-]/g," ").replace(/\s+/g," ").trim();}
+function containsTerm(hay,term){const clean=normalizeText(term);if(!clean)return false;const esc=clean.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");return new RegExp("(^|\\s|-)"+esc+"($|\\s|-)","i").test(hay);}
+function unique(a){return [...new Set(a)];}
+function traitLabel(t){return TRAIT_LABELS[t]||t.replaceAll("_"," ");}
+function formatConfidence(c){return String(c||"unknown").replaceAll("_"," ").replace(/\b\w/g,s=>s.toUpperCase());}
+function ratingClass(r){if(r==="usually_gentle")return"good";if(r==="likely_rough"||r==="personal_trigger")return"ugly";if(r==="flare_caution")return"flare";return"ehh";}
+function ratingPill(r){return `<span class="rating-pill rating-${ratingClass(r)}">${escapeHtml(RATINGS[r]||"unknown")}</span>`;}
+function findFastCards(text){const hay=normalizeText(text);return MEAL_FAST_CARDS.filter(c=>containsTerm(hay,c.name)||c.aliases.some(a=>containsTerm(hay,a)));}
+function findIngredientMatches(text){const hay=normalizeText(text);return INGREDIENT_DICTIONARY.filter(i=>[i.name,...i.aliases].some(t=>containsTerm(hay,t)));}
+function findProducts(text){const hay=normalizeText(text);if(!hay)return[];return PRODUCT_DB.filter(p=>normalizeText(`${p.brand} ${p.name} ${p.category} ${p.notes}`).includes(hay)||hay.split(" ").some(w=>w.length>3&&normalizeText(`${p.name} ${p.category}`).includes(w))).slice(0,4);}
+function applyRulebook(traits,base){const set=new Set(traits);let risk=0,gentle=0,flareRisk=0;set.forEach(t=>{if(RISK_TRAITS.has(t))risk++;if(GENTLE_TRAITS.has(t))gentle++;if(FLARE_TRAITS.has(t))flareRisk++;});let normal=base||"unknown";if(normal==="unknown"){if(risk===0&&gentle>0)normal="usually_gentle";else if(risk>=6)normal="likely_rough";else normal="caution";}if(normal==="usually_gentle"&&risk>=2)normal="caution";if(risk>=7)normal="likely_rough";let flare=normal;if(flareRisk===0&&normal==="usually_gentle")flare="usually_gentle";else if(flareRisk<=2&&normal==="usually_gentle")flare="caution";else if(flareRisk<=4)flare="flare_caution";else flare="likely_rough";return{normal,flare,risk,gentle,flareRisk};}
+function analyze(type){
+  captureInputs();
+  const quick=state.foodName;
+  const deep=type==="deep"?`${state.foodName} ${state.ingredientText}`:state.foodName;
+  const cards=findFastCards(quick);
+  const hits=findIngredientMatches(deep);
+  const products=findProducts(state.foodName);
+  let traits=[];cards.forEach(c=>traits.push(...c.likelyTraits));hits.forEach(h=>traits.push(...h.traits));traits=unique(traits);
+  let base=cards[0]?.normalRating||products[0]?.normal||"unknown";
+  const rules=applyRulebook(traits,base);
+  let confidence="unknown";
+  if(type==="deep"&&hits.length)confidence="ingredient_confirmed";
+  else if(cards.length)confidence="template_based";
+  else if(products.length)confidence="product_database_match";
+  else if(state.foodName)confidence="preliminary";
+  const detected=cards[0]?.name||products[0]?`${products[0]?.brand||""} ${products[0]?.name||""}`.trim():state.foodName||"Unknown food";
+  const reason=cards.length?(cards[0].reason+(hits.length?` Ingredient words also matched: ${hits.slice(0,6).map(x=>x.name).join(", ")}.`:"")):hits.length?`Ingredient text matched ${hits.slice(0,8).map(x=>x.name).join(", ")}.`:products.length?products[0].notes:"No exact Fast Card yet. Use Deep Check or save this food to personal memory.";
+  const next=type==="quick"&&!state.ingredientText.trim()?"Scan or paste the ingredient list for a deeper check.": "Save this food if you want the app to remember it, then log how it went after eating.";
+  state.lastAnalysis={type,detected,cards,hits,products,traits,normalRating:rules.normal,flareRating:rules.flare,confidence,reason,next};
+  state.savedNotice="";
+  render();
+}
+function screenTitle(title,subtitle){const flare=state.mode==="Flare";return `<div class="screen-title"><button class="mode-status-pill ${flare?"flare":"normal"}" data-action="toggle-mode" type="button"><span class="mode-flame"></span><span>${flare?"Flare":"normal"}</span></button><p>${escapeHtml(title)}</p><h2>${escapeHtml(subtitle)}</h2></div>`;}
+function homeScreen(){return `<div class="screen-content">${screenTitle("BB","Today starts with a Gut Check.")}<div class="belly-meter"><span class="icon">${icons.gauge}</span><div><p>Belly Meter</p><strong>steady</strong><span>Recognition Engine merge is ready for scanner testing.</span></div></div><div class="grid-two"><button class="primary-action" data-action="go-scan" type="button">scan food</button><button class="secondary-action" data-action="go-flare" type="button">flare help</button></div></div>`;}
+function scanScreen(){
+  const a=state.lastAnalysis;
+  return `<div class="screen-content">
+    ${screenTitle("Scan","Quick Read first. Deep Check when you need the ingredient truth.")}
+    <div class="viewbar"><div><strong>${state.scanView==="compact"?"Compact View":"Expanded View"}</strong><br><span>${state.scanView==="compact"?"Open sections as needed.":"Sections are open so you can see what this screen does."}</span></div><button class="secondary-action compact-action" data-action="toggle-view" type="button">${state.scanView==="compact"?"expanded":"compact"}</button></div>
+    <section class="input-card">
+      <h3>Quick Read</h3>
+      <p class="search-hint">Use a food name, package front, menu item, or recipe title for a fast preliminary read.</p>
+      <div class="search-row" style="margin-top:10px;">
+        <input id="foodName" value="${escapeHtml(state.foodName)}" placeholder="pepperoni pizza, minestrone soup, chicken noodle soup" />
+        <button class="secondary-action compact-action" data-action="clear-scan" type="button">clear</button>
+      </div>
+      <div class="grid-two" style="margin-top:10px;">
+        <button class="primary-action" data-action="quick-read" type="button">quick read</button>
+        <button class="primary-action" data-action="deep-check" type="button">deep check</button>
+      </div>
+    </section>
+    ${a?resultCard(a):`<article class="result-card"><h3>No scan yet</h3><p class="small-muted">Enter a food clue and tap Quick Read, or open Deep Check for ingredients.</p></article>`}
+    <details class="drawer optional" id="deepDrawer" ${state.scanView==="expanded"?"open":""}>
+      <summary><span class="drawer-title">Deep Check — ingredients / recipe text</span></summary>
+      <div class="drawer-body">
+        <textarea id="ingredientText" placeholder="cream, cheddar cheese, broccoli, onion powder, garlic powder, xanthan gum">${escapeHtml(state.ingredientText)}</textarea>
+        <p class="search-hint">Preferred for packaged foods. This catches hidden triggers the front of the box may not show.</p>
+        <button class="primary-action full-width" data-action="deep-check" type="button">run deep check</button>
+      </div>
+    </details>
+    <details class="drawer optional" id="cameraDrawer" ${state.scanView==="expanded"?"open":""}>
+      <summary><span class="drawer-title">Camera Scan</span></summary>
+      <div class="drawer-body">
+        <p class="search-hint">Use the camera to test package capture. OCR/barcode wiring comes next; this build confirms camera flow and stores the preview.</p>
+        <button class="primary-action full-width" data-action="open-camera" type="button"><span class="icon">${icons.camera}</span> scan product</button>
+        ${state.capturedImage?`<img class="camera-result-preview" src="${state.capturedImage}" alt="Captured scan preview"><p class="small-muted">${escapeHtml(state.cameraMessage)} ${state.capturedMeta?`Image: ${state.capturedMeta.width} × ${state.capturedMeta.height}px • ${state.capturedMeta.sizeKb} KB`:``}</p>`:""}
+      </div>
+    </details>
+    <details class="drawer optional" id="personalDrawer" ${state.scanView==="expanded"?"open":""}>
+      <summary><span class="drawer-title">Personal Food Memory (${getSavedFoods().length})</span></summary>
+      <div class="drawer-body">${savedFoodsList()}</div>
+    </details>
+  </div>`;
+}
+function resultCard(a){
+  const active=state.mode==="Flare"?a.flareRating:a.normalRating;
+  return `<article class="result-card">
+    <div class="result-top"><div><h3>${escapeHtml(a.detected)}</h3><span>${state.mode==="Flare"?"Flare Mode":"Normal Mode"} · ${formatConfidence(a.confidence)}</span></div>${ratingPill(active)}</div>
+    <div class="grid-two" style="margin-top:12px;"><div>${ratingPill(a.normalRating)}<p class="small-muted">normal</p></div><div>${ratingPill(a.flareRating)}<p class="small-muted">flare</p></div></div>
+    <details class="drawer optional" id="detailsDrawer" ${state.scanView==="expanded"?"open":""} style="margin-top:12px;">
+      <summary><span class="drawer-title">Detected Details</span></summary>
+      <div class="drawer-body">
+        <div class="chips">${a.traits.length?a.traits.map(t=>`<span class="chip ${GENTLE_TRAITS.has(t)?"gentle":RISK_TRAITS.has(t)?"risk":""}">${escapeHtml(traitLabel(t))}</span>`).join(""):`<span class="chip">none detected yet</span>`}</div>
+        <p class="small-muted">Ingredient words: ${a.hits.length?a.hits.map(x=>x.name).join(", "):"none detected yet"}</p>
+      </div>
+    </details>
+    <div class="why" style="margin-top:12px;"><strong>Why:</strong> ${escapeHtml(a.reason)}</div>
+    <div class="next" style="margin-top:10px;"><strong>Next:</strong> ${escapeHtml(a.next)}</div>
+    <div class="grid-two" style="margin-top:12px;"><button class="secondary-action" data-action="save-food" type="button">save it</button><button class="primary-action" data-action="log-reaction" type="button">ate it</button></div>
+    ${state.savedNotice?`<p class="small-muted" style="margin-top:10px;color:var(--purple-light);font-weight:900;">${escapeHtml(state.savedNotice)}</p>`:""}
+  </article>`;
+}
+function flareScreen(){return `<div class="screen-content">${screenTitle("Flare","normal and flare-mode food guidance.")}<div class="grid-two"><button class="${state.mode==="normal"?"primary-action":"secondary-action"}" data-action="normal-mode" type="button">normal mode</button><button class="${state.mode==="Flare"?"primary-action":"secondary-action"}" data-action="flare-mode" type="button">flare mode</button></div><article class="food-panel"><h3>Flare logic</h3><p class="small-muted">Flare Mode upgrades mechanical risk, fried/high-fat foods, beans/legumes, dairy, garlic/onion, spice, gums, and processed foods more conservatively.</p></article></div>`;}
+function meScreen(){return `<div class="screen-content">${screenTitle("Me","Personal food profile and records.")}<article class="food-panel"><h3>Saved foods</h3>${savedFoodsList()}</article></div>`;}
+function savedFoodsList(){const foods=getSavedFoods();if(!foods.length)return`<p class="small-muted">No saved foods yet.</p>`;return`<div class="saved-list">${foods.map(f=>`<div class="saved-item"><div class="saved-title">${escapeHtml(f.foodName)}</div><div class="saved-meta">Normal: ${escapeHtml(RATINGS[f.normalRating]||f.normalRating)} · Flare: ${escapeHtml(RATINGS[f.flareRating]||f.flareRating)} · Logs: ${f.reactionHistory?.length||0}</div><div class="grid-two" style="margin-top:8px;"><button class="secondary-action compact-action" data-action="load-saved" data-id="${f.id}" type="button">load</button><button class="secondary-action compact-action" data-action="delete-saved" data-id="${f.id}" type="button">delete</button></div></div>`).join("")}</div>`;}
+function captureInputs(){["foodName","ingredientText"].forEach(id=>{const el=document.getElementById(id);if(el)state[id]=el.value;});}
+function getSavedFoods(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]")}catch(e){return[]}}
+function setSavedFoods(v){localStorage.setItem(STORAGE_KEY,JSON.stringify(v));}
+function cryptoId(){return crypto?.randomUUID?crypto.randomUUID():"id_"+Date.now()+"_"+Math.random().toString(16).slice(2);}
+function saveCurrentFood(log=false){
+  if(!state.lastAnalysis){analyze(state.ingredientText?"deep":"quick");}
+  const a=state.lastAnalysis;if(!a)return;
+  const foods=getSavedFoods();const name=state.foodName.trim()||a.detected||"Unnamed food";
+  let existing=foods.find(f=>normalizeText(f.foodName)===normalizeText(name));
+  if(!existing){existing={id:cryptoId(),foodName:name,ingredientText:state.ingredientText,detectedTraits:a.traits,normalRating:a.normalRating,flareRating:a.flareRating,confidence:"user_saved_food",reactionHistory:[],createdAt:new Date().toISOString()};foods.unshift(existing);}
+  if(log){existing.reactionHistory=existing.reactionHistory||[];existing.reactionHistory.unshift({date:new Date().toISOString(),mode:state.mode,reaction:"ate it",notes:"Logged from scan result."});}
+  setSavedFoods(foods);state.savedNotice=log?"ate it logged locally.":"saved to Personal Food Memory.";render();
+}
+function render(){
+  document.body.classList.toggle("flare-active",state.mode==="Flare");
+  document.body.classList.toggle("compact",state.scanView==="compact");
+  const screen=document.getElementById("screen");
+  if(state.activeTab==="home")screen.innerHTML=homeScreen();
+  if(state.activeTab==="scan")screen.innerHTML=scanScreen();
+  if(state.activeTab==="flare")screen.innerHTML=flareScreen();
+  if(state.activeTab==="me")screen.innerHTML=meScreen();
+  document.querySelectorAll(".nav-button").forEach(b=>b.classList.toggle("active",b.dataset.tab===state.activeTab));
+  bindEvents();
+}
+function bindEvents(){
+  document.querySelectorAll("[data-nav-icon]").forEach(el=>{el.innerHTML=icons[el.dataset.navIcon]||""});
+  document.querySelectorAll(".nav-button").forEach(btn=>btn.onclick=()=>{captureInputs();state.activeTab=btn.dataset.tab;state.savedNotice="";render();});
+  ["foodName","ingredientText"].forEach(id=>{const el=document.getElementById(id);if(el){el.oninput=()=>captureInputs();el.onkeydown=e=>{if(e.key==="Enter"&&id==="foodName"){e.preventDefault();analyze("quick");}}}});
+  document.querySelectorAll("[data-action]").forEach(btn=>btn.onclick=()=>{
+    captureInputs();const a=btn.dataset.action;
+    if(a==="toggle-mode"){state.mode=state.mode==="Flare"?"normal":"Flare";localStorage.setItem(MODE_KEY,state.mode);}
+    if(a==="normal-mode"){state.mode="normal";localStorage.setItem(MODE_KEY,state.mode);}
+    if(a==="flare-mode"){state.mode="Flare";localStorage.setItem(MODE_KEY,state.mode);}
+    if(a==="toggle-view"){state.scanView=state.scanView==="compact"?"expanded":"compact";localStorage.setItem(VIEW_KEY,state.scanView);}
+    if(a==="go-scan"){state.activeTab="scan";}
+    if(a==="go-flare"){state.activeTab="flare";}
+    if(a==="quick-read"){analyze("quick");return;}
+    if(a==="deep-check"){analyze("deep");return;}
+    if(a==="clear-scan"){state.foodName="";state.ingredientText="";state.lastAnalysis=null;state.savedNotice="";state.capturedImage="";state.capturedMeta=null;}
+    if(a==="save-food"){saveCurrentFood(false);return;}
+    if(a==="log-reaction"){saveCurrentFood(true);return;}
+    if(a==="load-saved"){const f=getSavedFoods().find(x=>x.id===btn.dataset.id);if(f){state.foodName=f.foodName;state.ingredientText=f.ingredientText||"";state.activeTab="scan";analyze(state.ingredientText?"deep":"quick");return;}}
+    if(a==="delete-saved"){setSavedFoods(getSavedFoods().filter(x=>x.id!==btn.dataset.id));}
+    if(a==="open-camera"){openCameraOverlay();return;}
+    render();
+  });
+}
+
+/* Camera */
+let cameraStream=null,cameraFacingMode="environment",cameraInProgress=false;
+function setCameraStatus(m){const el=document.getElementById("cameraStatus");if(el)el.textContent=m;}
+function showCameraError(m){document.getElementById("cameraErrorText").textContent=m;document.getElementById("cameraErrorBox").classList.add("active");setCameraStatus("camera stopped");}
+function hideCameraError(){document.getElementById("cameraErrorBox").classList.remove("active");}
+function stopCameraStream(){if(cameraStream){cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null;}}
+async function openCameraOverlay(){
+  const overlay=document.getElementById("cameraOverlay"),video=document.getElementById("cameraVideo");if(!overlay||!video)return;
+  hideCameraError();overlay.classList.add("active");overlay.setAttribute("aria-hidden","false");overlay.classList.remove("collecting","analyzing");setCameraStatus("starting camera…");cameraInProgress=false;
+  try{
+    stopCameraStream();
+    cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:cameraFacingMode},width:{ideal:1920},height:{ideal:1080}},audio:false});
+    video.srcObject=cameraStream;await video.play();setCameraStatus("ready to scan");
+  }catch(e){
+    const needsHttps=location.protocol!=="https:"&&location.hostname!=="localhost";
+    showCameraError(needsHttps?"Camera requires HTTPS. Upload to GitHub Pages and test from Safari.":"Camera permission was blocked or unavailable. Check browser permission and try again.");
+  }
+}
+function closeCameraOverlay(){if(cameraInProgress)return;stopCameraStream();const overlay=document.getElementById("cameraOverlay");overlay.classList.remove("active","collecting","analyzing");overlay.setAttribute("aria-hidden","true");}
+function captureFrame(video,quality=.78,maxDimension=1400){
+  const sw=video.videoWidth,sh=video.videoHeight,scale=Math.min(1,maxDimension/Math.max(sw,sh)),tw=Math.round(sw*scale),th=Math.round(sh*scale);
+  const canvas=document.createElement("canvas");canvas.width=tw;canvas.height=th;const ctx=canvas.getContext("2d",{alpha:false});ctx.drawImage(video,0,0,tw,th);
+  const dataUrl=canvas.toDataURL("image/jpeg",quality);return{dataUrl,width:tw,height:th,sizeKb:Math.round(dataUrl.length*.75/1024)};
+}
+function startRecognitionScan(){
+  if(cameraInProgress)return;const overlay=document.getElementById("cameraOverlay"),video=document.getElementById("cameraVideo");if(!video||!video.videoWidth){setCameraStatus("camera not ready");return;}
+  cameraInProgress=true;overlay.classList.add("collecting");setCameraStatus("collecting information…");document.getElementById("cameraScanProduct").disabled=true;if(navigator.vibrate)navigator.vibrate([22,34,22]);
+  const started=performance.now(),duration=3600,frames=[];let lastSlot=-1;
+  function tick(){
+    const elapsed=performance.now()-started,pct=Math.min(1,elapsed/duration),slot=Math.floor(pct*5);
+    if(slot!==lastSlot&&frames.length<5){lastSlot=slot;frames.push(captureFrame(video));}
+    setCameraStatus(["looking for barcode…","reading front label…","checking ingredients…","checking nutrition…","preparing result…"][Math.min(4,slot)]||"collecting…");
+    if(elapsed<duration){requestAnimationFrame(tick)}else{
+      overlay.classList.remove("collecting");overlay.classList.add("analyzing");setCameraStatus("information collected.");
+      const flash=document.getElementById("cameraFlashConfirm");flash.classList.remove("active");void flash.offsetWidth;flash.classList.add("active");if(navigator.vibrate)navigator.vibrate(45);
+      setTimeout(()=>{const last=frames[frames.length-1]||captureFrame(video);state.capturedImage=last.dataUrl;state.capturedMeta={width:last.width,height:last.height,sizeKb:last.sizeKb};state.cameraMessage=`Camera scan captured ${frames.length||1} frame${(frames.length||1)===1?"":"s"}. OCR/barcode connects next.`;state.activeTab="scan";cameraInProgress=false;document.getElementById("cameraScanProduct").disabled=false;closeCameraOverlay();render();},650);
+    }
+  }
+  requestAnimationFrame(tick);
+}
+function bindCameraOverlayEvents(){
+  document.getElementById("cameraClose").onclick=closeCameraOverlay;
+  document.getElementById("cameraCancelDock").onclick=()=>{cameraInProgress=false;closeCameraOverlay();};
+  document.getElementById("cameraScanProduct").onclick=startRecognitionScan;
+  document.getElementById("cameraRetry").onclick=openCameraOverlay;
+  document.getElementById("cameraManualSearch").onclick=()=>{cameraInProgress=false;closeCameraOverlay();state.activeTab="scan";render();setTimeout(()=>document.getElementById("foodName")?.focus(),80);};
+  document.getElementById("cameraFlip").onclick=()=>{cameraFacingMode=cameraFacingMode==="environment"?"user":"environment";openCameraOverlay();};
+}
+render();bindCameraOverlayEvents();
 </script>
 </body>
 </html>
