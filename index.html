@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="theme-color" content="#1b2027" />
-<title>bill's bad belly — v1.0.6 thumbnail flow test</title>
+<title>bill's bad belly — v1.0.7 cleanup flow test</title>
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Baumans&display=swap");
 :root{
@@ -288,6 +288,118 @@ body.compact .drawer.optional:not([open]){display:block}
   .capture-actions{grid-template-columns:1fr}
 }
 
+
+/* ---------- v1.0.7 cleanup flow ---------- */
+.app-shell{
+  padding-bottom:calc(260px + env(safe-area-inset-bottom,0px)) !important;
+}
+.scan-clean-card{
+  box-shadow:0 14px 34px rgba(0,0,0,.18), inset 0 1px 0 rgba(255,255,255,.05);
+}
+.capture-preview-drawer{
+  padding:0 !important;
+  border-radius:20px !important;
+  background:rgba(22,31,33,.58) !important;
+  border-color:rgba(159,177,159,.24) !important;
+  overflow:hidden;
+}
+.capture-preview-drawer summary{
+  min-height:auto !important;
+  padding:8px !important;
+  display:block !important;
+}
+.capture-preview-drawer summary::after{
+  right:10px !important;
+  top:50% !important;
+  transform:translateY(-50%) !important;
+  width:30px !important;
+  height:30px !important;
+}
+.capture-strip{
+  display:grid !important;
+  grid-template-columns:58px 1fr !important;
+  gap:10px !important;
+  align-items:center !important;
+  padding:8px 46px 8px 8px !important;
+  min-height:74px;
+  border:1px solid rgba(159,177,159,.26) !important;
+  border-radius:16px !important;
+}
+.capture-thumb{
+  width:58px !important;
+  height:58px !important;
+  border-radius:12px !important;
+}
+.capture-strip strong{
+  font-size:.94rem !important;
+  line-height:1.05;
+}
+.capture-strip span{
+  font-size:.76rem !important;
+  line-height:1.22;
+}
+.capture-mini-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:10px;
+}
+.camera-countdown{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%) scale(.92);
+  z-index:6;
+  min-width:112px;
+  height:112px;
+  display:none;
+  place-items:center;
+  border-radius:999px;
+  border:2px solid rgba(159,177,159,.50);
+  color:#eef7ef;
+  background:rgba(5,7,10,.46);
+  box-shadow:0 0 28px rgba(159,177,159,.26), inset 0 0 22px rgba(159,177,159,.08);
+  font-family:var(--display-font);
+  font-size:4.1rem;
+  line-height:1;
+  text-shadow:0 0 18px rgba(159,177,159,.42),0 3px 18px rgba(0,0,0,.75);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  pointer-events:none;
+}
+.camera-overlay.collecting .camera-countdown{
+  display:grid;
+  animation:countdownPulse .8s ease-in-out infinite;
+}
+@keyframes countdownPulse{
+  0%,100%{transform:translate(-50%,-50%) scale(.92);opacity:.86}
+  50%{transform:translate(-50%,-50%) scale(1);opacity:1}
+}
+.camera-overlay.collecting .recognition-helper{
+  color:#dbeadb !important;
+}
+.next-step-note{
+  border:1px dashed rgba(184,154,192,.20);
+  border-radius:16px;
+  padding:10px 12px;
+  color:var(--muted);
+  background:rgba(17,21,26,.14);
+  font-size:.86rem;
+  line-height:1.35;
+}
+.next-step-note strong{
+  color:var(--purple-light);
+}
+.result-placement-note{
+  margin:0 0 8px;
+  color:var(--muted);
+  font-size:.82rem;
+}
+@media(max-width:360px){
+  .capture-mini-actions{grid-template-columns:1fr}
+  .camera-countdown{min-width:96px;height:96px;font-size:3.5rem}
+}
+
 @media(max-width:360px){.screen-title{padding-right:86px}.grid-two,.search-row{grid-template-columns:1fr}.logo-mark{width:48px;height:48px;flex-basis:48px}.brand-title-wrap h1{font-size:1.62rem}}
 </style>
 </head>
@@ -296,7 +408,7 @@ body.compact .drawer.optional:not([open]){display:block}
   <header class="topbar">
     <div class="header-mascot-wrap" aria-hidden="true"><div class="header-mascot-fallback">bb</div></div>
     <div class="brand-title-wrap">
-      <p class="eyebrow">v1.0.6 thumbnail flow test</p>
+      <p class="eyebrow">v1.0.7 cleanup flow test</p>
       <h1>bill's bad belly</h1>
     </div>
     <div class="logo-mark" aria-hidden="true">bb</div>
@@ -325,6 +437,7 @@ body.compact .drawer.optional:not([open]){display:block}
     <div class="camera-corner tl"></div><div class="camera-corner tr"></div><div class="camera-corner bl"></div><div class="camera-corner br"></div>
   </div>
   <div class="camera-progress-frame" aria-hidden="true"></div>
+  <div class="camera-countdown" id="cameraCountdown" aria-hidden="true"></div>
   <div class="camera-flash-confirm" id="cameraFlashConfirm" aria-hidden="true"></div>
   <div class="camera-error-box" id="cameraErrorBox">
     <h3>Camera unavailable</h3>
@@ -493,10 +606,10 @@ function scanScreen(){
   return `<div class="screen-content">
     ${screenTitle("Scan","Camera first. Then Quick Read or Deep Check.")}
 
-    <section class="camera-launch-card camera-priority-card">
+    <section class="camera-launch-card camera-priority-card scan-clean-card">
       <h3>Camera Scan</h3>
       <p class="camera-subhead">Package capture test</p>
-      <p class="section-kicker">Capture the label first. The photo is kept as a small saved reference so it does not take over the screen.</p>
+      <p class="section-kicker">Capture the front, ingredients, and nutrition if visible. Ingredients matter most; nutrition helps with fiber, fat, sugar, protein, and serving size.</p>
       <button class="primary-action full-width" data-action="open-camera" type="button"><span class="icon">${icons.camera}</span> scan product</button>
     </section>
 
@@ -509,20 +622,20 @@ function scanScreen(){
               <strong>Image captured</strong>
               <span>${escapeHtml(state.cameraMessage)} ${state.capturedMeta?`${state.capturedMeta.width} × ${state.capturedMeta.height}px • ${state.capturedMeta.sizeKb} KB`:``}</span>
             </div>
-            <button class="secondary-action compact-action" data-action="open-camera" type="button">scan again</button>
           </div>
         </summary>
         <div class="drawer-body">
           <img class="camera-result-preview" src="${state.capturedImage}" alt="Captured scan preview">
-          <div class="capture-actions">
+          <div class="capture-mini-actions">
             <button class="secondary-action" data-action="open-camera" type="button">scan again</button>
             <button class="primary-action" data-action="focus-deep" type="button">add ingredient text</button>
           </div>
         </div>
       </details>
+      ${!a?`<div class="next-step-note"><strong>Next:</strong> photo saved. Add a food name for Quick Read or ingredient text for Deep Check to get a rating.</div>`:""}
     `:""}
 
-    <section class="input-card quick-card">
+    <section class="input-card quick-card scan-clean-card">
       <h3>Quick Read</h3>
       <p class="search-hint">Use a food name, package front, menu item, or recipe title for a fast preliminary read.</p>
       <div class="search-row" style="margin-top:10px;">
@@ -544,12 +657,7 @@ function scanScreen(){
       </div>
     </details>
 
-    ${a?resultCard(a):`
-      <div class="no-result-note">
-        <strong>No food result yet.</strong><br>
-        A camera photo only confirms the image was captured. Add a food name for Quick Read or ingredient text for Deep Check to get a rating.
-      </div>
-    `}
+    ${a?`<p class="result-placement-note">Result from the latest Quick Read / Deep Check.</p>${resultCard(a)}`:""}
 
     <details class="drawer optional" id="personalDrawer">
       <summary><span class="drawer-title">Personal Food Memory (${getSavedFoods().length})</span></summary>
@@ -635,7 +743,10 @@ function hideCameraError(){document.getElementById("cameraErrorBox").classList.r
 function stopCameraStream(){if(cameraStream){cameraStream.getTracks().forEach(t=>t.stop());cameraStream=null;}}
 async function openCameraOverlay(){
   const overlay=document.getElementById("cameraOverlay"),video=document.getElementById("cameraVideo");if(!overlay||!video)return;
-  hideCameraError();overlay.classList.add("active");overlay.setAttribute("aria-hidden","false");overlay.classList.remove("collecting","analyzing");setCameraStatus("starting camera…");cameraInProgress=false;
+  hideCameraError();overlay.classList.add("active");overlay.setAttribute("aria-hidden","false");overlay.classList.remove("collecting","analyzing");setCameraStatus("starting camera…");
+  const countdown=document.getElementById("cameraCountdown"); if(countdown)countdown.textContent="";
+  const scanBtn=document.getElementById("cameraScanProduct"); if(scanBtn){scanBtn.disabled=false;scanBtn.textContent="scan product";}
+  const helper=document.getElementById("recognitionHelper"); if(helper)helper.textContent="5-second scan collects front, ingredients, nutrition, and barcode area if visible.";cameraInProgress=false;
   try{
     stopCameraStream();
     cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:cameraFacingMode},width:{ideal:1920},height:{ideal:1080}},audio:false});
@@ -652,17 +763,71 @@ function captureFrame(video,quality=.78,maxDimension=1400){
   const dataUrl=canvas.toDataURL("image/jpeg",quality);return{dataUrl,width:tw,height:th,sizeKb:Math.round(dataUrl.length*.75/1024)};
 }
 function startRecognitionScan(){
-  if(cameraInProgress)return;const overlay=document.getElementById("cameraOverlay"),video=document.getElementById("cameraVideo");if(!video||!video.videoWidth){setCameraStatus("camera not ready");return;}
-  cameraInProgress=true;overlay.classList.add("collecting");setCameraStatus("collecting information…");document.getElementById("cameraScanProduct").disabled=true;if(navigator.vibrate)navigator.vibrate([22,34,22]);
-  const started=performance.now(),duration=3600,frames=[];let lastSlot=-1;
+  if(cameraInProgress)return;
+  const overlay=document.getElementById("cameraOverlay"),video=document.getElementById("cameraVideo");
+  if(!video||!video.videoWidth){setCameraStatus("camera not ready");return;}
+
+  cameraInProgress=true;
+  overlay.classList.remove("analyzing");
+  overlay.classList.add("collecting");
+  setCameraStatus("scan starting… 5");
+  const scanBtn=document.getElementById("cameraScanProduct");
+  if(scanBtn){scanBtn.disabled=true;scanBtn.textContent="scanning…";}
+  const helper=document.getElementById("recognitionHelper");
+  if(helper)helper.textContent="Hold steady or rotate slowly. Capture front, ingredients, and nutrition if visible.";
+  const countdown=document.getElementById("cameraCountdown");
+  if(countdown)countdown.textContent="5";
+  if(navigator.vibrate)navigator.vibrate([22,34,22]);
+
+  const started=performance.now(),duration=5000,frames=[];
+  let lastSlot=-1,lastSecond=5;
+  const labels=["front label","barcode area","ingredients","nutrition facts","saving image"];
+
   function tick(){
-    const elapsed=performance.now()-started,pct=Math.min(1,elapsed/duration),slot=Math.floor(pct*5);
-    if(slot!==lastSlot&&frames.length<5){lastSlot=slot;frames.push(captureFrame(video));}
-    setCameraStatus(["looking for barcode…","reading front label…","checking ingredients…","checking nutrition…","preparing result…"][Math.min(4,slot)]||"collecting…");
-    if(elapsed<duration){requestAnimationFrame(tick)}else{
-      overlay.classList.remove("collecting");overlay.classList.add("analyzing");setCameraStatus("information collected.");
-      const flash=document.getElementById("cameraFlashConfirm");flash.classList.remove("active");void flash.offsetWidth;flash.classList.add("active");if(navigator.vibrate)navigator.vibrate(45);
-      setTimeout(()=>{const last=frames[frames.length-1]||captureFrame(video);state.capturedImage=last.dataUrl;state.capturedMeta={width:last.width,height:last.height,sizeKb:last.sizeKb};state.cameraMessage=`${frames.length||1} frame${(frames.length||1)===1?"":"s"} saved.`;state.activeTab="scan";cameraInProgress=false;document.getElementById("cameraScanProduct").disabled=false;closeCameraOverlay();render();setTimeout(()=>window.scrollTo({top:0,behavior:"smooth"}),80);},650);
+    const elapsed=performance.now()-started;
+    const pct=Math.min(1,elapsed/duration);
+    const secondsLeft=Math.max(1,Math.ceil((duration-elapsed)/1000));
+    const slot=Math.min(4,Math.floor(pct*5));
+
+    if(secondsLeft!==lastSecond){
+      lastSecond=secondsLeft;
+      if(countdown)countdown.textContent=String(secondsLeft);
+      if(navigator.vibrate)navigator.vibrate(12);
+    }
+
+    if(slot!==lastSlot&&frames.length<5&&video.videoWidth){
+      lastSlot=slot;
+      frames.push(captureFrame(video));
+    }
+
+    setCameraStatus(`scanning… ${secondsLeft} · ${labels[Math.min(4,slot)]}`);
+
+    if(elapsed<duration){
+      requestAnimationFrame(tick);
+    }else{
+      overlay.classList.remove("collecting");
+      overlay.classList.add("analyzing");
+      if(countdown)countdown.textContent="";
+      setCameraStatus("image captured.");
+      const flash=document.getElementById("cameraFlashConfirm");
+      flash.classList.remove("active");void flash.offsetWidth;flash.classList.add("active");
+      if(navigator.vibrate)navigator.vibrate(45);
+
+      setTimeout(()=>{
+        const last=frames[frames.length-1]||captureFrame(video);
+        state.capturedImage=last.dataUrl;
+        state.capturedMeta={width:last.width,height:last.height,sizeKb:last.sizeKb};
+        state.cameraMessage=`${frames.length||1} frame${(frames.length||1)===1?"":"s"} saved.`;
+        state.activeTab="scan";
+        // A photo alone is not a food result. Clear stale Unknown/photo-only analysis.
+        if(state.lastAnalysis && state.lastAnalysis.detected==="Unknown food") state.lastAnalysis=null;
+        cameraInProgress=false;
+        const btn=document.getElementById("cameraScanProduct");
+        if(btn){btn.disabled=false;btn.textContent="scan product";}
+        closeCameraOverlay();
+        render();
+        setTimeout(()=>window.scrollTo({top:0,behavior:"smooth"}),80);
+      },650);
     }
   }
   requestAnimationFrame(tick);
