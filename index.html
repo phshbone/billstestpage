@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="theme-color" content="#1b2027" />
-<title>bill's bad belly — v1.2.4 Local OCR Cleanup Pipeline</title>
+<title>bill's bad belly — v1.2.5 OCR Rollback + Corn Logic Fix</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baumans&display=swap" rel="stylesheet">
@@ -180,7 +180,7 @@ body.flare-active .screen-card{border-color:rgba(216,138,61,.48);box-shadow:0 0 
 }
 
 
-/* ---------- v1.2.4 Local OCR Cleanup Pipeline ---------- */
+/* ---------- v1.2.5 OCR Rollback + Corn Logic Fix ---------- */
 .camera-hint strong{color:white;font-family:var(--display-font);font-size:.96rem;letter-spacing:.02em}
 .lens-shell{
   width:min(92vw,390px) !important;
@@ -253,7 +253,7 @@ body.flare-active .screen-card{border-color:rgba(216,138,61,.48);box-shadow:0 0 
 }
 
 
-/* ---------- v1.2.4 simplified OCR UI ---------- */
+/* ---------- v1.2.5 simplified OCR UI ---------- */
 .ocr-mode-note{
   margin-top:8px;
   color:var(--muted);
@@ -283,7 +283,7 @@ body.flare-active .screen-card{border-color:rgba(216,138,61,.48);box-shadow:0 0 
 }
 
 
-/* ---------- v1.2.4 Capture Alignment + Local Cleanup ---------- */
+/* ---------- v1.2.5 Capture Alignment + Gentle OCR ---------- */
 .capture-image-wrap{
   position:relative;
   width:100%;
@@ -339,7 +339,7 @@ body.flare-active .screen-card{border-color:rgba(216,138,61,.48);box-shadow:0 0 
   <header class="topbar">
     <div class="header-mascot-wrap" aria-hidden="true"><div class="mascot-fallback">bb</div></div>
     <div class="brand-title-wrap">
-      <p class="eyebrow">v1.2.4 Local OCR Cleanup Pipeline</p>
+      <p class="eyebrow">v1.2.5 OCR Rollback + Corn Logic Fix</p>
       <h1>bill's bad belly</h1>
     </div>
     <div class="logo-mark" aria-hidden="true">bb</div>
@@ -425,7 +425,8 @@ const INGREDIENT_DICTIONARY=[
   {name:"garlic",aliases:["garlic","garlic powder","dehydrated garlic"],category:"spices/seasonings",normal:"caution",flare:"flare_caution",risk:"moderate",reason:"Garlic or garlic powder can cause gas or cramping for some people, but amount and personal tolerance matter."},
   {name:"chili pepper",aliases:["chili","chilli","cayenne","hot sauce","red pepper","jalapeno"],category:"spices/seasonings",normal:"caution",flare:"personal_trigger",risk:"high",reason:"Heat and capsaicin may irritate a sensitive gut."},
   {name:"tomato",aliases:["tomato","tomatoes","tomato paste","tomato puree","tomato sauce"],category:"vegetables",normal:"caution",flare:"flare_caution",risk:"moderate",reason:"Acidity and skins/seeds may bother some people."},
-  {name:"corn",aliases:["corn","corn kernels","whole corn","popcorn"],category:"grains/starches",normal:"likely_rough",flare:"flare_caution",risk:"high",reason:"Corn skins and hulls can be physically hard to digest."},
+  {name:"whole corn / kernels",aliases:["corn kernels","whole corn","popcorn","corn skins","corn hulls"],category:"grains/starches",normal:"likely_rough",flare:"flare_caution",risk:"high",reason:"Whole corn, kernels, popcorn, skins, and hulls can be physically hard to digest."},
+  {name:"corn-derived ingredient",aliases:["corn starch","cornstarch","corn syrup","corn flour","maltodextrin"],category:"grains/starches",normal:"caution",flare:"flare_caution",risk:"moderate",reason:"Corn-derived ingredients are usually more processed than whole corn; treat as caution unless your personal history says otherwise."},
   {name:"broccoli",aliases:["broccoli"],category:"vegetables",normal:"caution",flare:"flare_caution",risk:"moderate",reason:"Cruciferous vegetables can be gas-forming for some people."},
   {name:"cabbage",aliases:["cabbage","red cabbage","green cabbage"],category:"vegetables",normal:"likely_rough",flare:"likely_rough",risk:"high",reason:"Cabbage is often gas-forming and fibrous."},
   {name:"cream",aliases:["cream","heavy cream","sour cream"],category:"dairy",normal:"caution",flare:"flare_caution",risk:"moderate",reason:"Dairy plus fat load may bother some people."},
@@ -464,7 +465,30 @@ function nutritionTraits(n){const traits=[],notes=[];if(n.fiber>=5){traits.push(
 function findIngredientMatches(text){const hits=[];INGREDIENT_DICTIONARY.forEach(item=>{if(item.aliases.some(a=>containsTerm(text,a)))hits.push({...item,source:"ingredient"});});return uniqueByName(hits);}
 function findFastCards(text){const hits=[];FAST_CARDS.forEach(card=>{if(card.terms.some(t=>containsTerm(text,t)))hits.push({...card,source:"quick"});});return hits;}
 function worstRating(items,mode="normal"){const score={usually_gentle:1,good:1,caution:2,flare_caution:3,personal_trigger:4,likely_rough:5,unknown:2};let worst="unknown",best=0;items.forEach(x=>{const r=mode==="Flare"?x.flare:x.normal;const s=score[r]||2;if(s>best){best=s;worst=r;}});return worst;}
-function buildAnalysis(type){const textParts=[state.foodName,state.ingredientText,type==="ocr"?state.extractedText:""].filter(Boolean).join("\n");const input=textParts.trim();const quickHits=findFastCards(input);const ingredientHits=findIngredientMatches(input);const nutrition=parseNutritionText(input);const nt=nutritionTraits(nutrition);const all=[...quickHits,...ingredientHits,...nt.traits];let detected="Unknown food";if(quickHits[0])detected=quickHits[0].name;else if(state.foodName.trim())detected=state.foodName.trim();else if(ingredientHits[0])detected=`${ingredientHits[0].name} found`;else if(nt.traits.length)detected="nutrition label read";const normal=all.length?worstRating(all,"normal"):"unknown";const flare=all.length?worstRating(all,"Flare"):"unknown";const active=state.mode==="Flare"?flare:normal;let why="I do not have enough text to judge this yet. Add a food name, ingredients, or nutrition text.";if(all.length){const reasons=all.slice(0,4).map(x=>x.reason||x.why).filter(Boolean);why=reasons.length?reasons.join(" "):"The rating comes from matched food, ingredient, and nutrition signals.";}let next="Track your own response and portion size. Crohn's tolerance is individual.";if(active==="usually_gentle")next="This looks more predictable, but still track your own response.";if(active==="caution")next="Start small or save this for a steadier gut day if you are unsure.";if(active==="flare_caution"||active==="likely_rough"||active==="personal_trigger")next="During a flare or sensitive period, this deserves extra caution.";return {type,detected,normal,flare,active,why,next,hits:all,nutrition,confidence:all.length>=3?"good":all.length?"fair":"low",createdAt:new Date().toISOString()};}
+function contextualIngredientHits(text){
+  let hits=findIngredientMatches(text);
+  const t=normalizeText(text);
+  // Avoid treating every OCR glimpse of "corn" as whole corn/popcorn.
+  if(/\bcorn\b/.test(t)&&!/\b(corn kernels|whole corn|popcorn|corn skins|corn hulls|corn starch|cornstarch|corn syrup|corn flour|maltodextrin)\b/.test(t)){
+    hits.push({name:"corn mention",normal:"caution",flare:"flare_caution",risk:"moderate",reason:"OCR saw the word corn, but not enough context to treat it like whole corn or popcorn."});
+  }
+  return uniqueByName(hits);
+}
+function maybeSoftenWeakOcrAnalysis(analysis,type){
+  if(type!=="ocr")return analysis;
+  if(state.ocrConfidence!=="weak"&&state.ocrConfidence!=="none")return analysis;
+  const hitCount=analysis.hits?.length||0;
+  if(hitCount<=1&&(analysis.active==="likely_rough"||analysis.active==="personal_trigger")){
+    analysis.active="caution";
+    analysis.normal=analysis.normal==="likely_rough"||analysis.normal==="personal_trigger"?"caution":analysis.normal;
+    analysis.flare=analysis.flare==="likely_rough"||analysis.flare==="personal_trigger"?"flare_caution":analysis.flare;
+    analysis.confidence="low";
+    analysis.why="The OCR read is weak, so this is being softened to caution instead of a hard ugly call. Review the text or retake before trusting it.";
+    analysis.next="Use caution, but do not treat this as a firm avoid unless the ingredient text confirms a rough trigger.";
+  }
+  return analysis;
+}
+function buildAnalysis(type){const textParts=[state.foodName,state.ingredientText,type==="ocr"?state.extractedText:""].filter(Boolean).join("\n");const input=textParts.trim();const quickHits=findFastCards(input);const ingredientHits=contextualIngredientHits(input);const nutrition=parseNutritionText(input);const nt=nutritionTraits(nutrition);const all=[...quickHits,...ingredientHits,...nt.traits];let detected="Unknown food";if(quickHits[0])detected=quickHits[0].name;else if(state.foodName.trim())detected=state.foodName.trim();else if(ingredientHits[0])detected=`${ingredientHits[0].name} found`;else if(nt.traits.length)detected="nutrition label read";const normal=all.length?worstRating(all,"normal"):"unknown";const flare=all.length?worstRating(all,"Flare"):"unknown";const active=state.mode==="Flare"?flare:normal;let why="I do not have enough text to judge this yet. Add a food name, ingredients, or nutrition text.";if(all.length){const reasons=all.slice(0,4).map(x=>x.reason||x.why).filter(Boolean);why=reasons.length?reasons.join(" "):"The rating comes from matched food, ingredient, and nutrition signals.";}let next="Track your own response and portion size. Crohn's tolerance is individual.";if(active==="usually_gentle")next="This looks more predictable, but still track your own response.";if(active==="caution")next="Start small or save this for a steadier gut day if you are unsure.";if(active==="flare_caution"||active==="likely_rough"||active==="personal_trigger")next="During a flare or sensitive period, this deserves extra caution.";return maybeSoftenWeakOcrAnalysis({type,detected,normal,flare,active,why,next,hits:all,nutrition,confidence:all.length>=3?"good":all.length?"fair":"low",createdAt:new Date().toISOString()},type);}
 function analyze(type){captureInputs();if(type==="ocr"){state.ingredientText=state.extractedText;}state.lastAnalysis=buildAnalysis(type);state.savedNotice="";render();scrollScreenTo("resultCard");}
 function nutritionTiles(n){const entries=Object.entries(n).filter(([,v])=>v!==undefined&&!Number.isNaN(v));if(!entries.length)return `<p class="small-muted">No nutrition numbers were detected yet.</p>`;const labels={fiber:"Fiber",sugar:"Sugar",addedSugar:"Added sugar",fat:"Total fat",satFat:"Sat. fat",protein:"Protein",sodium:"Sodium"};return `<div class="nutrition-grid">${entries.map(([k,v])=>`<div class="nutrition-tile"><span>${labels[k]||k}</span><strong>${v}${k==="sodium"?" mg":" g"}</strong></div>`).join("")}</div>`;}
 function resultCard(a){if(!a)return "";const cls=stateClass(a.active);return `<section class="result-shell ${cls}" id="resultCard"><div class="result-inner"><div class="verdict-area">${ratingPill(a.active,state.mode==="Flare")}<h3>${escapeHtml(ratingLabel(a.active))}</h3><div class="detected-name">${escapeHtml(a.detected)} • confidence: ${escapeHtml(a.confidence)}</div></div><p class="result-copy">${escapeHtml(a.why)}</p><p class="result-copy"><strong>Next:</strong> ${escapeHtml(a.next)}</p>${a.hits?.length?`<div class="detected-list">${a.hits.slice(0,12).map(h=>`<span class="detected-chip">${escapeHtml(h.name)}</span>`).join("")}</div>`:""}<div class="compare-row"><div class="compare-box"><span>normal side</span>${ratingPill(a.normal,false)}</div><div class="compare-box"><span>flare side</span>${ratingPill(a.flare,true)}</div></div><div class="button-row"><button class="secondary-action" data-action="save-current" type="button">save it</button><button class="primary-action" data-action="ate-current" type="button">ate it</button></div><details class="support-drawer"><summary>nutrition support drawer</summary>${nutritionTiles(a.nutrition)}</details></div></section>`;}
@@ -479,24 +503,24 @@ function ocrReviewCard(){
     <p class="ocr-status-line" id="ocrStatusText">${escapeHtml(status)}</p>
     <span class="ocr-status-pill ${ocrPillClass()}" id="ocrStatusPill">${state.ocrInProgress?`reading ${pct}%`:(hasText?"text found":"review")}</span>
     ${(state.ocrInProgress||pct>0)?`<div class="ocr-progress-track" aria-label="OCR progress"><div class="ocr-progress-fill" id="ocrProgressFill" style="width:${pct}%"></div></div>`:""}
-    ${state.ocrInProgress?`<div class="ocr-loading-note">OCR is reading the cleaned boxed crop. If the first read is weak, the app may try one stronger cleanup pass.</div>`:""}
+    ${state.ocrInProgress?`<div class="ocr-loading-note">OCR is reading the raw aligned crop first. If the read is weak, it tries one gentle contrast pass only.</div>`:""}
     ${hasText&&!state.ocrInProgress?`<div class="ocr-actions"><button class="primary-action" data-action="run-ocr-deep-check" type="button">run deep check</button><button class="secondary-action" data-action="toggle-ocr-review" type="button">${state.ocrReviewOpen?"hide text":"review/edit text"}</button></div>`:""}
     ${!state.ocrInProgress?`<div class="ocr-actions"><button class="secondary-action" data-action="retry-ocr" type="button">retry OCR</button><button class="secondary-action" data-action="retake-photo" type="button">retake photo</button></div>`:""}
     ${state.ocrReviewOpen?`<div class="ocr-review-toggle"><textarea class="ocr-textarea" id="extractedText" placeholder="OCR text from the package appears here. Edit only if needed.">${escapeHtml(state.extractedText)}</textarea><div class="ocr-text-count">${state.extractedText.trim().length} characters read</div></div>`:""}
-    <p class="ocr-mode-note">If the read is weak, retake with the ingredients flatter, closer, and tilted away from glare. Vision AI backup stays on the back burner.</p>
+    <p class="ocr-mode-note">If the read is weak, review before trusting the card. This build avoids harsh cleanup so readable labels do not get crushed.</p>
   </section>`;
 }
-function homeScreen(){return `<div class="screen-content">${screenTitle("home base","what should we check?")}<section class="belly-meter"><div class="belly-icon">☻</div><div><p>Belly Meter</p><strong>${state.mode==="Flare"?"flare mode":"steady"}</strong><span>${state.mode==="Flare"?"Amber pulse is on. Scanner will judge more cautiously.":"Normal mode. Use Flare when your gut is more sensitive."}</span></div></section><div class="grid-two"><button class="action-card" data-action="go-scan" type="button"><span class="card-icon">◉</span><h3>scan food</h3><p>Camera-first product scan, OCR text extraction, and Deep Check.</p></button><button class="action-card" data-action="go-flare" type="button"><span class="card-icon">♨</span><h3>flare help</h3><p>Switch mode and tighten the read when your gut is active.</p></button></div><section class="mini-card"><h3>v1.2.4 test target</h3><p>Capture the camera-box view → clean the crop locally → run OCR → if weak, try one stronger local pass → optional review/edit → Deep Check result card.</p></section></div>`;}
+function homeScreen(){return `<div class="screen-content">${screenTitle("home base","what should we check?")}<section class="belly-meter"><div class="belly-icon">☻</div><div><p>Belly Meter</p><strong>${state.mode==="Flare"?"flare mode":"steady"}</strong><span>${state.mode==="Flare"?"Amber pulse is on. Scanner will judge more cautiously.":"Normal mode. Use Flare when your gut is more sensitive."}</span></div></section><div class="grid-two"><button class="action-card" data-action="go-scan" type="button"><span class="card-icon">◉</span><h3>scan food</h3><p>Camera-first product scan, OCR text extraction, and Deep Check.</p></button><button class="action-card" data-action="go-flare" type="button"><span class="card-icon">♨</span><h3>flare help</h3><p>Switch mode and tighten the read when your gut is active.</p></button></div><section class="mini-card"><h3>v1.2.5 test target</h3><p>Capture the camera-box view → OCR raw aligned crop → if weak, try one gentle contrast pass → optional review/edit → Deep Check result card.</p></section></div>`;}
 function scanScreen(){
   const a=state.lastAnalysis;
   const previewIcon=state.capturePreviewOpen?`<svg viewBox="0 0 24 24"><path d="M5 12h14"></path></svg>`:`<svg viewBox="0 0 24 24"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>`;
   return `<div class="screen-content">${screenTitle("scan","camera-first food check")}
     <section class="input-card camera-first-card">
-      <div class="scan-panel-title"><span class="scan-panel-icon">◉</span><div><h3>scan product</h3><p>Use the 5-second scan. The app now cleans the boxed label crop before OCR.</p></div></div>
+      <div class="scan-panel-title"><span class="scan-panel-icon">◉</span><div><h3>scan product</h3><p>Use the 5-second scan. The app reads the boxed label crop with minimal cleanup first.</p></div></div>
       <p class="scan-hint">Best test: fill the box with ingredients or nutrition text. Tilt shiny or dark packages to move glare off the words. White labels should read fastest.</p>
       <div class="camera-start-row"><button class="primary-action" data-action="open-camera" type="button">scan product</button></div>
     </section>
-    ${state.capturedImage?`<section class="capture-preview-drawer"><div class="capture-preview-header"><div class="capture-preview-title"><strong>image captured</strong><span>${escapeHtml(state.cameraMessage||"Ready for OCR review.")}</span></div><button class="capture-toggle-btn" data-action="toggle-capture-preview" type="button" aria-label="${state.capturePreviewOpen?"collapse captured image":"expand captured image"}">${previewIcon}</button></div><div class="capture-preview-body ${state.capturePreviewOpen?"":"is-closed"}"><div class="capture-image-wrap"><img class="capture-thumb" src="${state.capturedImage}" alt="Captured product label"><div class="ocr-crop-box" aria-hidden="true"><span>OCR read this area</span></div></div><div class="capture-meta"><span>${state.capturedMeta?`${state.capturedMeta.width}×${state.capturedMeta.height} • ${state.capturedMeta.sizeKb} KB`:""}</span><span>This preview is the camera-box capture, not the entire raw camera frame. OCR reads the amber boxed area.</span><div class="button-row"><button class="secondary-action" data-action="retake-photo" type="button">retake photo</button><button class="secondary-action" data-action="retry-ocr" type="button">retry OCR</button></div></div>${!a?`<div class="next-step-note"><strong>Next:</strong> OCR reads the boxed text area. You can run Deep Check immediately or review/edit first.</div>`:""}</div></section>`:""}
+    ${state.capturedImage?`<section class="capture-preview-drawer"><div class="capture-preview-header"><div class="capture-preview-title"><strong>image captured</strong><span>${escapeHtml(state.cameraMessage||"Ready for OCR review.")}</span></div><button class="capture-toggle-btn" data-action="toggle-capture-preview" type="button" aria-label="${state.capturePreviewOpen?"collapse captured image":"expand captured image"}">${previewIcon}</button></div><div class="capture-preview-body ${state.capturePreviewOpen?"":"is-closed"}"><div class="capture-image-wrap"><img class="capture-thumb" src="${state.capturedImage}" alt="Captured product label"><div class="ocr-crop-box" aria-hidden="true"><span>OCR read this area</span></div></div><div class="capture-meta"><span>${state.capturedMeta?`${state.capturedMeta.width}×${state.capturedMeta.height} • ${state.capturedMeta.sizeKb} KB`:""}</span><span>This preview is the camera-box capture. OCR reads the amber boxed area using raw image first, then gentle contrast only if needed.</span><div class="button-row"><button class="secondary-action" data-action="retake-photo" type="button">retake photo</button><button class="secondary-action" data-action="retry-ocr" type="button">retry OCR</button></div></div>${!a?`<div class="next-step-note"><strong>Next:</strong> OCR reads the boxed text area. You can run Deep Check immediately or review/edit first.</div>`:""}</div></section>`:""}
     ${ocrReviewCard()}
     <section class="input-card quick-card scan-clean-card"><h3>Quick Read</h3><p>Use this when you already know the food name.</p><input class="search-box" id="foodName" value="${escapeHtml(state.foodName)}" placeholder="example: pepperoni pizza, tomato soup, rice" autocomplete="off"><div class="button-row"><button class="secondary-action" data-action="clear-scan" type="button">clear</button><button class="primary-action" data-action="quick-read" type="button">quick read</button></div></section>
     <section class="input-card scan-clean-card" id="deepDrawer"><h3>Deep Check</h3><p>Paste or type ingredients/nutrition text here. OCR text is copied here when you run OCR Deep Check.</p><textarea class="text-input" id="ingredientText" placeholder="ingredients: wheat flour, tomato puree, mozzarella cheese, garlic powder...">${escapeHtml(state.ingredientText)}</textarea><div class="button-row"><button class="secondary-action" data-action="copy-ocr-to-deep" type="button">use OCR text</button><button class="primary-action" data-action="deep-check" type="button">deep check</button></div></section>
@@ -543,20 +567,20 @@ function ocrProgressText(m){
 }
 function scoreOcrText(text){const chars=text.trim().length;const words=text.trim().split(/\s+/).filter(Boolean).length;const foodWords=/(ingredients|nutrition|sodium|fiber|protein|fat|sugar|milk|wheat|cheese|rice|chicken|tomato|garlic|onion)/i.test(text);if(chars>80&&words>10&&foodWords)return "good";if(chars>25&&words>4)return "weak";return "none";}
 function clampByte(v){return Math.max(0,Math.min(255,Math.round(v)));}
-function cropDataUrlForOcr(dataUrl,mode="clean"){
+function cropDataUrlForOcr(dataUrl,mode="raw"){
   return new Promise(resolve=>{
     const img=new Image();
     img.onload=()=>{
       const w=img.naturalWidth||img.width;
       const h=img.naturalHeight||img.height;
-      // v1.2.4: capturedImage is already the camera-box/lens crop.
-      // OCR reads the center label band, then applies one local cleanup mode.
+      // v1.2.5: capturedImage is already the camera-box/lens capture.
+      // Keep OCR input close to what the user sees and avoid aggressive cleanup.
       const cropW=Math.round(w*.94);
-      const cropH=Math.round(h*.70);
+      const cropH=Math.round(h*.72);
       const sx=Math.round((w-cropW)/2);
       const sy=Math.round((h-cropH)/2);
       const canvas=document.createElement("canvas");
-      const targetW=1040;
+      const targetW=1280;
       const scale=targetW/cropW;
       canvas.width=targetW;
       canvas.height=Math.round(cropH*scale);
@@ -564,39 +588,26 @@ function cropDataUrlForOcr(dataUrl,mode="clean"){
       ctx.imageSmoothingEnabled=true;
       ctx.imageSmoothingQuality="high";
       ctx.drawImage(img,sx,sy,cropW,cropH,0,0,canvas.width,canvas.height);
-      try{
-        const imageData=ctx.getImageData(0,0,canvas.width,canvas.height);
-        const d=imageData.data;
-        for(let i=0;i<d.length;i+=4){
-          let gray=(d[i]*.299+d[i+1]*.587+d[i+2]*.114);
-          // Mild contrast and grayscale by default; stronger modes only run after a weak read.
-          if(mode==="raw"){
-            d[i]=d[i+1]=d[i+2]=gray;
-            continue;
-          }
-          if(mode==="invert"){
-            gray=255-gray;
-            const contrast=1.55;
+
+      // Only the fallback pass receives light grayscale/contrast.
+      // No threshold/negative auto-processing here; those were crushing readable green-label text.
+      if(mode==="mild"){
+        try{
+          const imageData=ctx.getImageData(0,0,canvas.width,canvas.height);
+          const d=imageData.data;
+          for(let i=0;i<d.length;i+=4){
+            let gray=(d[i]*.299+d[i+1]*.587+d[i+2]*.114);
+            const contrast=1.14;
             const boosted=clampByte((gray-128)*contrast+128);
-            d[i]=d[i+1]=d[i+2]=boosted;
-            continue;
+            // Mix some original color back in so tiny dark text on colored labels does not get flattened.
+            d[i]=clampByte((boosted*.68)+(d[i]*.32));
+            d[i+1]=clampByte((boosted*.68)+(d[i+1]*.32));
+            d[i+2]=clampByte((boosted*.68)+(d[i+2]*.32));
           }
-          if(mode==="threshold"){
-            const contrast=1.75;
-            const boosted=clampByte((gray-128)*contrast+128);
-            const bw=boosted>142?255:0;
-            d[i]=d[i+1]=d[i+2]=bw;
-            continue;
-          }
-          // clean mode: grayscale + contrast boost without harsh thresholding.
-          const contrast=1.38;
-          let boosted=clampByte((gray-128)*contrast+128);
-          boosted=boosted<150?clampByte(boosted-14):clampByte(boosted+18);
-          d[i]=d[i+1]=d[i+2]=boosted;
-        }
-        ctx.putImageData(imageData,0,0);
-      }catch(e){}
-      resolve({dataUrl:canvas.toDataURL("image/jpeg",.86),width:canvas.width,height:canvas.height,mode});
+          ctx.putImageData(imageData,0,0);
+        }catch(e){}
+      }
+      resolve({dataUrl:canvas.toDataURL("image/jpeg",.92),width:canvas.width,height:canvas.height,mode});
     };
     img.onerror=()=>resolve({dataUrl,width:0,height:0,mode});
     img.src=dataUrl;
@@ -655,26 +666,24 @@ async function runOcrOnCapturedImage(forceMode="auto"){
   }
   state.ocrInProgress=true;
   state.ocrProgress=0;
-  state.ocrStatus="Preparing cleaned label crop… 0%";
+  state.ocrStatus="Preparing aligned label crop… 0%";
   state.extractedText="";
   state.ocrConfidence="idle";
   state.ocrReviewOpen=false;
   state.ocrAttempts=1;
-  state.ocrMode="local cleanup";
+  state.ocrMode="raw aligned crop";
   render();
   try{
-    let best=await recognizeWithMode("clean","cleaned crop",3);
+    let best=await recognizeWithMode("raw","raw aligned crop",3);
 
-    // If the first pass is weak or empty, try one stronger local pass automatically.
-    // This keeps normal labels fast while giving dark/low-contrast labels one rescue attempt.
+    // v1.2.5: back off the v1.2.4 aggressive processing.
+    // Only one gentle fallback is allowed, and only when the first read is weak/empty.
     if(best.confidence!=="good"){
       state.ocrAttempts=2;
-      state.ocrStatus="First read was weak. Trying stronger cleanup…";
-      state.ocrProgress=Math.max(state.ocrProgress||0,52);
+      state.ocrStatus="First read was weak. Trying gentle contrast only…";
+      state.ocrProgress=Math.max(state.ocrProgress||0,54);
       renderOcrStatusOnly();
-      const altMode=best.confidence==="none"?"threshold":"invert";
-      const altLabel=best.confidence==="none"?"high contrast crop":"negative crop";
-      const alt=await recognizeWithMode(altMode,altLabel,56);
+      const alt=await recognizeWithMode("mild","gentle contrast crop",56);
       best=betterOcrResult(best,alt);
     }
 
@@ -684,7 +693,7 @@ async function runOcrOnCapturedImage(forceMode="auto"){
     state.ocrMode=best?.label||state.ocrMode;
     state.ocrProgress=100;
     if(state.ocrConfidence==="good")state.ocrStatus="Text found. Run Deep Check or review the scanned text first.";
-    else if(state.ocrConfidence==="weak")state.ocrStatus="I found some text, but it may need review. You can run Deep Check or review/edit first.";
+    else if(state.ocrConfidence==="weak")state.ocrStatus="I found some text, but this is a weak read. Review before trusting the card.";
     else{state.ocrStatus="Text was hard to read. Retake with less glare, type/search the food name, or use the future AI backup path later.";state.ocrReviewOpen=true;}
   }catch(err){
     state.ocrConfidence="error";
@@ -696,12 +705,13 @@ async function runOcrOnCapturedImage(forceMode="auto"){
     scrollScreenTo("ocrReviewCard");
   }
 }
+
 function captureInputs(){["foodName","ingredientText","extractedText"].forEach(id=>{const el=document.getElementById(id);if(el)state[id]=el.value;});}
 function copyOcrToDeep(runNow=false){captureInputs();state.ingredientText=state.extractedText;state.scanView="expanded";localStorage.setItem(VIEW_KEY,state.scanView);if(runNow){analyze("ocr");return;}render();setTimeout(()=>document.getElementById("ingredientText")?.focus(),80);}
 function scrollScreenTo(id){setTimeout(()=>{const screen=document.getElementById("screen");const el=document.getElementById(id);if(screen&&el)screen.scrollTo({top:Math.max(0,el.offsetTop-14),behavior:"smooth"});},80);}
 function render(){document.body.classList.toggle("flare-active",state.mode==="Flare");document.querySelectorAll(".nav-button").forEach(b=>b.classList.toggle("active",b.dataset.tab===state.activeTab));const screen=document.getElementById("screen");if(state.activeTab==="home")screen.innerHTML=homeScreen();if(state.activeTab==="scan")screen.innerHTML=scanScreen();if(state.activeTab==="flare")screen.innerHTML=flareScreen();if(state.activeTab==="me")screen.innerHTML=meScreen();bindDynamicInputs();}
 function bindDynamicInputs(){["foodName","ingredientText","extractedText"].forEach(id=>{const el=document.getElementById(id);if(el){el.oninput=()=>captureInputs();el.onkeydown=e=>{if(e.key==="Enter"&&id==="foodName"){e.preventDefault();analyze("quick");}};}});document.querySelectorAll("[data-mode]").forEach(btn=>btn.onclick=()=>setMode(btn.dataset.mode));document.querySelectorAll("[data-action]").forEach(btn=>btn.onclick=()=>handleAction(btn.dataset.action,btn));}
-function handleAction(a,btn){if(a==="go-scan"){state.activeTab="scan";render();return;}if(a==="go-flare"){state.activeTab="flare";render();return;}if(a==="open-camera"){openCameraOverlay();return;}if(a==="toggle-capture-preview"){state.capturePreviewOpen=!state.capturePreviewOpen;render();return;}if(a==="quick-read"){analyze("quick");return;}if(a==="deep-check"){analyze("deep");return;}if(a==="copy-ocr-to-deep"){copyOcrToDeep(false);return;}if(a==="run-ocr-deep-check"){copyOcrToDeep(true);return;}if(a==="toggle-ocr-review"){captureInputs();state.ocrReviewOpen=!state.ocrReviewOpen;render();if(state.ocrReviewOpen)setTimeout(()=>document.getElementById("extractedText")?.focus(),80);return;}if(a==="retry-ocr"){state.ocrStatus="OCR retry starting…";state.ocrReviewOpen=false;render();setTimeout(()=>runOcrOnCapturedImage("auto"),80);return;}if(a==="retake-photo"){openCameraOverlay();return;}if(a==="clear-scan"){state.foodName="";state.ingredientText="";state.extractedText="";state.capturedOcrImage="";state.ocrStatus="";state.ocrProgress=0;state.ocrInProgress=false;state.ocrReviewOpen=false;state.ocrConfidence="idle";state.ocrMode="auto clean";state.ocrAttempts=0;state.capturePreviewOpen=true;state.lastAnalysis=null;state.savedNotice="";state.capturedImage="";state.capturedMeta=null;state.cameraMessage="";render();return;}if(a==="save-current"){saveCurrentFood("saved");return;}if(a==="ate-current"){saveCurrentFood("ate");return;}if(a==="demo"){demoResult(btn.dataset.kind);return;}}
+function handleAction(a,btn){if(a==="go-scan"){state.activeTab="scan";render();return;}if(a==="go-flare"){state.activeTab="flare";render();return;}if(a==="open-camera"){openCameraOverlay();return;}if(a==="toggle-capture-preview"){state.capturePreviewOpen=!state.capturePreviewOpen;render();return;}if(a==="quick-read"){analyze("quick");return;}if(a==="deep-check"){analyze("deep");return;}if(a==="copy-ocr-to-deep"){copyOcrToDeep(false);return;}if(a==="run-ocr-deep-check"){copyOcrToDeep(true);return;}if(a==="toggle-ocr-review"){captureInputs();state.ocrReviewOpen=!state.ocrReviewOpen;render();if(state.ocrReviewOpen)setTimeout(()=>document.getElementById("extractedText")?.focus(),80);return;}if(a==="retry-ocr"){state.ocrStatus="OCR retry starting…";state.ocrReviewOpen=false;render();setTimeout(()=>runOcrOnCapturedImage("auto"),80);return;}if(a==="retake-photo"){openCameraOverlay();return;}if(a==="clear-scan"){state.foodName="";state.ingredientText="";state.extractedText="";state.capturedOcrImage="";state.ocrStatus="";state.ocrProgress=0;state.ocrInProgress=false;state.ocrReviewOpen=false;state.ocrConfidence="idle";state.ocrMode="raw aligned crop";state.ocrAttempts=0;state.capturePreviewOpen=true;state.lastAnalysis=null;state.savedNotice="";state.capturedImage="";state.capturedMeta=null;state.cameraMessage="";render();return;}if(a==="save-current"){saveCurrentFood("saved");return;}if(a==="ate-current"){saveCurrentFood("ate");return;}if(a==="demo"){demoResult(btn.dataset.kind);return;}}
 document.querySelectorAll(".nav-button").forEach(btn=>{btn.onclick=()=>{state.activeTab=btn.dataset.tab;render();};});
 let cameraStream=null,cameraFacing="environment",cameraInProgress=false;
 async function openCameraOverlay(){const overlay=document.getElementById("cameraOverlay");const video=document.getElementById("cameraVideo");const status=document.getElementById("cameraStatus");overlay.classList.add("active");overlay.setAttribute("aria-hidden","false");status.textContent="Opening camera…";try{if(cameraStream)cameraStream.getTracks().forEach(t=>t.stop());cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:cameraFacing,width:{ideal:1280},height:{ideal:1920}},audio:false});video.srcObject=cameraStream;await video.play();status.textContent="Ready. Fill the box with ingredients or nutrition text. Tilt glossy packages to move glare off the words.";}catch(e){status.textContent="Camera could not open. Check browser camera permission, then try again.";}}
@@ -748,7 +758,7 @@ function captureFrame(){
   const dataUrl=canvas.toDataURL("image/jpeg",.84);
   return {dataUrl,width:canvas.width,height:canvas.height,sizeKb:Math.round(dataUrl.length*0.75/1024)};
 }
-async function startRecognitionScan(){if(cameraInProgress)return;const btn=document.getElementById("cameraScanProduct"),status=document.getElementById("cameraStatus"),badge=document.getElementById("countdownBadge"),frame=document.getElementById("progressFrame");cameraInProgress=true;btn.disabled=true;btn.textContent="scanning…";badge.classList.add("active");frame.classList.add("scanning");const frames=[];let remaining=5;status.textContent="Capturing for 5 seconds. Keep the ingredient or nutrition text inside the box.";badge.textContent=remaining;const timer=setInterval(()=>{try{frames.push(captureFrame());}catch(e){}remaining-=1;badge.textContent=Math.max(remaining,0);status.textContent=remaining>0?`Capturing label… ${remaining} second${remaining===1?"":"s"} left.`:"Saving image…";if(remaining<=0){clearInterval(timer);setTimeout(()=>{const last=frames[frames.length-1]||captureFrame();state.capturedImage=last.dataUrl;state.capturedMeta={width:last.width,height:last.height,sizeKb:last.sizeKb};state.cameraMessage=`${frames.length||1} frame${(frames.length||1)===1?"":"s"} saved.`;state.activeTab="scan";state.extractedText="";state.capturedOcrImage="";state.ocrStatus="Image captured. Preparing cleaned label crop for OCR…";state.ocrProgress=0;state.ocrInProgress=false;state.ocrReviewOpen=false;state.ocrConfidence="idle";state.ocrMode="auto clean";state.ocrAttempts=0;state.capturePreviewOpen=true;if(state.lastAnalysis&&state.lastAnalysis.detected==="Unknown food")state.lastAnalysis=null;cameraInProgress=false;btn.disabled=false;btn.textContent="scan product";badge.classList.remove("active");frame.classList.remove("scanning");closeCameraOverlay();render();setTimeout(runOcrOnCapturedImage,150);},220);}},1000);}
+async function startRecognitionScan(){if(cameraInProgress)return;const btn=document.getElementById("cameraScanProduct"),status=document.getElementById("cameraStatus"),badge=document.getElementById("countdownBadge"),frame=document.getElementById("progressFrame");cameraInProgress=true;btn.disabled=true;btn.textContent="scanning…";badge.classList.add("active");frame.classList.add("scanning");const frames=[];let remaining=5;status.textContent="Capturing for 5 seconds. Keep the ingredient or nutrition text inside the box.";badge.textContent=remaining;const timer=setInterval(()=>{try{frames.push(captureFrame());}catch(e){}remaining-=1;badge.textContent=Math.max(remaining,0);status.textContent=remaining>0?`Capturing label… ${remaining} second${remaining===1?"":"s"} left.`:"Saving image…";if(remaining<=0){clearInterval(timer);setTimeout(()=>{const last=frames[frames.length-1]||captureFrame();state.capturedImage=last.dataUrl;state.capturedMeta={width:last.width,height:last.height,sizeKb:last.sizeKb};state.cameraMessage=`${frames.length||1} frame${(frames.length||1)===1?"":"s"} saved.`;state.activeTab="scan";state.extractedText="";state.capturedOcrImage="";state.ocrStatus="Image captured. Preparing aligned label crop for OCR…";state.ocrProgress=0;state.ocrInProgress=false;state.ocrReviewOpen=false;state.ocrConfidence="idle";state.ocrMode="raw aligned crop";state.ocrAttempts=0;state.capturePreviewOpen=true;if(state.lastAnalysis&&state.lastAnalysis.detected==="Unknown food")state.lastAnalysis=null;cameraInProgress=false;btn.disabled=false;btn.textContent="scan product";badge.classList.remove("active");frame.classList.remove("scanning");closeCameraOverlay();render();setTimeout(runOcrOnCapturedImage,150);},220);}},1000);}
 document.getElementById("cameraScanProduct").onclick=startRecognitionScan;document.getElementById("cameraClose").onclick=()=>closeCameraOverlay();document.getElementById("cameraCancel").onclick=()=>{cameraInProgress=false;document.getElementById("cameraScanProduct").disabled=false;document.getElementById("cameraScanProduct").textContent="scan product";document.getElementById("countdownBadge").classList.remove("active");document.getElementById("progressFrame").classList.remove("scanning");closeCameraOverlay();};document.getElementById("cameraFlip").onclick=async()=>{cameraFacing=cameraFacing==="environment"?"user":"environment";await openCameraOverlay();};document.getElementById("cameraHelper").onclick=()=>{document.getElementById("cameraStatus").textContent="Tip: use bright side light, not direct glare. Fill the box with ingredients or nutrition text, not the whole package.";};
 render();
 </script>
