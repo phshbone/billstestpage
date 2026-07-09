@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="theme-color" content="#1b2027" />
-<title>bill's bad belly — v1.2.6 Negative View Test</title>
+<title>bill's bad belly — v1.3.0 Barcode First Field Test</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baumans&display=swap" rel="stylesheet">
@@ -180,7 +180,7 @@ body.flare-active .screen-card{border-color:rgba(216,138,61,.48);box-shadow:0 0 
 }
 
 
-/* ---------- v1.2.6 Negative View Test ---------- */
+/* ---------- v1.3.0 Barcode First Field Test ---------- */
 .camera-hint strong{color:white;font-family:var(--display-font);font-size:.96rem;letter-spacing:.02em}
 .lens-shell{
   width:min(92vw,390px) !important;
@@ -332,6 +332,49 @@ body.flare-active .screen-card{border-color:rgba(216,138,61,.48);box-shadow:0 0 
   margin-top:6px;
 }
 
+/* ---------- v1.3.0 Barcode First Field Test ---------- */
+.barcode-card{
+  border-color:rgba(184,154,192,.28)!important;
+}
+.barcode-row{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+  margin-top:10px;
+}
+.barcode-actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:10px;
+}
+.barcode-status{
+  margin-top:8px;
+  color:var(--muted);
+  font-size:.84rem;
+  line-height:1.35;
+}
+.barcode-product-box{
+  margin-top:12px;
+  border:1px solid rgba(184,154,192,.22);
+  border-radius:18px;
+  padding:12px;
+  background:rgba(17,21,26,.28);
+}
+.barcode-product-box strong{display:block;color:var(--cream);font-size:1rem;}
+.barcode-product-box span{display:block;color:var(--muted);font-size:.82rem;line-height:1.35;margin-top:4px;}
+.barcode-overlay{position:fixed;inset:0;background:#07090c;z-index:100000;display:none;color:white}
+.barcode-overlay.active{display:block}
+.barcode-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#05070a}
+.barcode-guide{position:absolute;left:50%;top:48%;transform:translate(-50%,-50%);width:min(84vw,360px);height:160px;border:3px solid rgba(255,194,120,.86);border-radius:28px;box-shadow:0 0 0 999px rgba(0,0,0,.34),0 0 34px rgba(216,138,61,.24);z-index:2}
+.barcode-guide span{position:absolute;left:50%;top:-38px;transform:translateX(-50%);white-space:nowrap;border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.52);border-radius:999px;padding:7px 12px;font-family:var(--display-font);font-size:.78rem;color:#fff}
+.barcode-top{position:absolute;top:calc(14px + env(safe-area-inset-top));left:14px;right:14px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;z-index:3}
+.barcode-hint{max-width:280px;border:1px solid rgba(255,255,255,.18);border-radius:18px;padding:10px 12px;background:rgba(0,0,0,.46);backdrop-filter:blur(10px);font-size:.86rem;line-height:1.35}
+.barcode-hint strong{font-family:var(--display-font);font-size:.96rem}
+.barcode-close{width:46px;height:46px;border-radius:999px;border:1px solid rgba(255,255,255,.24);background:rgba(0,0,0,.46);color:white;font-size:1.4rem}
+.barcode-dock{position:absolute;left:14px;right:14px;bottom:calc(18px + env(safe-area-inset-bottom));z-index:3;display:grid;gap:10px}
+.barcode-overlay-status{border:1px solid rgba(255,255,255,.16);border-radius:18px;padding:10px 12px;background:rgba(0,0,0,.46);font-size:.86rem;line-height:1.35;color:#f3edf4}
+
 </style>
 </head>
 <body>
@@ -339,7 +382,7 @@ body.flare-active .screen-card{border-color:rgba(216,138,61,.48);box-shadow:0 0 
   <header class="topbar">
     <div class="header-mascot-wrap" aria-hidden="true"><div class="mascot-fallback">bb</div></div>
     <div class="brand-title-wrap">
-      <p class="eyebrow">v1.2.6 Negative View Test</p>
+      <p class="eyebrow">v1.3.0 Barcode First Field Test</p>
       <h1>bill's bad belly</h1>
     </div>
     <div class="logo-mark" aria-hidden="true">bb</div>
@@ -374,6 +417,19 @@ body.flare-active .screen-card{border-color:rgba(216,138,61,.48);box-shadow:0 0 
     </div>
   </div>
 </div>
+<div class="barcode-overlay" id="barcodeOverlay" aria-hidden="true">
+  <video class="barcode-video" id="barcodeVideo" playsinline autoplay muted></video>
+  <div class="barcode-top">
+    <div class="barcode-hint"><strong>scan barcode</strong><br>Center the UPC/EAN barcode inside the box. Barcode lookup is faster than OCR when the product is in the database.</div>
+    <button class="barcode-close" id="barcodeClose" type="button" aria-label="Close barcode scanner">×</button>
+  </div>
+  <div class="barcode-guide"><span>barcode here</span></div>
+  <div class="barcode-dock">
+    <div class="barcode-overlay-status" id="barcodeOverlayStatus">Opening barcode scanner…</div>
+  </div>
+</div>
+<script src="https://unpkg.com/@zxing/browser@latest"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script>
 const STORAGE_KEY="bbb_v123_saved_foods";
@@ -398,6 +454,10 @@ const state={
   ocrMode:"auto clean",
   ocrAttempts:0,
   cameraNegativeMode:false,
+  barcodeValue:"",
+  barcodeStatus:"",
+  barcodeProduct:null,
+  barcodeInProgress:false,
   capturedMode:"normal",
   capturePreviewOpen:true,
   scanView:localStorage.getItem(VIEW_KEY)||"expanded",
@@ -513,7 +573,21 @@ function ocrReviewCard(){
     <p class="ocr-mode-note">If the read is weak, review before trusting the card. Try negative OCR only for dark/low-contrast labels.</p>
   </section>`;
 }
-function homeScreen(){return `<div class="screen-content">${screenTitle("home base","what should we check?")}<section class="belly-meter"><div class="belly-icon">☻</div><div><p>Belly Meter</p><strong>${state.mode==="Flare"?"flare mode":"steady"}</strong><span>${state.mode==="Flare"?"Amber pulse is on. Scanner will judge more cautiously.":"Normal mode. Use Flare when your gut is more sensitive."}</span></div></section><div class="grid-two"><button class="action-card" data-action="go-scan" type="button"><span class="card-icon">◉</span><h3>scan food</h3><p>Camera-first product scan, OCR text extraction, and Deep Check.</p></button><button class="action-card" data-action="go-flare" type="button"><span class="card-icon">♨</span><h3>flare help</h3><p>Switch mode and tighten the read when your gut is active.</p></button></div><section class="mini-card"><h3>v1.2.6 test target</h3><p>Capture the camera-box view → normal or negative live view → OCR raw crop first → optional negative OCR retry → Deep Check result card.</p></section></div>`;}
+function homeScreen(){return `<div class="screen-content">${screenTitle("home base","what should we check?")}<section class="belly-meter"><div class="belly-icon">☻</div><div><p>Belly Meter</p><strong>${state.mode==="Flare"?"flare mode":"steady"}</strong><span>${state.mode==="Flare"?"Amber pulse is on. Scanner will judge more cautiously.":"Normal mode. Use Flare when your gut is more sensitive."}</span></div></section><div class="grid-two"><button class="action-card" data-action="go-scan" type="button"><span class="card-icon">◉</span><h3>scan food</h3><p>Camera-first product scan, OCR text extraction, and Deep Check.</p></button><button class="action-card" data-action="go-flare" type="button"><span class="card-icon">♨</span><h3>flare help</h3><p>Switch mode and tighten the read when your gut is active.</p></button></div><section class="mini-card"><h3>v1.3.0 test target</h3><p>Barcode first, Open Food Facts lookup, OCR and manual entry as backup paths.</p></section></div>`;}
+
+function barcodeCard(){
+  const p=state.barcodeProduct;
+  const productHtml=p?`<div class="barcode-product-box"><strong>${escapeHtml(p.name||"Product found")}</strong><span>${escapeHtml(p.brand||"")}</span><span>${escapeHtml(p.summary||"Barcode data found. Use product text for Deep Check.")}</span><div class="barcode-actions"><button class="secondary-action" data-action="use-barcode-text" type="button">use product text</button><button class="primary-action" data-action="barcode-deep-check" type="button">deep check</button></div></div>`:"";
+  return `<section class="input-card barcode-card scan-clean-card">
+    <h3>barcode lookup</h3>
+    <p class="search-hint">Fast route for store testing. Scan the UPC/EAN first; use OCR only when barcode lookup misses or ingredients are incomplete.</p>
+    <div class="barcode-actions"><button class="primary-action" data-action="open-barcode" type="button">scan barcode</button><button class="secondary-action" data-action="lookup-barcode" type="button">lookup code</button></div>
+    <div class="barcode-row"><input id="barcodeValue" value="${escapeHtml(state.barcodeValue||"")}" placeholder="or type barcode number" inputmode="numeric" autocomplete="off"></div>
+    ${state.barcodeStatus?`<p class="barcode-status">${escapeHtml(state.barcodeStatus)}</p>`:""}
+    ${productHtml}
+  </section>`;
+}
+
 function scanScreen(){
   const a=state.lastAnalysis;
   const previewIcon=state.capturePreviewOpen?`<svg viewBox="0 0 24 24"><path d="M5 12h14"></path></svg>`:`<svg viewBox="0 0 24 24"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>`;
@@ -523,6 +597,7 @@ function scanScreen(){
       <p class="scan-hint">Best test: fill the box with ingredients or nutrition text. Tilt shiny or dark packages to move glare off the words. White labels should read fastest.</p>
       <div class="camera-start-row"><button class="primary-action" data-action="open-camera" type="button">scan product</button></div>
     </section>
+    ${barcodeCard()}
     ${state.capturedImage?`<section class="capture-preview-drawer"><div class="capture-preview-header"><div class="capture-preview-title"><strong>image captured</strong><span>${escapeHtml(state.cameraMessage||"Ready for OCR review.")}</span></div><button class="capture-toggle-btn" data-action="toggle-capture-preview" type="button" aria-label="${state.capturePreviewOpen?"collapse captured image":"expand captured image"}">${previewIcon}</button></div><div class="capture-preview-body ${state.capturePreviewOpen?"":"is-closed"}"><div class="capture-image-wrap"><img class="capture-thumb" src="${state.capturedImage}" alt="Captured product label"><div class="ocr-crop-box" aria-hidden="true"><span>OCR read this area</span></div></div><div class="capture-meta"><span>${state.capturedMeta?`${state.capturedMeta.width}×${state.capturedMeta.height} • ${state.capturedMeta.sizeKb} KB • ${state.capturedMode}`:""}</span><span>This preview is the camera-box capture. OCR reads the amber boxed area. Negative view saves and reads an inverted copy for dark labels.</span><div class="button-row"><button class="secondary-action" data-action="retake-photo" type="button">retake photo</button><button class="secondary-action" data-action="retry-ocr" type="button">retry OCR</button></div><div class="button-row"><button class="secondary-action" data-action="retry-negative-ocr" type="button">try negative OCR</button><button class="secondary-action" data-action="clear-scan" type="button">clear</button></div></div>${!a?`<div class="next-step-note"><strong>Next:</strong> OCR reads the boxed text area. You can run Deep Check immediately or review/edit first.</div>`:""}</div></section>`:""}
     ${ocrReviewCard()}
     <section class="input-card quick-card scan-clean-card"><h3>Quick Read</h3><p>Use this when you already know the food name.</p><input class="search-box" id="foodName" value="${escapeHtml(state.foodName)}" placeholder="example: pepperoni pizza, tomato soup, rice" autocomplete="off"><div class="button-row"><button class="secondary-action" data-action="clear-scan" type="button">clear</button><button class="primary-action" data-action="quick-read" type="button">quick read</button></div></section>
@@ -737,12 +812,112 @@ async function runOcrOnCapturedImage(forceMode="auto"){
   }
 }
 
-function captureInputs(){["foodName","ingredientText","extractedText"].forEach(id=>{const el=document.getElementById(id);if(el)state[id]=el.value;});}
+function captureInputs(){["foodName","ingredientText","extractedText","barcodeValue"].forEach(id=>{const el=document.getElementById(id);if(el)state[id]=el.value;});}
 function copyOcrToDeep(runNow=false){captureInputs();state.ingredientText=state.extractedText;state.scanView="expanded";localStorage.setItem(VIEW_KEY,state.scanView);if(runNow){analyze("ocr");return;}render();setTimeout(()=>document.getElementById("ingredientText")?.focus(),80);}
 function scrollScreenTo(id){setTimeout(()=>{const screen=document.getElementById("screen");const el=document.getElementById(id);if(screen&&el)screen.scrollTo({top:Math.max(0,el.offsetTop-14),behavior:"smooth"});},80);}
 function render(){document.body.classList.toggle("flare-active",state.mode==="Flare");document.querySelectorAll(".nav-button").forEach(b=>b.classList.toggle("active",b.dataset.tab===state.activeTab));const screen=document.getElementById("screen");if(state.activeTab==="home")screen.innerHTML=homeScreen();if(state.activeTab==="scan")screen.innerHTML=scanScreen();if(state.activeTab==="flare")screen.innerHTML=flareScreen();if(state.activeTab==="me")screen.innerHTML=meScreen();bindDynamicInputs();}
-function bindDynamicInputs(){["foodName","ingredientText","extractedText"].forEach(id=>{const el=document.getElementById(id);if(el){el.oninput=()=>captureInputs();el.onkeydown=e=>{if(e.key==="Enter"&&id==="foodName"){e.preventDefault();analyze("quick");}};}});document.querySelectorAll("[data-mode]").forEach(btn=>btn.onclick=()=>setMode(btn.dataset.mode));document.querySelectorAll("[data-action]").forEach(btn=>btn.onclick=()=>handleAction(btn.dataset.action,btn));}
-function handleAction(a,btn){if(a==="go-scan"){state.activeTab="scan";render();return;}if(a==="go-flare"){state.activeTab="flare";render();return;}if(a==="open-camera"){openCameraOverlay();return;}if(a==="toggle-capture-preview"){state.capturePreviewOpen=!state.capturePreviewOpen;render();return;}if(a==="quick-read"){analyze("quick");return;}if(a==="deep-check"){analyze("deep");return;}if(a==="copy-ocr-to-deep"){copyOcrToDeep(false);return;}if(a==="run-ocr-deep-check"){copyOcrToDeep(true);return;}if(a==="toggle-ocr-review"){captureInputs();state.ocrReviewOpen=!state.ocrReviewOpen;render();if(state.ocrReviewOpen)setTimeout(()=>document.getElementById("extractedText")?.focus(),80);return;}if(a==="retry-ocr"){state.ocrStatus="OCR retry starting…";state.ocrReviewOpen=false;render();setTimeout(()=>runOcrOnCapturedImage("auto"),80);return;}if(a==="retry-negative-ocr"){state.ocrStatus="Negative OCR retry starting…";state.ocrReviewOpen=false;render();setTimeout(()=>runOcrOnCapturedImage("negative"),80);return;}if(a==="retake-photo"){openCameraOverlay();return;}if(a==="clear-scan"){state.foodName="";state.ingredientText="";state.extractedText="";state.capturedOcrImage="";state.ocrStatus="";state.ocrProgress=0;state.ocrInProgress=false;state.ocrReviewOpen=false;state.ocrConfidence="idle";state.ocrMode="raw aligned crop";state.ocrAttempts=0;state.cameraNegativeMode=false;state.capturedMode="normal";state.capturePreviewOpen=true;state.lastAnalysis=null;state.savedNotice="";state.capturedImage="";state.capturedMeta=null;state.cameraMessage="";render();return;}if(a==="save-current"){saveCurrentFood("saved");return;}if(a==="ate-current"){saveCurrentFood("ate");return;}if(a==="demo"){demoResult(btn.dataset.kind);return;}}
+function bindDynamicInputs(){["foodName","ingredientText","extractedText","barcodeValue"].forEach(id=>{const el=document.getElementById(id);if(el){el.oninput=()=>captureInputs();el.onkeydown=e=>{if(e.key==="Enter"&&id==="foodName"){e.preventDefault();analyze("quick");}};}});document.querySelectorAll("[data-mode]").forEach(btn=>btn.onclick=()=>setMode(btn.dataset.mode));document.querySelectorAll("[data-action]").forEach(btn=>btn.onclick=()=>handleAction(btn.dataset.action,btn));}
+
+function barcodeDigits(v){return String(v||"").replace(/[^0-9]/g,"").trim();}
+function productTextFromOpenFoodFacts(product){
+  const bits=[];
+  if(product.product_name)bits.push(`Product: ${product.product_name}`);
+  if(product.brands)bits.push(`Brand: ${product.brands}`);
+  if(product.generic_name)bits.push(`Food type: ${product.generic_name}`);
+  if(product.categories)bits.push(`Categories: ${product.categories}`);
+  if(product.ingredients_text)bits.push(`Ingredients: ${product.ingredients_text}`);
+  if(product.allergens)bits.push(`Allergens/traces: ${product.allergens}`);
+  const n=product.nutriments||{};
+  const nutrition=[];
+  const add=(label,key,unit="")=>{if(n[key]!==undefined&&n[key]!==null&&String(n[key])!=="")nutrition.push(`${label}: ${n[key]}${unit||n[`${key}_unit`]||""}`)};
+  add("Fiber","fiber"); add("Fat","fat"); add("Saturated fat","saturated-fat"); add("Sugar","sugars"); add("Added sugar","added-sugars"); add("Protein","proteins"); add("Sodium","sodium");
+  if(nutrition.length)bits.push(`Nutrition: ${nutrition.join("; ")}`);
+  return bits.join("\n");
+}
+function summarizeBarcodeProduct(product){
+  const name=product.product_name||product.generic_name||"Product found";
+  const brand=product.brands||"";
+  const parts=[];
+  if(product.ingredients_text)parts.push("ingredients found"); else parts.push("ingredients missing");
+  if(product.nutriments&&Object.keys(product.nutriments).length)parts.push("nutrition found");
+  return {name,brand,summary:parts.join(" • "),text:productTextFromOpenFoodFacts(product)};
+}
+async function lookupBarcodeValue(value){
+  const code=barcodeDigits(value||state.barcodeValue);
+  state.barcodeValue=code;
+  state.barcodeProduct=null;
+  if(!code){state.barcodeStatus="Enter or scan a barcode first.";render();return;}
+  state.barcodeInProgress=true;
+  state.barcodeStatus="Looking up barcode…";
+  render();
+  try{
+    const fields="product_name,generic_name,brands,categories,ingredients_text,allergens,nutriments";
+    const url=`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(code)}.json?fields=${fields}`;
+    const res=await fetch(url,{headers:{"Accept":"application/json"}});
+    const data=await res.json();
+    if(!data||data.status!==1||!data.product){
+      state.barcodeStatus="Barcode not found in Open Food Facts. Use OCR, Quick Read, or type the food name.";
+      state.barcodeProduct=null;
+    }else{
+      state.barcodeProduct=summarizeBarcodeProduct(data.product);
+      state.barcodeStatus="Product found. Use product text for Deep Check, or keep OCR as backup.";
+    }
+  }catch(e){
+    state.barcodeStatus="Barcode lookup failed. Check connection or type the food name.";
+    state.barcodeProduct=null;
+  }finally{
+    state.barcodeInProgress=false;
+    render();
+  }
+}
+function useBarcodeText(runNow=false){
+  captureInputs();
+  if(!state.barcodeProduct||!state.barcodeProduct.text){state.barcodeStatus="No barcode product text available yet.";render();return;}
+  state.foodName=state.barcodeProduct.name||state.foodName;
+  state.ingredientText=state.barcodeProduct.text;
+  state.extractedText=state.barcodeProduct.text;
+  state.ocrReviewOpen=false;
+  state.savedNotice="";
+  if(runNow){analyze("deep");return;}
+  render();
+  setTimeout(()=>document.getElementById("ingredientText")?.focus(),80);
+}
+let barcodeStream=null,barcodeControls=null,barcodeReader=null,barcodeFoundLock=false;
+async function openBarcodeOverlay(){
+  const overlay=document.getElementById("barcodeOverlay"),video=document.getElementById("barcodeVideo"),status=document.getElementById("barcodeOverlayStatus");
+  barcodeFoundLock=false;
+  overlay.classList.add("active"); overlay.setAttribute("aria-hidden","false");
+  status.textContent="Opening barcode scanner…";
+  try{
+    if(!window.ZXingBrowser||!ZXingBrowser.BrowserMultiFormatReader){
+      status.textContent="Barcode library did not load. Type the barcode number instead.";
+      return;
+    }
+    barcodeReader=new ZXingBrowser.BrowserMultiFormatReader();
+    status.textContent="Center barcode in the box. Hold steady.";
+    barcodeControls=await barcodeReader.decodeFromVideoDevice(undefined, video, (result,err,controls)=>{
+      if(result&&!barcodeFoundLock){
+        barcodeFoundLock=true;
+        const text=result.getText ? result.getText() : String(result.text||result);
+        state.barcodeValue=barcodeDigits(text);
+        status.textContent=`Barcode found: ${state.barcodeValue}`;
+        try{controls?.stop?.();}catch(e){}
+        setTimeout(()=>{closeBarcodeOverlay();lookupBarcodeValue(state.barcodeValue);},250);
+      }
+    });
+  }catch(e){
+    status.textContent="Barcode scanner failed. Type the barcode number or use OCR.";
+  }
+}
+function closeBarcodeOverlay(){
+  const overlay=document.getElementById("barcodeOverlay"),video=document.getElementById("barcodeVideo");
+  overlay.classList.remove("active"); overlay.setAttribute("aria-hidden","true");
+  try{barcodeControls?.stop?.();}catch(e){}
+  barcodeControls=null;
+  if(video)video.srcObject=null;
+}
+
+function handleAction(a,btn){if(a==="open-barcode"){openBarcodeOverlay();return;}if(a==="lookup-barcode"){captureInputs();lookupBarcodeValue();return;}if(a==="use-barcode-text"){useBarcodeText(false);return;}if(a==="barcode-deep-check"){useBarcodeText(true);return;}if(a==="go-scan"){state.activeTab="scan";render();return;}if(a==="go-flare"){state.activeTab="flare";render();return;}if(a==="open-camera"){openCameraOverlay();return;}if(a==="toggle-capture-preview"){state.capturePreviewOpen=!state.capturePreviewOpen;render();return;}if(a==="quick-read"){analyze("quick");return;}if(a==="deep-check"){analyze("deep");return;}if(a==="copy-ocr-to-deep"){copyOcrToDeep(false);return;}if(a==="run-ocr-deep-check"){copyOcrToDeep(true);return;}if(a==="toggle-ocr-review"){captureInputs();state.ocrReviewOpen=!state.ocrReviewOpen;render();if(state.ocrReviewOpen)setTimeout(()=>document.getElementById("extractedText")?.focus(),80);return;}if(a==="retry-ocr"){state.ocrStatus="OCR retry starting…";state.ocrReviewOpen=false;render();setTimeout(()=>runOcrOnCapturedImage("auto"),80);return;}if(a==="retry-negative-ocr"){state.ocrStatus="Negative OCR retry starting…";state.ocrReviewOpen=false;render();setTimeout(()=>runOcrOnCapturedImage("negative"),80);return;}if(a==="retake-photo"){openCameraOverlay();return;}if(a==="clear-scan"){state.foodName="";state.ingredientText="";state.extractedText="";state.capturedOcrImage="";state.ocrStatus="";state.ocrProgress=0;state.ocrInProgress=false;state.ocrReviewOpen=false;state.ocrConfidence="idle";state.ocrMode="raw aligned crop";state.ocrAttempts=0;state.cameraNegativeMode=false;state.capturedMode="normal";state.capturePreviewOpen=true;state.lastAnalysis=null;state.savedNotice="";state.capturedImage="";state.capturedMeta=null;state.cameraMessage="";state.barcodeValue="";state.barcodeStatus="";state.barcodeProduct=null;state.barcodeInProgress=false;render();return;}if(a==="save-current"){saveCurrentFood("saved");return;}if(a==="ate-current"){saveCurrentFood("ate");return;}if(a==="demo"){demoResult(btn.dataset.kind);return;}}
 document.querySelectorAll(".nav-button").forEach(btn=>{btn.onclick=()=>{state.activeTab=btn.dataset.tab;render();};});
 let cameraStream=null,cameraFacing="environment",cameraInProgress=false;
 async function openCameraOverlay(){const overlay=document.getElementById("cameraOverlay");const video=document.getElementById("cameraVideo");const status=document.getElementById("cameraStatus");overlay.classList.add("active");overlay.classList.toggle("negative-mode",state.cameraNegativeMode);overlay.setAttribute("aria-hidden","false");const negBtn=document.getElementById("cameraNegative");if(negBtn){negBtn.classList.toggle("camera-negative-active",state.cameraNegativeMode);negBtn.textContent=state.cameraNegativeMode?"±":"±";}status.textContent="Opening camera…";try{if(cameraStream)cameraStream.getTracks().forEach(t=>t.stop());cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:cameraFacing,width:{ideal:1280},height:{ideal:1920}},audio:false});video.srcObject=cameraStream;await video.play();status.textContent=state.cameraNegativeMode?"Negative view is on. Use this only for dark labels; fill the box with the ingredient text.":"Ready. Fill the box with ingredients or nutrition text. Tilt glossy packages to move glare off the words.";}catch(e){status.textContent="Camera could not open. Check browser camera permission, then try again.";}}
@@ -803,6 +978,7 @@ function captureFrame(){
   return {dataUrl,width:canvas.width,height:canvas.height,sizeKb:Math.round(dataUrl.length*0.75/1024)};
 }
 async function startRecognitionScan(){if(cameraInProgress)return;const btn=document.getElementById("cameraScanProduct"),status=document.getElementById("cameraStatus"),badge=document.getElementById("countdownBadge"),frame=document.getElementById("progressFrame");cameraInProgress=true;btn.disabled=true;btn.textContent="scanning…";badge.classList.add("active");frame.classList.add("scanning");const frames=[];let remaining=5;status.textContent=state.cameraNegativeMode?"Capturing negative view for 5 seconds. Keep text inside the box.":"Capturing for 5 seconds. Keep the ingredient or nutrition text inside the box.";badge.textContent=remaining;const timer=setInterval(()=>{try{frames.push(captureFrame());}catch(e){}remaining-=1;badge.textContent=Math.max(remaining,0);status.textContent=remaining>0?`Capturing label… ${remaining} second${remaining===1?"":"s"} left.`:"Saving image…";if(remaining<=0){clearInterval(timer);setTimeout(()=>{const last=frames[frames.length-1]||captureFrame();state.capturedImage=last.dataUrl;state.capturedMeta={width:last.width,height:last.height,sizeKb:last.sizeKb};state.cameraMessage=`${frames.length||1} frame${(frames.length||1)===1?"":"s"} saved.`;state.activeTab="scan";state.extractedText="";state.capturedOcrImage="";state.ocrStatus="Image captured. Preparing aligned label crop for OCR…";state.ocrProgress=0;state.ocrInProgress=false;state.ocrReviewOpen=false;state.ocrConfidence="idle";state.ocrMode=state.cameraNegativeMode?"negative view crop":"raw aligned crop";state.ocrAttempts=0;state.capturedMode=state.cameraNegativeMode?"negative":"normal";state.capturePreviewOpen=true;if(state.lastAnalysis&&state.lastAnalysis.detected==="Unknown food")state.lastAnalysis=null;cameraInProgress=false;btn.disabled=false;btn.textContent="scan product";badge.classList.remove("active");frame.classList.remove("scanning");closeCameraOverlay();render();setTimeout(runOcrOnCapturedImage,150);},220);}},1000);}
+document.getElementById("barcodeClose").onclick=()=>closeBarcodeOverlay();
 document.getElementById("cameraScanProduct").onclick=startRecognitionScan;document.getElementById("cameraClose").onclick=()=>closeCameraOverlay();document.getElementById("cameraCancel").onclick=()=>{cameraInProgress=false;document.getElementById("cameraScanProduct").disabled=false;document.getElementById("cameraScanProduct").textContent="scan product";document.getElementById("countdownBadge").classList.remove("active");document.getElementById("progressFrame").classList.remove("scanning");closeCameraOverlay();};document.getElementById("cameraFlip").onclick=async()=>{cameraFacing=cameraFacing==="environment"?"user":"environment";await openCameraOverlay();};document.getElementById("cameraNegative").onclick=()=>{state.cameraNegativeMode=!state.cameraNegativeMode;const overlay=document.getElementById("cameraOverlay");overlay.classList.toggle("negative-mode",state.cameraNegativeMode);const btn=document.getElementById("cameraNegative");btn.classList.toggle("camera-negative-active",state.cameraNegativeMode);document.getElementById("cameraStatus").textContent=state.cameraNegativeMode?"Negative view on. Aim again, then scan.":"Normal view on. Aim again, then scan.";};document.getElementById("cameraHelper").onclick=()=>{document.getElementById("cameraStatus").textContent="Tip: use bright side light, not direct glare. Fill the box with ingredients or nutrition text, not the whole package.";};
 render();
 </script>
