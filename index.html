@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="theme-color" content="#1b2027" />
-<title>bill's bad belly — v1.3.0 Barcode First Field Test</title>
+<title>bill's bad belly — v1.3.1 OFF + USDA Barcode Lookup</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baumans&display=swap" rel="stylesheet">
@@ -180,7 +180,7 @@ body.flare-active .screen-card{border-color:rgba(216,138,61,.48);box-shadow:0 0 
 }
 
 
-/* ---------- v1.3.0 Barcode First Field Test ---------- */
+/* ---------- v1.3.1 OFF + USDA Barcode Lookup ---------- */
 .camera-hint strong{color:white;font-family:var(--display-font);font-size:.96rem;letter-spacing:.02em}
 .lens-shell{
   width:min(92vw,390px) !important;
@@ -332,7 +332,7 @@ body.flare-active .screen-card{border-color:rgba(216,138,61,.48);box-shadow:0 0 
   margin-top:6px;
 }
 
-/* ---------- v1.3.0 Barcode First Field Test ---------- */
+/* ---------- v1.3.1 OFF + USDA Barcode Lookup ---------- */
 .barcode-card{
   border-color:rgba(184,154,192,.28)!important;
 }
@@ -382,7 +382,7 @@ body.flare-active .screen-card{border-color:rgba(216,138,61,.48);box-shadow:0 0 
   <header class="topbar">
     <div class="header-mascot-wrap" aria-hidden="true"><div class="mascot-fallback">bb</div></div>
     <div class="brand-title-wrap">
-      <p class="eyebrow">v1.3.0 Barcode First Field Test</p>
+      <p class="eyebrow">v1.3.1 OFF + USDA Barcode Lookup</p>
       <h1>bill's bad belly</h1>
     </div>
     <div class="logo-mark" aria-hidden="true">bb</div>
@@ -457,6 +457,8 @@ const state={
   barcodeValue:"",
   barcodeStatus:"",
   barcodeProduct:null,
+  barcodeCandidates:[],
+  barcodeSource:"",
   barcodeInProgress:false,
   capturedMode:"normal",
   capturePreviewOpen:true,
@@ -573,17 +575,18 @@ function ocrReviewCard(){
     <p class="ocr-mode-note">If the read is weak, review before trusting the card. Try negative OCR only for dark/low-contrast labels.</p>
   </section>`;
 }
-function homeScreen(){return `<div class="screen-content">${screenTitle("home base","what should we check?")}<section class="belly-meter"><div class="belly-icon">☻</div><div><p>Belly Meter</p><strong>${state.mode==="Flare"?"flare mode":"steady"}</strong><span>${state.mode==="Flare"?"Amber pulse is on. Scanner will judge more cautiously.":"Normal mode. Use Flare when your gut is more sensitive."}</span></div></section><div class="grid-two"><button class="action-card" data-action="go-scan" type="button"><span class="card-icon">◉</span><h3>scan food</h3><p>Camera-first product scan, OCR text extraction, and Deep Check.</p></button><button class="action-card" data-action="go-flare" type="button"><span class="card-icon">♨</span><h3>flare help</h3><p>Switch mode and tighten the read when your gut is active.</p></button></div><section class="mini-card"><h3>v1.3.0 test target</h3><p>Barcode first, Open Food Facts lookup, OCR and manual entry as backup paths.</p></section></div>`;}
+function homeScreen(){return `<div class="screen-content">${screenTitle("home base","what should we check?")}<section class="belly-meter"><div class="belly-icon">☻</div><div><p>Belly Meter</p><strong>${state.mode==="Flare"?"flare mode":"steady"}</strong><span>${state.mode==="Flare"?"Amber pulse is on. Scanner will judge more cautiously.":"Normal mode. Use Flare when your gut is more sensitive."}</span></div></section><div class="grid-two"><button class="action-card" data-action="go-scan" type="button"><span class="card-icon">◉</span><h3>scan food</h3><p>Camera-first product scan, OCR text extraction, and Deep Check.</p></button><button class="action-card" data-action="go-flare" type="button"><span class="card-icon">♨</span><h3>flare help</h3><p>Switch mode and tighten the read when your gut is active.</p></button></div><section class="mini-card"><h3>v1.3.1 test target</h3><p>Barcode first with Open Food Facts, USDA fallback, barcode correction, and OCR/manual backup.</p></section></div>`;}
 
 function barcodeCard(){
   const p=state.barcodeProduct;
-  const productHtml=p?`<div class="barcode-product-box"><strong>${escapeHtml(p.name||"Product found")}</strong><span>${escapeHtml(p.brand||"")}</span><span>${escapeHtml(p.summary||"Barcode data found. Use product text for Deep Check.")}</span><div class="barcode-actions"><button class="secondary-action" data-action="use-barcode-text" type="button">use product text</button><button class="primary-action" data-action="barcode-deep-check" type="button">deep check</button></div></div>`:"";
+  const productHtml=p?`<div class="barcode-product-box"><strong>${escapeHtml(p.name||"Product found")}</strong><span>${escapeHtml(p.brand||"")}</span><span><b>source:</b> ${escapeHtml(p.source||state.barcodeSource||"barcode lookup")}</span><span>${escapeHtml(p.summary||"Barcode data found. Use product text for Deep Check.")}</span><div class="barcode-actions"><button class="secondary-action" data-action="use-barcode-text" type="button">use product text</button><button class="primary-action" data-action="barcode-deep-check" type="button">deep check</button></div></div>`:"";
   return `<section class="input-card barcode-card scan-clean-card">
     <h3>barcode lookup</h3>
-    <p class="search-hint">Fast route for store testing. Scan the UPC/EAN first; use OCR only when barcode lookup misses or ingredients are incomplete.</p>
+    <p class="search-hint">Fast route for store testing. Scan the UPC/EAN first. The app tries Open Food Facts, then USDA FoodData Central, before falling back to OCR/manual entry.</p>
     <div class="barcode-actions"><button class="primary-action" data-action="open-barcode" type="button">scan barcode</button><button class="secondary-action" data-action="lookup-barcode" type="button">lookup code</button></div>
     <div class="barcode-row"><input id="barcodeValue" value="${escapeHtml(state.barcodeValue||"")}" placeholder="or type barcode number" inputmode="numeric" autocomplete="off"></div>
     ${state.barcodeStatus?`<p class="barcode-status">${escapeHtml(state.barcodeStatus)}</p>`:""}
+    ${state.barcodeCandidates&&state.barcodeCandidates.length?`<p class="barcode-status">tried: ${escapeHtml(state.barcodeCandidates.join(" → "))}</p>`:""}
     ${productHtml}
   </section>`;
 }
@@ -819,6 +822,24 @@ function render(){document.body.classList.toggle("flare-active",state.mode==="Fl
 function bindDynamicInputs(){["foodName","ingredientText","extractedText","barcodeValue"].forEach(id=>{const el=document.getElementById(id);if(el){el.oninput=()=>captureInputs();el.onkeydown=e=>{if(e.key==="Enter"&&id==="foodName"){e.preventDefault();analyze("quick");}};}});document.querySelectorAll("[data-mode]").forEach(btn=>btn.onclick=()=>setMode(btn.dataset.mode));document.querySelectorAll("[data-action]").forEach(btn=>btn.onclick=()=>handleAction(btn.dataset.action,btn));}
 
 function barcodeDigits(v){return String(v||"").replace(/[^0-9]/g,"").trim();}
+function barcodeVariants(value){
+  const raw=barcodeDigits(value);
+  const set=[];
+  const add=v=>{v=barcodeDigits(v);if(v&&!set.includes(v))set.push(v);};
+  add(raw);
+  // UPC/EAN rescue candidates. Some camera reads can add/drop a guard digit.
+  if(raw.length===13 && raw.startsWith("0"))add(raw.slice(1));
+  if(raw.length===12)add("0"+raw);
+  if(raw.length>13){
+    add(raw.slice(-13));
+    add(raw.slice(-12));
+    add(raw.slice(0,13));
+    add(raw.slice(0,12));
+  }
+  if(raw.length===11)add("0"+raw);
+  if(raw.length===14 && raw.startsWith("0"))add(raw.slice(1));
+  return set.slice(0,8);
+}
 function productTextFromOpenFoodFacts(product){
   const bits=[];
   if(product.product_name)bits.push(`Product: ${product.product_name}`);
@@ -834,33 +855,102 @@ function productTextFromOpenFoodFacts(product){
   if(nutrition.length)bits.push(`Nutrition: ${nutrition.join("; ")}`);
   return bits.join("\n");
 }
-function summarizeBarcodeProduct(product){
+function summarizeBarcodeProduct(product,source="Open Food Facts",code=""){
   const name=product.product_name||product.generic_name||"Product found";
   const brand=product.brands||"";
   const parts=[];
   if(product.ingredients_text)parts.push("ingredients found"); else parts.push("ingredients missing");
   if(product.nutriments&&Object.keys(product.nutriments).length)parts.push("nutrition found");
-  return {name,brand,summary:parts.join(" • "),text:productTextFromOpenFoodFacts(product)};
+  if(code)parts.push(`barcode ${code}`);
+  return {name,brand,source,code,summary:parts.join(" • "),text:productTextFromOpenFoodFacts(product)};
+}
+function productTextFromUSDA(food){
+  const bits=[];
+  if(food.description)bits.push(`Product: ${food.description}`);
+  if(food.brandOwner)bits.push(`Brand owner: ${food.brandOwner}`);
+  if(food.brandName)bits.push(`Brand: ${food.brandName}`);
+  if(food.gtinUpc)bits.push(`Barcode: ${food.gtinUpc}`);
+  if(food.ingredients)bits.push(`Ingredients: ${food.ingredients}`);
+  if(food.foodCategory)bits.push(`Category: ${food.foodCategory}`);
+  const nutrition=[];
+  (food.foodNutrients||[]).forEach(n=>{
+    const name=String(n.nutrientName||"").toLowerCase();
+    if(["fiber","total lipid","total fat","fatty acids, total saturated","sugars, total including nlea","sugars, added","protein","sodium"].some(k=>name.includes(k))){
+      const label=n.nutrientName||"nutrient";
+      const val=n.value??n.amount;
+      const unit=n.unitName||"";
+      if(val!==undefined&&val!==null)nutrition.push(`${label}: ${val}${unit}`);
+    }
+  });
+  if(nutrition.length)bits.push(`Nutrition: ${nutrition.slice(0,10).join("; ")}`);
+  return bits.join("\n");
+}
+function summarizeUSDAFood(food,code=""){
+  const name=food.description||"USDA product found";
+  const brand=food.brandName||food.brandOwner||"";
+  const parts=[];
+  if(food.ingredients)parts.push("ingredients found"); else parts.push("ingredients missing");
+  if(food.foodNutrients&&food.foodNutrients.length)parts.push("nutrition found");
+  if(food.gtinUpc)parts.push(`USDA UPC ${food.gtinUpc}`);
+  return {name,brand,source:"USDA FoodData Central",code:food.gtinUpc||code,summary:parts.join(" • "),text:productTextFromUSDA(food)};
+}
+async function lookupOpenFoodFacts(code){
+  const fields="product_name,generic_name,brands,categories,ingredients_text,allergens,nutriments";
+  const url=`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(code)}.json?fields=${fields}`;
+  const res=await fetch(url,{headers:{"Accept":"application/json"}});
+  const data=await res.json();
+  if(data&&data.status===1&&data.product)return summarizeBarcodeProduct(data.product,"Open Food Facts",code);
+  return null;
+}
+async function lookupUSDA(code){
+  // Uses DEMO_KEY for test builds. If USDA throttles it, later builds can add a user/project API key field.
+  const url=`https://api.nal.usda.gov/fdc/v1/foods/search?api_key=DEMO_KEY&dataType=Branded&pageSize=10&query=${encodeURIComponent(code)}`;
+  const res=await fetch(url,{headers:{"Accept":"application/json"}});
+  const data=await res.json();
+  const foods=Array.isArray(data.foods)?data.foods:[];
+  if(!foods.length)return null;
+  const exact=foods.find(f=>barcodeDigits(f.gtinUpc)===barcodeDigits(code));
+  const food=exact||foods.find(f=>f.ingredients)||foods[0];
+  return summarizeUSDAFood(food,code);
 }
 async function lookupBarcodeValue(value){
-  const code=barcodeDigits(value||state.barcodeValue);
-  state.barcodeValue=code;
+  const raw=barcodeDigits(value||state.barcodeValue);
+  const candidates=barcodeVariants(raw);
+  state.barcodeValue=raw;
+  state.barcodeCandidates=candidates;
   state.barcodeProduct=null;
-  if(!code){state.barcodeStatus="Enter or scan a barcode first.";render();return;}
+  state.barcodeSource="";
+  if(!raw){state.barcodeStatus="Enter or scan a barcode first.";render();return;}
   state.barcodeInProgress=true;
-  state.barcodeStatus="Looking up barcode…";
+  state.barcodeStatus="Looking up barcode in Open Food Facts…";
   render();
   try{
-    const fields="product_name,generic_name,brands,categories,ingredients_text,allergens,nutriments";
-    const url=`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(code)}.json?fields=${fields}`;
-    const res=await fetch(url,{headers:{"Accept":"application/json"}});
-    const data=await res.json();
-    if(!data||data.status!==1||!data.product){
-      state.barcodeStatus="Barcode not found in Open Food Facts. Use OCR, Quick Read, or type the food name.";
-      state.barcodeProduct=null;
+    let found=null,foundCode="";
+    for(const code of candidates){
+      state.barcodeStatus=`Checking Open Food Facts: ${code}`;
+      render();
+      try{found=await lookupOpenFoodFacts(code);}catch(e){found=null;}
+      if(found){foundCode=code;break;}
+    }
+    if(!found){
+      state.barcodeStatus="Not found in Open Food Facts. Trying USDA FoodData Central…";
+      render();
+      for(const code of candidates){
+        state.barcodeStatus=`Checking USDA: ${code}`;
+        render();
+        try{found=await lookupUSDA(code);}catch(e){found=null;}
+        if(found){foundCode=code;break;}
+      }
+    }
+    if(found){
+      state.barcodeProduct=found;
+      state.barcodeValue=found.code||foundCode||raw;
+      state.barcodeSource=found.source||"barcode lookup";
+      const hasIngredients=found.text&&/ingredients\s*:/i.test(found.text);
+      state.barcodeStatus=`Product found in ${state.barcodeSource}${hasIngredients?" with ingredients":"; ingredients may be limited"}.`;
     }else{
-      state.barcodeProduct=summarizeBarcodeProduct(data.product);
-      state.barcodeStatus="Product found. Use product text for Deep Check, or keep OCR as backup.";
+      state.barcodeStatus="Barcode not found in Open Food Facts or USDA. Use OCR, Quick Read, or type the food name.";
+      state.barcodeProduct=null;
     }
   }catch(e){
     state.barcodeStatus="Barcode lookup failed. Check connection or type the food name.";
@@ -917,7 +1007,7 @@ function closeBarcodeOverlay(){
   if(video)video.srcObject=null;
 }
 
-function handleAction(a,btn){if(a==="open-barcode"){openBarcodeOverlay();return;}if(a==="lookup-barcode"){captureInputs();lookupBarcodeValue();return;}if(a==="use-barcode-text"){useBarcodeText(false);return;}if(a==="barcode-deep-check"){useBarcodeText(true);return;}if(a==="go-scan"){state.activeTab="scan";render();return;}if(a==="go-flare"){state.activeTab="flare";render();return;}if(a==="open-camera"){openCameraOverlay();return;}if(a==="toggle-capture-preview"){state.capturePreviewOpen=!state.capturePreviewOpen;render();return;}if(a==="quick-read"){analyze("quick");return;}if(a==="deep-check"){analyze("deep");return;}if(a==="copy-ocr-to-deep"){copyOcrToDeep(false);return;}if(a==="run-ocr-deep-check"){copyOcrToDeep(true);return;}if(a==="toggle-ocr-review"){captureInputs();state.ocrReviewOpen=!state.ocrReviewOpen;render();if(state.ocrReviewOpen)setTimeout(()=>document.getElementById("extractedText")?.focus(),80);return;}if(a==="retry-ocr"){state.ocrStatus="OCR retry starting…";state.ocrReviewOpen=false;render();setTimeout(()=>runOcrOnCapturedImage("auto"),80);return;}if(a==="retry-negative-ocr"){state.ocrStatus="Negative OCR retry starting…";state.ocrReviewOpen=false;render();setTimeout(()=>runOcrOnCapturedImage("negative"),80);return;}if(a==="retake-photo"){openCameraOverlay();return;}if(a==="clear-scan"){state.foodName="";state.ingredientText="";state.extractedText="";state.capturedOcrImage="";state.ocrStatus="";state.ocrProgress=0;state.ocrInProgress=false;state.ocrReviewOpen=false;state.ocrConfidence="idle";state.ocrMode="raw aligned crop";state.ocrAttempts=0;state.cameraNegativeMode=false;state.capturedMode="normal";state.capturePreviewOpen=true;state.lastAnalysis=null;state.savedNotice="";state.capturedImage="";state.capturedMeta=null;state.cameraMessage="";state.barcodeValue="";state.barcodeStatus="";state.barcodeProduct=null;state.barcodeInProgress=false;render();return;}if(a==="save-current"){saveCurrentFood("saved");return;}if(a==="ate-current"){saveCurrentFood("ate");return;}if(a==="demo"){demoResult(btn.dataset.kind);return;}}
+function handleAction(a,btn){if(a==="open-barcode"){openBarcodeOverlay();return;}if(a==="lookup-barcode"){captureInputs();lookupBarcodeValue();return;}if(a==="use-barcode-text"){useBarcodeText(false);return;}if(a==="barcode-deep-check"){useBarcodeText(true);return;}if(a==="go-scan"){state.activeTab="scan";render();return;}if(a==="go-flare"){state.activeTab="flare";render();return;}if(a==="open-camera"){openCameraOverlay();return;}if(a==="toggle-capture-preview"){state.capturePreviewOpen=!state.capturePreviewOpen;render();return;}if(a==="quick-read"){analyze("quick");return;}if(a==="deep-check"){analyze("deep");return;}if(a==="copy-ocr-to-deep"){copyOcrToDeep(false);return;}if(a==="run-ocr-deep-check"){copyOcrToDeep(true);return;}if(a==="toggle-ocr-review"){captureInputs();state.ocrReviewOpen=!state.ocrReviewOpen;render();if(state.ocrReviewOpen)setTimeout(()=>document.getElementById("extractedText")?.focus(),80);return;}if(a==="retry-ocr"){state.ocrStatus="OCR retry starting…";state.ocrReviewOpen=false;render();setTimeout(()=>runOcrOnCapturedImage("auto"),80);return;}if(a==="retry-negative-ocr"){state.ocrStatus="Negative OCR retry starting…";state.ocrReviewOpen=false;render();setTimeout(()=>runOcrOnCapturedImage("negative"),80);return;}if(a==="retake-photo"){openCameraOverlay();return;}if(a==="clear-scan"){state.foodName="";state.ingredientText="";state.extractedText="";state.capturedOcrImage="";state.ocrStatus="";state.ocrProgress=0;state.ocrInProgress=false;state.ocrReviewOpen=false;state.ocrConfidence="idle";state.ocrMode="raw aligned crop";state.ocrAttempts=0;state.cameraNegativeMode=false;state.capturedMode="normal";state.capturePreviewOpen=true;state.lastAnalysis=null;state.savedNotice="";state.capturedImage="";state.capturedMeta=null;state.cameraMessage="";state.barcodeValue="";state.barcodeStatus="";state.barcodeProduct=null;state.barcodeCandidates=[];state.barcodeSource="";state.barcodeInProgress=false;render();return;}if(a==="save-current"){saveCurrentFood("saved");return;}if(a==="ate-current"){saveCurrentFood("ate");return;}if(a==="demo"){demoResult(btn.dataset.kind);return;}}
 document.querySelectorAll(".nav-button").forEach(btn=>{btn.onclick=()=>{state.activeTab=btn.dataset.tab;render();};});
 let cameraStream=null,cameraFacing="environment",cameraInProgress=false;
 async function openCameraOverlay(){const overlay=document.getElementById("cameraOverlay");const video=document.getElementById("cameraVideo");const status=document.getElementById("cameraStatus");overlay.classList.add("active");overlay.classList.toggle("negative-mode",state.cameraNegativeMode);overlay.setAttribute("aria-hidden","false");const negBtn=document.getElementById("cameraNegative");if(negBtn){negBtn.classList.toggle("camera-negative-active",state.cameraNegativeMode);negBtn.textContent=state.cameraNegativeMode?"±":"±";}status.textContent="Opening camera…";try{if(cameraStream)cameraStream.getTracks().forEach(t=>t.stop());cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:cameraFacing,width:{ideal:1280},height:{ideal:1920}},audio:false});video.srcObject=cameraStream;await video.play();status.textContent=state.cameraNegativeMode?"Negative view is on. Use this only for dark labels; fill the box with the ingredient text.":"Ready. Fill the box with ingredients or nutrition text. Tilt glossy packages to move glare off the words.";}catch(e){status.textContent="Camera could not open. Check browser camera permission, then try again.";}}
