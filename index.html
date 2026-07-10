@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="theme-color" content="#1b2027" />
-<title>bill's bad belly — v1.3.2 Three Scan Paths</title>
+<title>bill's bad belly — v1.3.3 Scan Stack Cleanup</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baumans&display=swap" rel="stylesheet">
@@ -58,7 +58,9 @@ body.flare-active .screen-card{border-color:rgba(216,138,61,.48);box-shadow:0 0 
 .primary-action:disabled,.secondary-action:disabled,.compact-action:disabled{opacity:.45;filter:grayscale(.35);cursor:not-allowed}.primary-action,.secondary-action,.compact-action{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;border-radius:16px;padding:12px 15px;color:var(--cream);font-weight:900;text-decoration:none}.primary-action{border:0;background:linear-gradient(145deg,var(--purple),#5e4867);box-shadow:0 10px 24px rgba(125,95,134,.28)}.secondary-action{border:1px solid rgba(184,154,192,.28);background:rgba(17,21,26,.5)}.compact-action{min-height:40px;padding:9px 12px;border:1px solid rgba(184,154,192,.28);background:rgba(17,21,26,.45)}.button-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.button-row.three{grid-template-columns:1fr 1fr 1fr}.scan-clean-card{position:relative;overflow:hidden}.camera-first-card{text-align:center;padding:18px}.camera-lens-button{width:104px;height:104px;border-radius:35px;border:1px solid rgba(184,154,192,.32);background:radial-gradient(circle at 40% 32%,rgba(184,154,192,.30),rgba(125,95,134,.20) 46%,rgba(17,21,26,.70));color:white;box-shadow:0 18px 40px rgba(0,0,0,.42);font-size:2.4rem;margin:2px auto 12px;display:grid;place-items:center}.scan-hint{color:var(--muted);font-size:.86rem;line-height:1.35;margin-top:8px}.capture-preview-drawer{padding:12px;display:grid;grid-template-columns:84px 1fr;gap:12px;align-items:center}.capture-thumb{width:84px;height:84px;object-fit:cover;border-radius:18px;border:1px solid rgba(184,154,192,.24);background:#11151a}.capture-meta strong{display:block;font-size:.98rem}.capture-meta span{display:block;color:var(--muted);font-size:.82rem;line-height:1.35;margin-top:3px}.next-step-note{grid-column:1/-1;border:1px dashed rgba(184,154,192,.28);border-radius:14px;padding:9px 10px;color:var(--muted);font-size:.84rem;background:rgba(17,21,26,.22)}
 .ocr-review-card{padding:14px;border-color:rgba(184,154,192,.34)!important;background:radial-gradient(circle at 8% 0%,rgba(184,154,192,.10),transparent 34%),linear-gradient(145deg,rgba(58,68,78,.96),rgba(36,43,52,.96))!important}.ocr-review-card h3{margin:0;color:var(--purple-light);font-size:1.08rem}.ocr-status-line{margin:7px 0 10px!important;color:#e8e2ea!important;font-size:.88rem!important;line-height:1.35!important}.ocr-status-pill{display:inline-flex;align-items:center;justify-content:center;min-height:28px;padding:5px 9px;border-radius:999px;border:1px solid rgba(184,154,192,.26);background:rgba(17,21,26,.28);color:var(--purple-light);font-size:.74rem;font-weight:900}.ocr-status-pill.good-read{border-color:rgba(75,179,106,.4);color:var(--green-soft);background:rgba(75,179,106,.12)}.ocr-status-pill.weak-read{border-color:rgba(198,146,63,.44);color:var(--caution-soft);background:rgba(198,146,63,.12)}.ocr-status-pill.no-read{border-color:rgba(141,47,74,.52);color:var(--cranberry-soft);background:rgba(141,47,74,.16)}.ocr-loading-note{border:1px dashed rgba(184,154,192,.24);border-radius:16px;padding:10px 12px;background:rgba(17,21,26,.16);color:var(--muted);font-size:.84rem;line-height:1.35;margin:10px 0}.ocr-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}.ocr-review-toggle{margin-top:10px}.ocr-text-count{margin-top:6px;color:var(--muted);font-size:.78rem}.support-drawer{margin-top:12px;border:1px solid rgba(184,154,192,.18);border-radius:16px;background:rgba(17,21,26,.22);padding:11px}.support-drawer summary{cursor:pointer;color:var(--purple-light);font-weight:900;font-family:var(--display-font)}.nutrition-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}.nutrition-tile{border:1px solid rgba(184,154,192,.16);border-radius:14px;padding:9px;background:rgba(17,21,26,.26)}.nutrition-tile span{display:block;color:var(--muted);font-size:.75rem}.nutrition-tile strong{display:block;font-size:1rem;margin-top:2px}.demo-chip-row{display:flex;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:2px}.demo-chip{flex:0 0 auto;border:1px solid rgba(184,154,192,.26);border-radius:999px;padding:8px 10px;background:rgba(17,21,26,.55);color:var(--cream);font-size:.82rem;font-weight:900}.result-shell{padding:14px;border-width:2px;background:linear-gradient(145deg,rgba(48,57,70,.98),rgba(27,32,39,.98));box-shadow:0 14px 34px rgba(0,0,0,.30),inset 0 1px 0 rgba(255,255,255,.05)}.result-shell.good{border-color:rgba(75,179,106,.70)}.result-shell.ehh{border-color:rgba(198,146,63,.78)}.result-shell.ugly{border-color:rgba(141,47,74,.82)}.result-inner{border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:13px;background:rgba(17,21,26,.20)}.verdict-area{text-align:center;display:grid;gap:7px;place-items:center;margin-bottom:12px}.verdict-area h3{margin:0;font-size:1.28rem;color:var(--cream)}.detected-name{color:var(--muted);font-size:.9rem}.rating-pill{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:7px 11px;min-width:72px;font-weight:900;font-size:.82rem;letter-spacing:.04em;box-shadow:0 8px 18px rgba(0,0,0,.24)}.rating-good{color:var(--green-soft);background:rgba(75,179,106,.20);border:1px solid rgba(113,255,147,.34)}.rating-ehh{color:var(--caution-soft);background:rgba(198,146,63,.20);border:1px solid rgba(255,216,93,.35)}.rating-ugly{color:var(--cranberry-soft);background:rgba(141,47,74,.25);border:1px solid rgba(255,122,154,.35)}.rating-flare{color:var(--amber-soft);background:rgba(216,138,61,.18);border:1px solid rgba(255,194,120,.36)}.result-copy{color:var(--cream);line-height:1.42;font-size:.92rem}.detected-list{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}.detected-chip{border:1px solid rgba(184,154,192,.20);border-radius:999px;background:rgba(17,21,26,.28);padding:6px 8px;color:var(--muted);font-size:.78rem}.compare-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}.compare-box{border:1px solid rgba(184,154,192,.16);border-radius:14px;padding:9px;background:rgba(17,21,26,.24);text-align:center}.compare-box span{display:block;color:var(--muted);font-size:.74rem;margin-bottom:5px}.save-notice{margin:0;color:var(--purple-light);font-weight:900}.saved-list{display:grid;gap:9px;margin-top:10px}.saved-item{border:1px solid rgba(184,154,192,.18);border-radius:16px;padding:10px;background:rgba(17,21,26,.28);display:grid;gap:4px}.saved-item strong{font-size:.94rem}.saved-item span{color:var(--muted);font-size:.78rem}.bottom-nav{position:fixed;left:50%;bottom:calc(10px + env(safe-area-inset-bottom));transform:translate3d(-50%,0,0);width:min(calc(100% - 24px),430px);display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:10px;border:1px solid rgba(184,154,192,.28);border-radius:24px;background:rgba(27,32,39,.94);box-shadow:0 18px 50px rgba(0,0,0,.55);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);z-index:9000}.nav-button{display:grid;place-items:center;gap:4px;border:0;border-radius:17px;padding:10px 4px;background:transparent;color:var(--muted);font-size:.74rem;font-weight:900}.nav-button .nav-ico{font-size:1.22rem}.nav-button.active{color:white;background:linear-gradient(145deg,var(--purple),#5e4867)}
 .camera-overlay{position:fixed;inset:0;background:#07090c;z-index:99999;display:none;color:white}.camera-overlay.active{display:block}.camera-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#05070a;transition:filter .18s ease}.camera-overlay.negative-mode .camera-video{filter:invert(1) grayscale(1) contrast(1.28) brightness(1.05)}.camera-overlay.negative-mode .lens-shell{border-color:rgba(255,194,120,.86);box-shadow:0 0 0 999px rgba(0,0,0,.18),0 0 34px rgba(216,138,61,.28)}.camera-overlay.negative-mode .camera-hint{border-color:rgba(255,194,120,.34)}.camera-negative-active{background:rgba(216,138,61,.24)!important;border-color:rgba(255,194,120,.46)!important}.camera-shade{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.40),rgba(0,0,0,.04) 34%,rgba(0,0,0,.12) 64%,rgba(0,0,0,.66))}.camera-top{position:absolute;top:calc(14px + env(safe-area-inset-top));left:14px;right:14px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;z-index:2}.camera-hint{max-width:270px;border:1px solid rgba(255,255,255,.18);border-radius:18px;padding:10px 12px;background:rgba(0,0,0,.42);backdrop-filter:blur(10px);font-size:.86rem;line-height:1.35}.camera-controls{display:flex;gap:8px}.camera-round{width:44px;height:44px;border-radius:999px;border:1px solid rgba(255,255,255,.22);background:rgba(0,0,0,.42);color:white}.lens-shell{position:absolute;left:50%;top:49%;transform:translate(-50%,-50%);width:min(82vw,340px);aspect-ratio:1/1.2;border:2px solid rgba(255,255,255,.72);border-radius:28px;box-shadow:0 0 0 999px rgba(0,0,0,.18),0 0 34px rgba(184,154,192,.22);z-index:1}.progress-frame{position:absolute;inset:-2px;border-radius:28px;border:3px solid rgba(184,154,192,.35);opacity:.9}.progress-frame.scanning{animation:scanPulse 1s ease-in-out infinite}@keyframes scanPulse{0%,100%{border-color:rgba(184,154,192,.40);box-shadow:0 0 8px rgba(184,154,192,.16)}50%{border-color:rgba(216,138,61,.78);box-shadow:0 0 28px rgba(216,138,61,.28)}}.countdown-badge{position:absolute;left:50%;top:calc(50% - 188px);transform:translateX(-50%);width:62px;height:62px;border-radius:999px;display:none;place-items:center;border:2px solid rgba(255,255,255,.42);background:rgba(0,0,0,.48);font-family:var(--display-font);font-size:1.8rem;z-index:3}.countdown-badge.active{display:grid}.camera-dock{position:absolute;left:14px;right:14px;bottom:calc(18px + env(safe-area-inset-bottom));z-index:3;display:grid;gap:10px}.camera-status{border:1px solid rgba(255,255,255,.16);border-radius:18px;padding:10px 12px;background:rgba(0,0,0,.44);font-size:.86rem;line-height:1.35;color:#f3edf4}.camera-main-button{min-height:58px;border:0;border-radius:22px;background:linear-gradient(145deg,var(--purple),#5e4867);color:white;font-family:var(--display-font);font-size:1.05rem;box-shadow:0 14px 34px rgba(0,0,0,.42)}.camera-main-button:disabled{opacity:.62}.camera-helper-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.camera-helper-row button{min-height:46px;border-radius:16px;border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.40);color:white;font-family:var(--display-font)}
-.mode-toggle{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:8px;border-radius:18px;background:rgba(17,21,26,.5)}.mode-toggle button{border:0;border-radius:13px;padding:11px 8px;color:var(--cream);background:transparent;font-family:var(--display-font)}.mode-toggle button.selected{background:var(--purple);color:white;box-shadow:0 10px 24px rgba(125,95,134,.28)}body.flare-active .mode-toggle button.selected[data-mode="Flare"]{background:linear-gradient(145deg,#935b2b,#6f3f22)}.small-muted{color:var(--muted);font-size:.86rem;line-height:1.35}.divider{height:1px;background:rgba(184,154,192,.16);margin:6px 0}.hidden{display:none!important}@media(max-width:360px){.app-shell{padding-left:10px;padding-right:10px}.grid-two,.button-row,.ocr-actions,.compare-row{grid-template-columns:1fr}.brand-title-wrap h1{font-size:1.65rem}.logo-mark{width:44px;height:44px;flex-basis:44px}.capture-preview-drawer{grid-template-columns:72px 1fr}.capture-thumb{width:72px;height:72px}.button-row.three{grid-template-columns:1fr}}
+.mode-toggle{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:8px;border-radius:18px;background:rgba(17,21,26,.5)}.mode-toggle button{border:0;border-radius:13px;padding:11px 8px;color:var(--cream);background:transparent;font-family:var(--display-font)}.mode-toggle button.selected{background:var(--purple);color:white;box-shadow:0 10px 24px rgba(125,95,134,.28)}body.flare-active .mode-toggle button.selected[data-mode="Flare"]{background:linear-gradient(145deg,#935b2b,#6f3f22)}.small-muted{color:var(--muted);font-size:.86rem;line-height:1.35}.divider{height:1px;background:rgba(184,154,192,.16);margin:6px 0}.hidden{display:none!important}
+.source-badge{display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(184,154,192,.22);border-radius:999px;padding:5px 8px;background:rgba(17,21,26,.25);color:var(--purple-light);font-size:.72rem;font-weight:800}.scan-start-card{border-color:rgba(184,154,192,.32);background:radial-gradient(circle at 10% 0%,rgba(184,154,192,.10),transparent 35%),linear-gradient(145deg,rgba(48,57,70,.98),rgba(27,32,39,.96))}.advanced-drawer{margin-top:10px;border:1px solid rgba(184,154,192,.18);border-radius:16px;background:rgba(17,21,26,.18);padding:10px}.advanced-drawer>summary,.ai-backup-card>details>summary{cursor:pointer;color:var(--purple-light);font-family:var(--display-font);font-weight:900;letter-spacing:.02em}.data-limited-note,.data-ok-note,.ai-status-box{margin-top:10px;border-radius:14px;padding:9px 10px;font-size:.84rem;line-height:1.35}.data-limited-note{border:1px solid rgba(216,138,61,.38);background:rgba(216,138,61,.10);color:var(--amber-soft)}.data-ok-note{border:1px solid rgba(75,179,106,.30);background:rgba(75,179,106,.10);color:var(--green-soft)}.barcode-actions.single{grid-template-columns:1fr}.rescue-collapsed{padding:0;background:transparent;border-color:rgba(184,154,192,.14)}.rescue-collapsed>details{padding:12px}.guided-card{border-color:rgba(184,154,192,.30)}
+@media(max-width:360px){.app-shell{padding-left:10px;padding-right:10px}.grid-two,.button-row,.ocr-actions,.compare-row{grid-template-columns:1fr}.brand-title-wrap h1{font-size:1.65rem}.logo-mark{width:44px;height:44px;flex-basis:44px}.capture-preview-drawer{grid-template-columns:72px 1fr}.capture-thumb{width:72px;height:72px}.button-row.three{grid-template-columns:1fr}}
 
 /* ---------- v1.2.0a layout restore: OCR add-on only ---------- */
 .camera-first-card{
@@ -180,7 +182,7 @@ body.flare-active .screen-card{border-color:rgba(216,138,61,.48);box-shadow:0 0 
 }
 
 
-/* ---------- v1.3.1 OFF + USDA Barcode Lookup ---------- */
+/* ---------- v1.3.3 Scan Stack Cleanup ---------- */
 .camera-hint strong{color:white;font-family:var(--display-font);font-size:.96rem;letter-spacing:.02em}
 .lens-shell{
   width:min(92vw,390px) !important;
@@ -278,6 +280,8 @@ body.flare-active .screen-card{border-color:rgba(216,138,61,.48);box-shadow:0 0 
   font-size:.72rem;
   font-weight:900;
 }
+
+.source-badge{display:inline-flex;align-items:center;justify-content:center;border:1px solid rgba(184,154,192,.22);border-radius:999px;padding:5px 8px;background:rgba(17,21,26,.25);color:var(--purple-light);font-size:.72rem;font-weight:800}.scan-start-card{border-color:rgba(184,154,192,.32);background:radial-gradient(circle at 10% 0%,rgba(184,154,192,.10),transparent 35%),linear-gradient(145deg,rgba(48,57,70,.98),rgba(27,32,39,.96))}.advanced-drawer{margin-top:10px;border:1px solid rgba(184,154,192,.18);border-radius:16px;background:rgba(17,21,26,.18);padding:10px}.advanced-drawer>summary,.ai-backup-card>details>summary{cursor:pointer;color:var(--purple-light);font-family:var(--display-font);font-weight:900;letter-spacing:.02em}.data-limited-note,.data-ok-note,.ai-status-box{margin-top:10px;border-radius:14px;padding:9px 10px;font-size:.84rem;line-height:1.35}.data-limited-note{border:1px solid rgba(216,138,61,.38);background:rgba(216,138,61,.10);color:var(--amber-soft)}.data-ok-note{border:1px solid rgba(75,179,106,.30);background:rgba(75,179,106,.10);color:var(--green-soft)}.barcode-actions.single{grid-template-columns:1fr}.rescue-collapsed{padding:0;background:transparent;border-color:rgba(184,154,192,.14)}.rescue-collapsed>details{padding:12px}.guided-card{border-color:rgba(184,154,192,.30)}
 @media(max-width:360px){
   .ocr-actions.three{grid-template-columns:1fr;}
 }
@@ -332,7 +336,7 @@ body.flare-active .screen-card{border-color:rgba(216,138,61,.48);box-shadow:0 0 
   margin-top:6px;
 }
 
-/* ---------- v1.3.1 OFF + USDA Barcode Lookup ---------- */
+/* ---------- v1.3.3 Scan Stack Cleanup ---------- */
 .barcode-card{
   border-color:rgba(184,154,192,.28)!important;
 }
@@ -382,7 +386,7 @@ body.flare-active .screen-card{border-color:rgba(216,138,61,.48);box-shadow:0 0 
   <header class="topbar">
     <div class="header-mascot-wrap" aria-hidden="true"><div class="mascot-fallback">bb</div></div>
     <div class="brand-title-wrap">
-      <p class="eyebrow">v1.3.1 OFF + USDA Barcode Lookup</p>
+      <p class="eyebrow">v1.3.3 Scan Stack Cleanup</p>
       <h1>bill's bad belly</h1>
     </div>
     <div class="logo-mark" aria-hidden="true">bb</div>
@@ -399,7 +403,7 @@ body.flare-active .screen-card{border-color:rgba(216,138,61,.48);box-shadow:0 0 
   <video class="camera-video" id="cameraVideo" playsinline autoplay muted></video>
   <div class="camera-shade"></div>
   <div class="camera-top">
-    <div class="camera-hint"><strong>aim at text</strong><br>Fill the box with ingredients or nutrition facts. Tilt glossy packages so glare moves off the words.</div>
+    <div class="camera-hint"><strong>aim at text</strong><br>Fill the box with ingredients. Use bright light and tilt glossy packages so glare moves off the words.</div>
     <div class="camera-controls">
       <button class="camera-round" id="cameraFlip" type="button" aria-label="Flip camera">↻</button>
       <button class="camera-round" id="cameraNegative" type="button" aria-label="Toggle negative view">±</button>
@@ -410,7 +414,7 @@ body.flare-active .screen-card{border-color:rgba(216,138,61,.48);box-shadow:0 0 
   <div class="countdown-badge" id="countdownBadge">5</div>
   <div class="camera-dock">
     <div class="camera-status" id="cameraStatus">Ready. Hold still and tap scan product.</div>
-    <button class="camera-main-button" id="cameraScanProduct" type="button">scan product</button>
+    <button class="camera-main-button" id="cameraScanProduct" type="button">scan label</button>
     <div class="camera-helper-row">
       <button id="cameraHelper" type="button">steady label</button>
       <button id="cameraCancel" type="button">cancel</button>
@@ -420,7 +424,7 @@ body.flare-active .screen-card{border-color:rgba(216,138,61,.48);box-shadow:0 0 
 <div class="barcode-overlay" id="barcodeOverlay" aria-hidden="true">
   <video class="barcode-video" id="barcodeVideo" playsinline autoplay muted></video>
   <div class="barcode-top">
-    <div class="barcode-hint"><strong>scan barcode</strong><br>Center the UPC/EAN barcode inside the box. Barcode lookup is faster than OCR when the product is in the database.</div>
+    <div class="barcode-hint"><strong>scan barcode</strong><br>Bring the barcode close until it fills most of the box, but keep the lines sharp. Move slowly; tiny barcodes may read best close-up.</div>
     <button class="barcode-close" id="barcodeClose" type="button" aria-label="Close barcode scanner">×</button>
   </div>
   <div class="barcode-guide"><span>barcode here</span></div>
@@ -435,7 +439,7 @@ body.flare-active .screen-card{border-color:rgba(216,138,61,.48);box-shadow:0 0 
 const STORAGE_KEY="bbb_v123_saved_foods";
 const MODE_KEY="bbb_v123_mode";
 const VIEW_KEY="bbb_v123_scan_view";
-const AI_ENDPOINT_KEY="bbb_v132_ai_endpoint";
+const AI_ENDPOINT_KEY="bbb_v133_ai_endpoint";
 const savedMode=localStorage.getItem(MODE_KEY);
 const state={
   activeTab:"home",
@@ -461,7 +465,7 @@ const state={
   barcodeCandidates:[],
   barcodeSource:"",
   barcodeInProgress:false,
-  aiEndpoint:localStorage.getItem(AI_ENDPOINT_KEY)||"",
+  aiEndpoint:localStorage.getItem(AI_ENDPOINT_KEY)||"https://bad-belly-ai.phshbone.workers.dev/",
   aiStatus:"",
   aiInProgress:false,
   aiText:"",
@@ -470,6 +474,7 @@ const state={
   capturePreviewOpen:true,
   scanView:localStorage.getItem(VIEW_KEY)||"expanded",
   lastAnalysis:null,
+  currentSource:"Manual",
   savedNotice:""
 };
 const ratingMeta={
@@ -482,18 +487,19 @@ const ratingMeta={
   unknown:{label:"unknown",cls:"rating-ehh",state:"ehh"}
 };
 const INGREDIENT_DICTIONARY=[
-  {name:"sesame seeds",aliases:["sesame","sesame seed","sesame seeds","seseme"],category:"seeds/nuts",normal:"likely_rough",flare:"flare_caution",risk:"high",reason:"Small seeds may be difficult to digest or irritating for some people."},
+  {name:"sesame seed oil",aliases:["sesame seed oil","sesame oil"],category:"oils/fats",normal:"caution",flare:"flare_caution",risk:"moderate",reason:"Sesame seed oil is not the same rough-texture issue as whole sesame seeds; treat it as a flavoring/fat caution."},
+  {name:"sesame seeds",aliases:["sesame seed","sesame seeds","seseme seed","seseme seeds"],category:"seeds/nuts",normal:"likely_rough",flare:"flare_caution",risk:"high",reason:"Whole sesame seeds may be difficult to digest or irritating for some people."},
   {name:"poppy seeds",aliases:["poppy","poppy seed","poppy seeds","popy"],category:"seeds/nuts",normal:"likely_rough",flare:"flare_caution",risk:"high",reason:"Small seeds can be physically rough for sensitive guts."},
   {name:"chia seeds",aliases:["chia","chia seed","chia seeds"],category:"seeds/nuts",normal:"likely_rough",flare:"flare_caution",risk:"high",reason:"Seeds and added fiber may be harder during sensitive periods."},
   {name:"flaxseed",aliases:["flax","flaxseed","flax seed","ground flax","linseed"],category:"seeds/nuts",normal:"caution",flare:"flare_caution",risk:"moderate",reason:"High fiber can bother some people, especially during a flare."},
   {name:"peanuts",aliases:["peanut","peanuts","groundnut"],category:"seeds/nuts",normal:"personal_trigger",flare:"flare_caution",risk:"high",reason:"Whole nuts can be harder to break down; tolerance varies."},
   {name:"smooth peanut butter",aliases:["peanut butter","smooth peanut butter"],category:"seeds/nuts",normal:"usually_gentle",flare:"caution",risk:"low",reason:"Smooth nut butter removes the rough whole-nut texture, but fat load can still matter."},
-  {name:"beans",aliases:["bean","beans","black beans","kidney beans","pinto beans"],category:"legumes",normal:"likely_rough",flare:"flare_caution",risk:"high",reason:"Beans often cause gas and may be difficult to digest for some people."},
+  {name:"beans",aliases:["beans","black beans","kidney beans","pinto beans","navy beans","baked beans"],category:"legumes",normal:"likely_rough",flare:"flare_caution",risk:"high",reason:"Beans often cause gas and may be difficult to digest for some people."},
   {name:"lentils",aliases:["lentil","lentils"],category:"legumes",normal:"likely_rough",flare:"flare_caution",risk:"high",reason:"High fiber legumes may be harder during sensitive periods."},
   {name:"chickpeas",aliases:["chickpea","chickpeas","garbanzo","garbanzo bean"],category:"legumes",normal:"likely_rough",flare:"flare_caution",risk:"high",reason:"Legume fiber can cause gas or bloating for some people."},
   {name:"onion",aliases:["onion","onions","dehydrated onion"],category:"spices/seasonings",normal:"caution",flare:"personal_trigger",risk:"high",reason:"Real onion is a common gas and bloating trigger for many people."},
   {name:"onion powder",aliases:["onion powder","granulated onion","powdered onion"],category:"spices/seasonings",normal:"caution",flare:"flare_caution",risk:"moderate",reason:"Onion powder can bother some people, but texture and amount matter; personal tolerance should override this later."},
-  {name:"garlic",aliases:["garlic","garlic powder","dehydrated garlic"],category:"spices/seasonings",normal:"caution",flare:"flare_caution",risk:"moderate",reason:"Garlic or garlic powder can cause gas or cramping for some people, but amount and personal tolerance matter."},
+  {name:"garlic",aliases:["garlic","garlic powder","dehydrated garlic","garlic clove"],category:"spices/seasonings",normal:"caution",flare:"flare_caution",risk:"moderate",reason:"Garlic or garlic powder can cause gas or cramping for some people, but amount and personal tolerance matter."},
   {name:"chili pepper",aliases:["chili","chilli","cayenne","hot sauce","red pepper","jalapeno"],category:"spices/seasonings",normal:"caution",flare:"personal_trigger",risk:"high",reason:"Heat and capsaicin may irritate a sensitive gut."},
   {name:"tomato",aliases:["tomato","tomatoes","tomato paste","tomato puree","tomato sauce"],category:"vegetables",normal:"caution",flare:"flare_caution",risk:"moderate",reason:"Acidity and skins/seeds may bother some people."},
   {name:"whole corn / kernels",aliases:["corn kernels","whole corn","popcorn","corn skins","corn hulls"],category:"grains/starches",normal:"likely_rough",flare:"flare_caution",risk:"high",reason:"Whole corn, kernels, popcorn, skins, and hulls can be physically hard to digest."},
@@ -522,7 +528,15 @@ const FAST_CARDS=[
 ];
 function escapeHtml(s){return String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));}
 function normalizeText(s){return String(s||"").toLowerCase().replace(/[^a-z0-9%\.\s-]/g," ").replace(/\s+/g," ").trim();}
-function containsTerm(hay,term){const h=normalizeText(hay);const t=normalizeText(term);if(!t)return false;return new RegExp(`(^|\\s)${t.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")}(s|es)?($|\\s)`).test(h)||h.includes(t);}
+function containsTerm(hay,term){
+  const h=normalizeText(hay);
+  const t=normalizeText(term);
+  if(!t)return false;
+  const pattern=t.replace(/\s+/g,"\\s+");
+  const exact=new RegExp("(^|\\s)"+pattern+"(s|es)?($|\\s)").test(h);
+  if(exact)return true;
+  return t.includes(" ") && h.includes(t);
+}
 function uniqueByName(arr){const seen=new Set();return arr.filter(x=>{const k=x.name||x.label;if(seen.has(k))return false;seen.add(k);return true;});}
 function ratingClass(r){return ratingMeta[r]?.cls||"rating-ehh";}
 function ratingLabel(r){return ratingMeta[r]?.label||"unknown";}
@@ -539,6 +553,14 @@ function worstRating(items,mode="normal"){const score={usually_gentle:1,good:1,c
 function contextualIngredientHits(text){
   let hits=findIngredientMatches(text);
   const t=normalizeText(text);
+  // Do not treat sesame seed oil as whole sesame seeds.
+  if(/\bsesame seed oil\b|\bsesame oil\b/.test(t) && !/\bsesame seeds\b/.test(t)){
+    hits=hits.filter(h=>h.name!=="sesame seeds");
+  }
+  // Do not treat locust bean gum as beans.
+  if(/\blocust bean gum\b/.test(t) && !/\b(black beans|kidney beans|pinto beans|navy beans|baked beans)\b/.test(t)){
+    hits=hits.filter(h=>h.name!=="beans");
+  }
   // Avoid treating every OCR glimpse of "corn" as whole corn/popcorn.
   if(/\bcorn\b/.test(t)&&!/\b(corn kernels|whole corn|popcorn|corn skins|corn hulls|corn starch|cornstarch|corn syrup|corn flour|maltodextrin)\b/.test(t)){
     hits.push({name:"corn mention",normal:"caution",flare:"flare_caution",risk:"moderate",reason:"OCR saw the word corn, but not enough context to treat it like whole corn or popcorn."});
@@ -559,10 +581,17 @@ function maybeSoftenWeakOcrAnalysis(analysis,type){
   }
   return analysis;
 }
-function buildAnalysis(type){const textParts=[state.foodName,state.ingredientText,type==="ocr"?state.extractedText:""].filter(Boolean).join("\n");const input=textParts.trim();const quickHits=findFastCards(input);const ingredientHits=contextualIngredientHits(input);const nutrition=parseNutritionText(input);const nt=nutritionTraits(nutrition);const all=[...quickHits,...ingredientHits,...nt.traits];let detected="Unknown food";if(quickHits[0])detected=quickHits[0].name;else if(state.foodName.trim())detected=state.foodName.trim();else if(ingredientHits[0])detected=`${ingredientHits[0].name} found`;else if(nt.traits.length)detected="nutrition label read";const normal=all.length?worstRating(all,"normal"):"unknown";const flare=all.length?worstRating(all,"Flare"):"unknown";const active=state.mode==="Flare"?flare:normal;let why="I do not have enough text to judge this yet. Add a food name, ingredients, or nutrition text.";if(all.length){const reasons=all.slice(0,4).map(x=>x.reason||x.why).filter(Boolean);why=reasons.length?reasons.join(" "):"The rating comes from matched food, ingredient, and nutrition signals.";}let next="Track your own response and portion size. Crohn's tolerance is individual.";if(active==="usually_gentle")next="This looks more predictable, but still track your own response.";if(active==="caution")next="Start small or save this for a steadier gut day if you are unsure.";if(active==="flare_caution"||active==="likely_rough"||active==="personal_trigger")next="During a flare or sensitive period, this deserves extra caution.";return maybeSoftenWeakOcrAnalysis({type,detected,normal,flare,active,why,next,hits:all,nutrition,confidence:all.length>=3?"good":all.length?"fair":"low",createdAt:new Date().toISOString()},type);}
-function analyze(type){captureInputs();if(type==="ocr"){state.ingredientText=state.extractedText;}state.lastAnalysis=buildAnalysis(type);state.savedNotice="";render();scrollScreenTo("resultCard");}
+function buildAnalysis(type){const textParts=[state.foodName,state.ingredientText,type==="ocr"?state.extractedText:""].filter(Boolean).join("\n");const input=textParts.trim();const quickHits=findFastCards(input);const ingredientHits=contextualIngredientHits(input);const nutrition=parseNutritionText(input);const nt=nutritionTraits(nutrition);const all=[...quickHits,...ingredientHits,...nt.traits];let detected="Unknown food";if(quickHits[0])detected=quickHits[0].name;else if(state.foodName.trim())detected=state.foodName.trim();else if(ingredientHits[0])detected=`${ingredientHits[0].name} found`;else if(nt.traits.length)detected="nutrition label read";const normal=all.length?worstRating(all,"normal"):"unknown";const flare=all.length?worstRating(all,"Flare"):"unknown";const active=state.mode==="Flare"?flare:normal;let why="I do not have enough text to judge this yet. Add a food name, ingredients, or nutrition text.";if(all.length){const reasons=all.slice(0,4).map(x=>x.reason||x.why).filter(Boolean);why=reasons.length?reasons.join(" "):"The rating comes from matched food, ingredient, and nutrition signals.";}let next="Track your own response and portion size. Crohn's tolerance is individual.";if(active==="usually_gentle")next="This looks more predictable, but still track your own response.";if(active==="caution")next="Start small or save this for a steadier gut day if you are unsure.";if(active==="flare_caution"||active==="likely_rough"||active==="personal_trigger")next="During a flare or sensitive period, this deserves extra caution.";return maybeSoftenWeakOcrAnalysis({type,detected,normal,flare,active,why,next,hits:all,nutrition,confidence:all.length>=3?"good":all.length?"fair":"low",source:sourceLabel(type),createdAt:new Date().toISOString()},type);}
+function analyze(type){captureInputs();if(type==="quick")state.currentSource="Quick Read";if(type==="deep"&&!state.currentSource)state.currentSource="Manual / Product Text";if(type==="ocr"){state.currentSource="OCR label scan";state.ingredientText=state.extractedText;}if(type==="ai")state.currentSource="AI backup";state.lastAnalysis=buildAnalysis(type);state.savedNotice="";render();scrollScreenTo("resultCard");}
 function nutritionTiles(n){const entries=Object.entries(n).filter(([,v])=>v!==undefined&&!Number.isNaN(v));if(!entries.length)return `<p class="small-muted">No nutrition numbers were detected yet.</p>`;const labels={fiber:"Fiber",sugar:"Sugar",addedSugar:"Added sugar",fat:"Total fat",satFat:"Sat. fat",protein:"Protein",sodium:"Sodium"};return `<div class="nutrition-grid">${entries.map(([k,v])=>`<div class="nutrition-tile"><span>${labels[k]||k}</span><strong>${v}${k==="sodium"?" mg":" g"}</strong></div>`).join("")}</div>`;}
-function resultCard(a){if(!a)return "";const cls=stateClass(a.active);return `<section class="result-shell ${cls}" id="resultCard"><div class="result-inner"><div class="verdict-area">${ratingPill(a.active,state.mode==="Flare")}<h3>${escapeHtml(ratingLabel(a.active))}</h3><div class="detected-name">${escapeHtml(a.detected)} • confidence: ${escapeHtml(a.confidence)}</div></div><p class="result-copy">${escapeHtml(a.why)}</p><p class="result-copy"><strong>Next:</strong> ${escapeHtml(a.next)}</p>${a.hits?.length?`<div class="detected-list">${a.hits.slice(0,12).map(h=>`<span class="detected-chip">${escapeHtml(h.name)}</span>`).join("")}</div>`:""}<div class="compare-row"><div class="compare-box"><span>normal side</span>${ratingPill(a.normal,false)}</div><div class="compare-box"><span>flare side</span>${ratingPill(a.flare,true)}</div></div><div class="button-row"><button class="secondary-action" data-action="save-current" type="button">save it</button><button class="primary-action" data-action="ate-current" type="button">ate it</button></div><details class="support-drawer"><summary>nutrition support drawer</summary>${nutritionTiles(a.nutrition)}</details></div></section>`;}
+function sourceLabel(type){
+  const map={quick:"Quick Read",deep:"Manual / Product Text",ocr:"OCR label scan",ai:"AI backup",demo:"Demo"};
+  return state.currentSource || map[type] || "Scan";
+}
+function hasIngredientData(product){
+  return !!(product && product.text && /ingredients\s*:/i.test(product.text) && !/ingredients\s*:\s*(nutrition|$)/i.test(product.text));
+}
+function resultCard(a){if(!a)return "";const cls=stateClass(a.active);return `<section class="result-shell ${cls}" id="resultCard"><div class="result-inner"><div class="verdict-area">${ratingPill(a.active,state.mode==="Flare")}<h3>${escapeHtml(ratingLabel(a.active))}</h3><div class="detected-name">${escapeHtml(a.detected)} • confidence: ${escapeHtml(a.confidence)}</div>${a.source?`<div class="source-badge">source: ${escapeHtml(a.source)}</div>`:""}</div><p class="result-copy">${escapeHtml(a.why)}</p><p class="result-copy"><strong>Next:</strong> ${escapeHtml(a.next)}</p>${a.hits?.length?`<div class="detected-list">${a.hits.slice(0,12).map(h=>`<span class="detected-chip">${escapeHtml(h.name)}</span>`).join("")}</div>`:""}<div class="compare-row"><div class="compare-box"><span>normal side</span>${ratingPill(a.normal,false)}</div><div class="compare-box"><span>flare side</span>${ratingPill(a.flare,true)}</div></div><div class="button-row"><button class="secondary-action" data-action="save-current" type="button">save it</button><button class="primary-action" data-action="ate-current" type="button">ate it</button></div><details class="support-drawer"><summary>nutrition support drawer</summary>${nutritionTiles(a.nutrition)}</details></div></section>`;}
 function ocrPillClass(){if(state.ocrConfidence==="good")return "good-read";if(state.ocrConfidence==="weak")return "weak-read";if(state.ocrConfidence==="none"||state.ocrConfidence==="error")return "no-read";return "";}
 function ocrReviewCard(){
   if(!state.capturedImage&&!state.extractedText&&!state.ocrStatus)return "";
@@ -581,18 +610,18 @@ function ocrReviewCard(){
     <p class="ocr-mode-note">If the read is weak, review before trusting the card. Try negative OCR only for dark/low-contrast labels.</p>
   </section>`;
 }
-function homeScreen(){return `<div class="screen-content">${screenTitle("home base","what should we check?")}<section class="belly-meter"><div class="belly-icon">☻</div><div><p>Belly Meter</p><strong>${state.mode==="Flare"?"flare mode":"steady"}</strong><span>${state.mode==="Flare"?"Amber pulse is on. Scanner will judge more cautiously.":"Normal mode. Use Flare when your gut is more sensitive."}</span></div></section><div class="grid-two"><button class="action-card" data-action="go-scan" type="button"><span class="card-icon">◉</span><h3>scan food</h3><p>Camera-first product scan, OCR text extraction, and Deep Check.</p></button><button class="action-card" data-action="go-flare" type="button"><span class="card-icon">♨</span><h3>flare help</h3><p>Switch mode and tighten the read when your gut is active.</p></button></div><section class="mini-card"><h3>v1.3.2 test target</h3><p>All three routes are visible: barcode/database, regular OCR text pull, and configurable AI backup through a Cloudflare Worker.</p></section></div>`;}
+function homeScreen(){return `<div class="screen-content">${screenTitle("home base","what should we check?")}<section class="belly-meter"><div class="belly-icon">☻</div><div><p>Belly Meter</p><strong>${state.mode==="Flare"?"flare mode":"steady"}</strong><span>${state.mode==="Flare"?"Amber pulse is on. Scanner will judge more cautiously.":"Normal mode. Use Flare when your gut is more sensitive."}</span></div></section><div class="grid-two"><button class="action-card" data-action="go-scan" type="button"><span class="card-icon">◉</span><h3>scan food</h3><p>Guided barcode and label scan, then one result card.</p></button><button class="action-card" data-action="go-flare" type="button"><span class="card-icon">♨</span><h3>flare help</h3><p>Switch mode and tighten the read when your gut is active.</p></button></div><section class="mini-card"><h3>v1.3.3 test target</h3><p>Guided scan flow: barcode first, ingredient label when data is incomplete, AI only as a rescue reader.</p></section></div>`;}
 
 function barcodeCard(){
   const p=state.barcodeProduct;
-  const productHtml=p?`<div class="barcode-product-box"><strong>${escapeHtml(p.name||"Product found")}</strong><span>${escapeHtml(p.brand||"")}</span><span><b>source:</b> ${escapeHtml(p.source||state.barcodeSource||"barcode lookup")}</span><span>${escapeHtml(p.summary||"Barcode data found. Use product text for Deep Check.")}</span><div class="barcode-actions"><button class="secondary-action" data-action="use-barcode-text" type="button">use product text</button><button class="primary-action" data-action="barcode-deep-check" type="button">deep check</button></div></div>`:"";
-  return `<section class="input-card barcode-card scan-clean-card">
-    <h3>barcode lookup</h3>
-    <p class="search-hint">Fast route for store testing. Scan the UPC/EAN first. The app tries Open Food Facts, then USDA FoodData Central, before falling back to OCR/manual entry.</p>
+  const hasIngredients=hasIngredientData(p);
+  const productHtml=p?`<div class="barcode-product-box ${hasIngredients?"has-full-data":"limited-data"}"><strong>${escapeHtml(p.name||"Product found")}</strong><span>${escapeHtml(p.brand||"")}</span><span><b>source:</b> ${escapeHtml(p.source||state.barcodeSource||"barcode lookup")}</span><span>${escapeHtml(p.summary||"Barcode data found.")}</span>${hasIngredients?`<div class="data-ok-note">Ingredients found. Use product text, or scan the label too for combo packs, sauce cups, bakery items, or variety packs.</div>`:`<div class="data-limited-note">Product found, but ingredient data is missing or limited. Scan the ingredient label for the full picture.</div>`}<div class="barcode-actions"><button class="secondary-action" data-action="use-barcode-text" type="button">use product text</button><button class="primary-action" data-action="barcode-deep-check" type="button">check product</button></div>${!hasIngredients?`<div class="barcode-actions single"><button class="primary-action" data-action="open-camera" type="button">scan ingredient label</button></div>`:""}</div>`:"";
+  return `<section class="input-card barcode-card scan-clean-card guided-card">
+    <h3>barcode result</h3>
+    <p class="search-hint">Barcode is the fastest route when product data includes ingredients. If it only finds a name/nutrition, scan the label too.</p>
     <div class="barcode-actions"><button class="primary-action" data-action="open-barcode" type="button">scan barcode</button><button class="secondary-action" data-action="lookup-barcode" type="button">lookup code</button></div>
-    <div class="barcode-row"><input id="barcodeValue" value="${escapeHtml(state.barcodeValue||"")}" placeholder="or type barcode number" inputmode="numeric" autocomplete="off"></div>
+    <details class="advanced-drawer"><summary>manual barcode entry</summary><div class="barcode-row"><input id="barcodeValue" value="${escapeHtml(state.barcodeValue||"")}" placeholder="type barcode number" inputmode="numeric" autocomplete="off"></div>${state.barcodeCandidates&&state.barcodeCandidates.length?`<p class="barcode-status">tried: ${escapeHtml(state.barcodeCandidates.join(" → "))}</p>`:""}</details>
     ${state.barcodeStatus?`<p class="barcode-status">${escapeHtml(state.barcodeStatus)}</p>`:""}
-    ${state.barcodeCandidates&&state.barcodeCandidates.length?`<p class="barcode-status">tried: ${escapeHtml(state.barcodeCandidates.join(" → "))}</p>`:""}
     ${productHtml}
   </section>`;
 }
@@ -602,34 +631,36 @@ function aiBackupCard(){
   const configured=!!String(state.aiEndpoint||"").trim();
   const hasImage=!!state.capturedImage;
   const canRun=configured&&hasImage&&!state.aiInProgress;
-  return `<section class="input-card ai-backup-card scan-clean-card">
-    <h3>AI backup reader</h3>
-    <p class="search-hint">Use only when barcode misses and OCR is weak. This sends the cropped label photo to your Cloudflare Worker, which should call Gemini and return extracted label text. Do not send health notes here.</p>
-    <div class="barcode-row"><input id="aiEndpoint" value="${escapeHtml(state.aiEndpoint||"")}" placeholder="Cloudflare Worker URL for AI backup" inputmode="url" autocomplete="off"></div>
-    <div class="barcode-actions"><button class="${canRun?"primary-action":"secondary-action"}" data-action="run-ai-backup" type="button" ${canRun?"":"disabled"}>${state.aiInProgress?"reading with AI…":"AI backup"}</button><button class="secondary-action" data-action="copy-ai-to-deep" type="button" ${state.aiText?"":"disabled"}>use AI text</button><button class="primary-action" data-action="ai-deep-check" type="button" ${state.aiText?"":"disabled"}>deep check AI text</button></div>
-    ${!configured?`<p class="barcode-status">AI backup is not configured yet. Add the Worker URL after the Cloudflare proxy is deployed.</p>`:""}
-    ${configured&&!hasImage?`<p class="barcode-status">Take a label photo first. The AI backup reads the captured crop, not the live camera.</p>`:""}
-    ${state.aiStatus?`<p class="barcode-status">${escapeHtml(state.aiStatus)}</p>`:""}
-    ${state.aiText?`<div class="ocr-review-card"><div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><h3>AI extracted text</h3><span class="ocr-status-pill good-read">backup text</span></div><textarea class="ocr-textarea" id="aiText">${escapeHtml(state.aiText||"")}</textarea><div class="ocr-text-count">${(state.aiText||"").length} characters from AI backup. Review before trusting.</div></div>`:""}
+  const shouldShow=state.aiStatus||state.aiText||state.ocrConfidence==="weak"||state.ocrConfidence==="none"||state.ocrConfidence==="error";
+  return `<section class="input-card ai-backup-card scan-clean-card ${shouldShow?"":"rescue-collapsed"}">
+    <details ${shouldShow?"open":""}>
+      <summary>AI backup reader</summary>
+      <p class="search-hint">Use only when barcode data is incomplete and OCR is weak. This sends the cropped label photo to your Cloudflare Worker/Gemini. Do not send health notes.</p>
+      <details class="advanced-drawer"><summary>Worker URL</summary><div class="barcode-row"><input id="aiEndpoint" value="${escapeHtml(state.aiEndpoint||"")}" placeholder="Cloudflare Worker URL for AI backup" inputmode="url" autocomplete="off"></div></details>
+      <div class="barcode-actions"><button class="${canRun?"primary-action":"secondary-action"}" data-action="run-ai-backup" type="button" ${canRun?"":"disabled"}>${state.aiInProgress?"reading with AI…":"run AI backup"}</button><button class="secondary-action" data-action="copy-ai-to-deep" type="button" ${state.aiText?"":"disabled"}>use AI text</button><button class="primary-action" data-action="ai-deep-check" type="button" ${state.aiText?"":"disabled"}>check AI text</button></div>
+      ${!configured?`<p class="barcode-status">AI backup is not configured yet.</p>`:""}
+      ${configured&&!hasImage?`<p class="barcode-status">Take a label photo first. AI reads the captured crop, not the live camera.</p>`:""}
+      ${state.aiStatus?`<p class="barcode-status ai-status-box">${escapeHtml(state.aiStatus)}</p>`:""}
+      ${state.aiText?`<div class="ocr-review-card"><div style="display:flex;align-items:center;justify-content:space-between;gap:10px"><h3>AI extracted text</h3><span class="ocr-status-pill good-read">backup text</span></div><textarea class="ocr-textarea" id="aiText">${escapeHtml(state.aiText||"")}</textarea><div class="ocr-text-count">${(state.aiText||"").length} characters from AI backup. Review before trusting.</div></div>`:""}
+    </details>
   </section>`;
 }
 
 function scanScreen(){
   const a=state.lastAnalysis;
   const previewIcon=state.capturePreviewOpen?`<svg viewBox="0 0 24 24"><path d="M5 12h14"></path></svg>`:`<svg viewBox="0 0 24 24"><path d="M12 5v14"></path><path d="M5 12h14"></path></svg>`;
-  return `<div class="screen-content">${screenTitle("scan","camera-first food check")}
-    <section class="input-card camera-first-card">
-      <div class="scan-panel-title"><span class="scan-panel-icon">◉</span><div><h3>scan product</h3><p>Use the 5-second scan. The app reads the boxed label crop with minimal cleanup first.</p></div></div>
-      <p class="scan-hint">Best test: fill the box with ingredients or nutrition text. Tilt shiny or dark packages to move glare off the words. White labels should read fastest.</p>
-      <div class="camera-start-row"><button class="primary-action" data-action="open-camera" type="button">scan product</button></div>
+  return `<div class="screen-content">${screenTitle("scan","guided food check")}
+    <section class="input-card scan-start-card">
+      <h3>start here</h3>
+      <p class="search-hint">Barcode first. If the product data is missing ingredients, scan the ingredient label. Use AI only when OCR struggles.</p>
+      <div class="button-row"><button class="primary-action" data-action="open-barcode" type="button">scan barcode</button><button class="secondary-action" data-action="open-camera" type="button">scan label</button></div>
+      <details class="advanced-drawer"><summary>type food name</summary><input class="search-box" id="foodName" value="${escapeHtml(state.foodName)}" placeholder="example: rice, shrimp cocktail, tomato soup" autocomplete="off"><div class="button-row"><button class="secondary-action" data-action="clear-scan" type="button">clear</button><button class="primary-action" data-action="quick-read" type="button">quick read</button></div></details>
     </section>
-    ${barcodeCard()}
-    ${aiBackupCard()}
-    ${state.capturedImage?`<section class="capture-preview-drawer"><div class="capture-preview-header"><div class="capture-preview-title"><strong>image captured</strong><span>${escapeHtml(state.cameraMessage||"Ready for OCR review.")}</span></div><button class="capture-toggle-btn" data-action="toggle-capture-preview" type="button" aria-label="${state.capturePreviewOpen?"collapse captured image":"expand captured image"}">${previewIcon}</button></div><div class="capture-preview-body ${state.capturePreviewOpen?"":"is-closed"}"><div class="capture-image-wrap"><img class="capture-thumb" src="${state.capturedImage}" alt="Captured product label"><div class="ocr-crop-box" aria-hidden="true"><span>OCR read this area</span></div></div><div class="capture-meta"><span>${state.capturedMeta?`${state.capturedMeta.width}×${state.capturedMeta.height} • ${state.capturedMeta.sizeKb} KB • ${state.capturedMode}`:""}</span><span>This preview is the camera-box capture. OCR reads the amber boxed area. Negative view saves and reads an inverted copy for dark labels.</span><div class="button-row"><button class="secondary-action" data-action="retake-photo" type="button">retake photo</button><button class="secondary-action" data-action="retry-ocr" type="button">retry OCR</button></div><div class="button-row"><button class="secondary-action" data-action="retry-negative-ocr" type="button">try negative OCR</button><button class="secondary-action" data-action="clear-scan" type="button">clear</button></div></div>${!a?`<div class="next-step-note"><strong>Next:</strong> OCR reads the boxed text area. You can run Deep Check immediately or review/edit first.</div>`:""}</div></section>`:""}
+    ${(state.barcodeStatus||state.barcodeProduct)?barcodeCard():""}
+    ${state.capturedImage?`<section class="capture-preview-drawer"><div class="capture-preview-header"><div class="capture-preview-title"><strong>image captured</strong><span>${escapeHtml(state.cameraMessage||"Ready for OCR review.")}</span></div><button class="capture-toggle-btn" data-action="toggle-capture-preview" type="button" aria-label="${state.capturePreviewOpen?"collapse captured image":"expand captured image"}">${previewIcon}</button></div><div class="capture-preview-body ${state.capturePreviewOpen?"":"is-closed"}"><div class="capture-image-wrap"><img class="capture-thumb" src="${state.capturedImage}" alt="Captured product label"><div class="ocr-crop-box" aria-hidden="true"><span>OCR read this area</span></div></div><div class="capture-meta"><span>${state.capturedMeta?`${state.capturedMeta.width}×${state.capturedMeta.height} • ${state.capturedMeta.sizeKb} KB • ${state.capturedMode}`:""}</span><span>OCR reads the amber boxed area. Retake if text is clipped, blurred, or washed out.</span><div class="button-row"><button class="secondary-action" data-action="retake-photo" type="button">retake photo</button><button class="secondary-action" data-action="retry-ocr" type="button">retry OCR</button></div><details class="advanced-drawer"><summary>rescue OCR tools</summary><div class="button-row"><button class="secondary-action" data-action="retry-negative-ocr" type="button">negative OCR</button><button class="secondary-action" data-action="clear-scan" type="button">clear</button></div></details></div>${!a?`<div class="next-step-note"><strong>Next:</strong> Review the OCR read or run Deep Check. Use AI only if the text is weak.</div>`:""}</div></section>`:""}
     ${ocrReviewCard()}
-    <section class="input-card quick-card scan-clean-card"><h3>Quick Read</h3><p>Use this when you already know the food name.</p><input class="search-box" id="foodName" value="${escapeHtml(state.foodName)}" placeholder="example: pepperoni pizza, tomato soup, rice" autocomplete="off"><div class="button-row"><button class="secondary-action" data-action="clear-scan" type="button">clear</button><button class="primary-action" data-action="quick-read" type="button">quick read</button></div></section>
-    <section class="input-card scan-clean-card" id="deepDrawer"><h3>Deep Check</h3><p>Paste or type ingredients/nutrition text here. OCR text is copied here when you run OCR Deep Check.</p><textarea class="text-input" id="ingredientText" placeholder="ingredients: wheat flour, tomato puree, mozzarella cheese, garlic powder...">${escapeHtml(state.ingredientText)}</textarea><div class="button-row"><button class="secondary-action" data-action="copy-ocr-to-deep" type="button">use OCR text</button><button class="primary-action" data-action="deep-check" type="button">deep check</button></div></section>
-    <section class="input-card"><h3>demo buttons</h3><div class="demo-chip-row"><button class="demo-chip" data-action="demo" data-kind="good" type="button">rice</button><button class="demo-chip" data-action="demo" data-kind="caution" type="button">mac cheese</button><button class="demo-chip" data-action="demo" data-kind="ugly" type="button">pepperoni pizza</button><button class="demo-chip" data-action="demo" data-kind="ocr" type="button">OCR label sample</button></div></section>
+    ${aiBackupCard()}
+    <details class="input-card scan-clean-card advanced-drawer" id="deepDrawer"><summary>manual deep check</summary><p>Paste or type ingredients/nutrition text here.</p><textarea class="text-input" id="ingredientText" placeholder="ingredients: wheat flour, tomato puree, mozzarella cheese, garlic powder...">${escapeHtml(state.ingredientText)}</textarea><div class="button-row"><button class="secondary-action" data-action="copy-ocr-to-deep" type="button">use OCR text</button><button class="primary-action" data-action="deep-check" type="button">deep check</button></div></details>
     ${a?resultCard(a):""}${state.savedNotice?`<p class="save-notice">${escapeHtml(state.savedNotice)}</p>`:""}
     <section class="memory-card"><h3>Personal Food Memory</h3><p>Saved foods stay on this device for testing.</p>${savedFoodsList()}</section>
   </div>`;
@@ -988,6 +1019,7 @@ function useBarcodeText(runNow=false){
   captureInputs();
   if(!state.barcodeProduct||!state.barcodeProduct.text){state.barcodeStatus="No barcode product text available yet.";render();return;}
   state.foodName=state.barcodeProduct.name||state.foodName;
+  state.currentSource=state.barcodeProduct.source||state.barcodeSource||"Barcode lookup";
   state.ingredientText=state.barcodeProduct.text;
   state.extractedText=state.barcodeProduct.text;
   state.ocrReviewOpen=false;
@@ -1008,7 +1040,7 @@ async function openBarcodeOverlay(){
       return;
     }
     barcodeReader=new ZXingBrowser.BrowserMultiFormatReader();
-    status.textContent="Center barcode in the box. Hold steady.";
+    status.textContent="Move closer slowly. Fill most of the box with the barcode and keep the lines sharp.";
     barcodeControls=await barcodeReader.decodeFromVideoDevice(undefined, video, (result,err,controls)=>{
       if(result&&!barcodeFoundLock){
         barcodeFoundLock=true;
@@ -1042,7 +1074,7 @@ function normalizeAiPayload(data){
   if(Array.isArray(data.ingredients))add("Ingredients",data.ingredients.join(", ")); else add("Ingredients",data.ingredients||data.ingredientsText||data.ingredients_text);
   if(Array.isArray(data.allergens))add("Allergens",data.allergens.join(", ")); else add("Allergens",data.allergens);
   add("Nutrition",data.nutrition||data.nutritionText||data.nutrition_text);
-  add("Text",data.text||data.extractedText||data.labelText||data.result);
+  add("Text",data.rawText||data.text||data.extractedText||data.labelText||data.result);
   return bits.join("\n").trim();
 }
 async function runAiBackup(){
@@ -1054,7 +1086,7 @@ async function runAiBackup(){
   state.aiStatus="Sending captured label crop to AI backup…";
   render();
   try{
-    const res=await fetch(endpoint,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({image:state.capturedImage,mode:state.mode,task:"extract_food_label",source:"bills_bad_belly_v1_3_2"})});
+    const res=await fetch(endpoint,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({imageBase64:String(state.capturedImage).split(",").pop(),mimeType:(String(state.capturedImage).match(/^data:(.*?);base64,/)||[])[1]||"image/jpeg",mode:state.mode,task:"extract_food_label",source:"bills_bad_belly_v1_3_3"})});
     let data=null;
     try{data=await res.json();}catch(e){data=await res.text();}
     if(!res.ok){throw new Error((data&&data.error)||`Worker returned ${res.status}`);}
@@ -1077,6 +1109,7 @@ async function runAiBackup(){
 function useAiText(runNow=false){
   captureInputs();
   if(!state.aiText){state.aiStatus="No AI backup text yet.";render();return;}
+  state.currentSource="AI backup";
   state.ingredientText=state.aiText;
   state.extractedText=state.aiText;
   state.scanView="expanded";
@@ -1086,7 +1119,7 @@ function useAiText(runNow=false){
   setTimeout(()=>document.getElementById("ingredientText")?.focus(),80);
 }
 
-function handleAction(a,btn){if(a==="run-ai-backup"){runAiBackup();return;}if(a==="copy-ai-to-deep"){useAiText(false);return;}if(a==="ai-deep-check"){useAiText(true);return;}if(a==="open-barcode"){openBarcodeOverlay();return;}if(a==="lookup-barcode"){captureInputs();lookupBarcodeValue();return;}if(a==="use-barcode-text"){useBarcodeText(false);return;}if(a==="barcode-deep-check"){useBarcodeText(true);return;}if(a==="go-scan"){state.activeTab="scan";render();return;}if(a==="go-flare"){state.activeTab="flare";render();return;}if(a==="open-camera"){openCameraOverlay();return;}if(a==="toggle-capture-preview"){state.capturePreviewOpen=!state.capturePreviewOpen;render();return;}if(a==="quick-read"){analyze("quick");return;}if(a==="deep-check"){analyze("deep");return;}if(a==="copy-ocr-to-deep"){copyOcrToDeep(false);return;}if(a==="run-ocr-deep-check"){copyOcrToDeep(true);return;}if(a==="toggle-ocr-review"){captureInputs();state.ocrReviewOpen=!state.ocrReviewOpen;render();if(state.ocrReviewOpen)setTimeout(()=>document.getElementById("extractedText")?.focus(),80);return;}if(a==="retry-ocr"){state.ocrStatus="OCR retry starting…";state.ocrReviewOpen=false;render();setTimeout(()=>runOcrOnCapturedImage("auto"),80);return;}if(a==="retry-negative-ocr"){state.ocrStatus="Negative OCR retry starting…";state.ocrReviewOpen=false;render();setTimeout(()=>runOcrOnCapturedImage("negative"),80);return;}if(a==="retake-photo"){openCameraOverlay();return;}if(a==="clear-scan"){state.foodName="";state.ingredientText="";state.extractedText="";state.capturedOcrImage="";state.ocrStatus="";state.ocrProgress=0;state.ocrInProgress=false;state.ocrReviewOpen=false;state.ocrConfidence="idle";state.ocrMode="raw aligned crop";state.ocrAttempts=0;state.cameraNegativeMode=false;state.capturedMode="normal";state.capturePreviewOpen=true;state.lastAnalysis=null;state.savedNotice="";state.capturedImage="";state.capturedMeta=null;state.cameraMessage="";state.barcodeValue="";state.barcodeStatus="";state.barcodeProduct=null;state.barcodeCandidates=[];state.barcodeSource="";state.barcodeInProgress=false;state.aiStatus="";state.aiText="";state.aiInProgress=false;state.aiReviewOpen=false;render();return;}if(a==="save-current"){saveCurrentFood("saved");return;}if(a==="ate-current"){saveCurrentFood("ate");return;}if(a==="demo"){demoResult(btn.dataset.kind);return;}}
+function handleAction(a,btn){if(a==="run-ai-backup"){runAiBackup();return;}if(a==="copy-ai-to-deep"){useAiText(false);return;}if(a==="ai-deep-check"){useAiText(true);return;}if(a==="open-barcode"){openBarcodeOverlay();return;}if(a==="lookup-barcode"){captureInputs();lookupBarcodeValue();return;}if(a==="use-barcode-text"){useBarcodeText(false);return;}if(a==="barcode-deep-check"){useBarcodeText(true);return;}if(a==="go-scan"){state.activeTab="scan";render();return;}if(a==="go-flare"){state.activeTab="flare";render();return;}if(a==="open-camera"){openCameraOverlay();return;}if(a==="toggle-capture-preview"){state.capturePreviewOpen=!state.capturePreviewOpen;render();return;}if(a==="quick-read"){analyze("quick");return;}if(a==="deep-check"){analyze("deep");return;}if(a==="copy-ocr-to-deep"){copyOcrToDeep(false);return;}if(a==="run-ocr-deep-check"){copyOcrToDeep(true);return;}if(a==="toggle-ocr-review"){captureInputs();state.ocrReviewOpen=!state.ocrReviewOpen;render();if(state.ocrReviewOpen)setTimeout(()=>document.getElementById("extractedText")?.focus(),80);return;}if(a==="retry-ocr"){state.ocrStatus="OCR retry starting…";state.ocrReviewOpen=false;render();setTimeout(()=>runOcrOnCapturedImage("auto"),80);return;}if(a==="retry-negative-ocr"){state.ocrStatus="Negative OCR retry starting…";state.ocrReviewOpen=false;render();setTimeout(()=>runOcrOnCapturedImage("negative"),80);return;}if(a==="retake-photo"){openCameraOverlay();return;}if(a==="clear-scan"){state.foodName="";state.ingredientText="";state.extractedText="";state.capturedOcrImage="";state.ocrStatus="";state.ocrProgress=0;state.ocrInProgress=false;state.ocrReviewOpen=false;state.ocrConfidence="idle";state.ocrMode="raw aligned crop";state.ocrAttempts=0;state.cameraNegativeMode=false;state.capturedMode="normal";state.capturePreviewOpen=true;state.lastAnalysis=null;state.savedNotice="";state.capturedImage="";state.capturedMeta=null;state.cameraMessage="";state.barcodeValue="";state.barcodeStatus="";state.barcodeProduct=null;state.barcodeCandidates=[];state.barcodeSource="";state.barcodeInProgress=false;state.aiStatus="";state.aiText="";state.aiInProgress=false;state.aiReviewOpen=false;state.currentSource="Manual";render();return;}if(a==="save-current"){saveCurrentFood("saved");return;}if(a==="ate-current"){saveCurrentFood("ate");return;}if(a==="demo"){demoResult(btn.dataset.kind);return;}}
 document.querySelectorAll(".nav-button").forEach(btn=>{btn.onclick=()=>{state.activeTab=btn.dataset.tab;render();};});
 let cameraStream=null,cameraFacing="environment",cameraInProgress=false;
 async function openCameraOverlay(){const overlay=document.getElementById("cameraOverlay");const video=document.getElementById("cameraVideo");const status=document.getElementById("cameraStatus");overlay.classList.add("active");overlay.classList.toggle("negative-mode",state.cameraNegativeMode);overlay.setAttribute("aria-hidden","false");const negBtn=document.getElementById("cameraNegative");if(negBtn){negBtn.classList.toggle("camera-negative-active",state.cameraNegativeMode);negBtn.textContent=state.cameraNegativeMode?"±":"±";}status.textContent="Opening camera…";try{if(cameraStream)cameraStream.getTracks().forEach(t=>t.stop());cameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:cameraFacing,width:{ideal:1280},height:{ideal:1920}},audio:false});video.srcObject=cameraStream;await video.play();status.textContent=state.cameraNegativeMode?"Negative view is on. Use this only for dark labels; fill the box with the ingredient text.":"Ready. Fill the box with ingredients or nutrition text. Tilt glossy packages to move glare off the words.";}catch(e){status.textContent="Camera could not open. Check browser camera permission, then try again.";}}
