@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <meta name="theme-color" content="#1b2027" />
-<title>bill's bad belly — v1.5.1 Rules Alignment Fix</title>
+<title>bill's bad belly — v1.5.2 Display Alignment Fix</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baumans&display=swap" rel="stylesheet">
@@ -435,6 +435,71 @@ html,body{max-width:100%;overflow-x:hidden!important}
 .exposure-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:10px}.exposure-chip{border:1px solid rgba(184,154,192,.18);border-radius:13px;padding:8px;text-align:center;background:rgba(17,21,26,.22);font-size:.78rem;color:var(--muted)}
 .usda-status{margin-top:8px;font-size:.78rem;color:var(--muted)}
 @media(max-width:360px){.checkin-grid,.exposure-grid{grid-template-columns:1fr}.trigger-entry{grid-template-columns:1fr}}
+
+/* ---------- v1.5.2 display alignment patch ---------- */
+.verdict-area>.rating-flare{
+  min-width:0;
+  padding:7px 13px;
+  font-size:.86rem;
+  letter-spacing:.035em;
+  box-shadow:none;
+}
+.mode-guidance .rating-flare{
+  min-width:0;
+  padding:6px 12px;
+  font-size:.80rem;
+}
+.compare-row .rating-flare{
+  min-width:0;
+  padding:7px 8px;
+  font-size:.78rem;
+  line-height:1.18;
+}
+.daily-checkin-drawer{
+  padding:0;
+  overflow:hidden;
+}
+.daily-checkin-drawer>summary{
+  list-style:none;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:14px;
+  color:var(--purple-light);
+  font-family:var(--display-font);
+  font-size:1.04rem;
+  font-weight:900;
+}
+.daily-checkin-drawer>summary::-webkit-details-marker{display:none}
+.daily-checkin-drawer>summary::after{
+  content:"+";
+  width:32px;
+  height:32px;
+  flex:0 0 32px;
+  display:grid;
+  place-items:center;
+  border:1px solid rgba(184,154,192,.24);
+  border-radius:12px;
+  background:rgba(17,21,26,.30);
+}
+.daily-checkin-drawer[open]>summary::after{content:"−"}
+.daily-checkin-summary-copy{
+  display:grid;
+  gap:3px;
+}
+.daily-checkin-summary-copy small{
+  color:var(--muted);
+  font-family:var(--body-font);
+  font-size:.78rem;
+  font-weight:600;
+}
+.daily-checkin-body{
+  padding:0 14px 14px;
+  border-top:1px solid rgba(184,154,192,.14);
+}
+.daily-checkin-body p{margin-top:12px}
 </style>
 </head>
 <body>
@@ -442,7 +507,7 @@ html,body{max-width:100%;overflow-x:hidden!important}
   <header class="topbar">
     <div class="header-mascot-wrap" aria-hidden="true"><div class="mascot-fallback">bb</div></div>
     <div class="brand-title-wrap">
-      <p class="eyebrow">v1.5.1 Rules Alignment Fix</p>
+      <p class="eyebrow">v1.5.2 Display Alignment Fix</p>
       <h1>bill's bad belly</h1>
     </div>
     <div class="logo-mark" aria-hidden="true">bb</div>
@@ -947,9 +1012,12 @@ function broadRatingState(r){
   const s=stateClass(r);
   return s==="good"?"usually_gentle":s==="ugly"?"likely_rough":"caution";
 }
+function normalDisplayRating(r){
+  return r==="flare_caution"?"caution":r;
+}
 function modeGuidancePill(a){
-  if(!a)return "";
-  if(a.flare!==a.normal||state.mode==="Flare")return ratingPill(a.flare,true);
+  if(!a||state.mode==="Flare")return "";
+  if(a.flare!==a.normal)return ratingPill(a.flare,true);
   return "";
 }
 function resultCard(a){
@@ -968,7 +1036,7 @@ function resultCard(a){
   const primaryNames=(a.ingredientFamilies||[]).filter(h=>h.dominant||["lean_protein","broccoli_fibrous","potato_skin_starch"].includes(h.id)).slice(0,5).map(h=>h.label||h.name||h.id);
   const primaryNote=primaryNames.length?`<div class="primary-foods-note"><strong>main foods identified:</strong> ${primaryNames.map(escapeHtml).join(", ")}</div>`:"";
   const exposureHtml=(a.exposures||[]).length?`<details class="support-drawer"><summary>exposures detected</summary><div class="exposure-grid">${a.exposures.map(x=>`<div class="exposure-chip">${escapeHtml(x.label)}</div>`).join("")}</div></details>`:"";
-  return `<section class="result-shell ${cls}" id="resultCard"><div class="result-inner"><div class="verdict-area"><div class="overall-rating-label">overall result</div>${ratingPill(broadRatingState(a.normal),false)}<div class="detected-name food-title">${escapeHtml(a.detected)}</div>${modeGuidancePill(a)?`<div class="mode-guidance">${modeGuidancePill(a)}</div>`:""}</div>${primaryNote}<div class="card-section"><h4>gut check</h4><p class="result-copy">${escapeHtml(a.gutCheck||"This food needs a closer look.")}</p></div>${breakdownHtml?`<div class="food-breakdown">${breakdownHtml}</div>`:""}<div class="compare-row"><div class="compare-box"><span>normal side</span>${ratingPill(a.normal,false)}</div><div class="compare-box"><span>flare side</span>${ratingPill(a.flare,true)}</div></div><div class="button-row three-actions"><button class="secondary-action" data-action="save-current" type="button">save it</button><button class="primary-action" data-action="ate-current" type="button">ate it</button><button class="secondary-action" data-action="junk-current" type="button">junk for now</button></div>${ingredientDrawer}${exposureHtml}<details class="support-drawer"><summary>nutrition support drawer</summary>${nutritionTiles(a.nutrition)}</details>${technical}</div></section>`;
+  return `<section class="result-shell ${cls}" id="resultCard"><div class="result-inner"><div class="verdict-area"><div class="overall-rating-label">overall result</div>${ratingPill(state.mode==="Flare"?a.active:normalDisplayRating(a.active),state.mode==="Flare")}<div class="detected-name food-title">${escapeHtml(a.detected)}</div>${modeGuidancePill(a)?`<div class="mode-guidance">${modeGuidancePill(a)}</div>`:""}</div>${primaryNote}<div class="card-section"><h4>gut check</h4><p class="result-copy">${escapeHtml(a.gutCheck||"This food needs a closer look.")}</p></div>${breakdownHtml?`<div class="food-breakdown">${breakdownHtml}</div>`:""}<div class="compare-row"><div class="compare-box"><span>normal side</span>${ratingPill(normalDisplayRating(a.normal),false)}</div><div class="compare-box"><span>flare side</span>${ratingPill(a.flare,true)}</div></div><div class="button-row three-actions"><button class="secondary-action" data-action="save-current" type="button">save it</button><button class="primary-action" data-action="ate-current" type="button">ate it</button><button class="secondary-action" data-action="junk-current" type="button">junk for now</button></div>${ingredientDrawer}${exposureHtml}<details class="support-drawer"><summary>nutrition support drawer</summary>${nutritionTiles(a.nutrition)}</details>${technical}</div></section>`;
 }
 
 function ocrPillClass(){if(state.ocrConfidence==="good")return "good-read";if(state.ocrConfidence==="weak")return "weak-read";if(state.ocrConfidence==="none"||state.ocrConfidence==="error")return "no-read";return "";}
@@ -1013,7 +1081,7 @@ function billTipCard(){
   if(state.mode!=="Flare"&&elevated>=2){return `<section class="bill-tip"><div class="bill-tip-face">bb ☺</div><div><h3>Bill's Tip</h3><p>Your recent check-ins include ${elevated} rough or flare days. Consider using Flare Mode for more conservative food guidance until things settle.</p></div><div class="button-row"><button class="primary-action" data-action="accept-flare-tip" type="button">switch to flare</button><button class="secondary-action" data-action="dismiss-tip" type="button">not now</button></div></section>`;}
   return "";
 }
-function dailyCheckinCard(){const selected=todayCheckin();return `<section class="input-card"><h3>daily check-in</h3><p>How is your belly today? This helps connect meals with same-day and delayed patterns.</p><div class="checkin-grid"><button class="checkin-btn ${selected==="good"?"selected":""}" data-checkin="good" type="button">good</button><button class="checkin-btn ${selected==="rough"?"selected":""}" data-checkin="rough" type="button">rough</button><button class="checkin-btn ${selected==="flare"?"flare-selected":""}" data-checkin="flare" type="button">flare</button></div></section>`;}
+function dailyCheckinCard(){const selected=todayCheckin();const status=selected?`today: ${selected}`:"open yesterday's bathroom update";return `<details class="input-card daily-checkin-drawer"><summary><span class="daily-checkin-summary-copy"><span>daily check-in</span><small>${escapeHtml(status)}</small></span></summary><div class="daily-checkin-body"><p>How has your belly been since yesterday? Record a quick status now; the fuller bathroom-history questions can remain part of the next personal-learning step.</p><div class="checkin-grid"><button class="checkin-btn ${selected==="good"?"selected":""}" data-checkin="good" type="button">good</button><button class="checkin-btn ${selected==="rough"?"selected":""}" data-checkin="rough" type="button">rough</button><button class="checkin-btn ${selected==="flare"?"flare-selected":""}" data-checkin="flare" type="button">flare</button></div></div></details>`;}
 function personalTriggerSection(){const items=getPersonalTriggers();return `<section class="memory-card"><h3>personal trigger list</h3><p>Add foods, drinks, or ingredients you already know you want flagged. You can remove them at any time.</p><div class="trigger-entry"><input class="search-box" id="personalTriggerDraft" value="${escapeHtml(state.personalTriggerDraft||"")}" placeholder="example: alcohol, coconut, popcorn"><button class="compact-action" data-action="add-personal-trigger" type="button">add</button></div>${items.length?`<div class="trigger-list">${items.map((x,i)=>`<div class="trigger-item"><span>${escapeHtml(x.name)}</span><button class="trigger-remove" data-remove-trigger="${i}" type="button" aria-label="Remove ${escapeHtml(x.name)}">×</button></div>`).join("")}</div>`:`<p class="small-muted" style="margin-top:10px">No personal triggers added yet.</p>`}</section>`;}
 function detectExposures(input,nutrition={}){
   const t=normalizeText(input),out=[]; const add=(id,label)=>{if(!out.some(x=>x.id===id))out.push({id,label});};
