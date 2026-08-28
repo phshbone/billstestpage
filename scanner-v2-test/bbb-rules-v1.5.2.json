@@ -1,0 +1,708 @@
+{
+  "version": "1.5.2",
+  "status": "authoritative",
+  "derivedFrom": "bbb-rules-v1.5.1.json",
+  "purpose": "Locked barcode-to-personal-verdict integration rules",
+  "labels": {
+    "good": "GOOD",
+    "hold": "HOLD ON",
+    "ugly": "UGLY"
+  },
+  "principles": {
+    "summary": "Broad food category establishes the starting lane; food structure, ingredient form, preparation, completeness, mode, and personal history determine the final decision state.",
+    "portionRule": "Portion may inform dose-sensitive concerns but never downgrades a structural Don't or a personal hard stop.",
+    "minorSeasoningRule": "A minor seasoning must not automatically become the identity of the food.",
+    "missingDataRule": "Missing essential ingredients or serving information produces HOLD ON rather than fabricated certainty.",
+    "personalRule": "Personal guidance is displayed separately and takes precedence over general guidance."
+  },
+  "precedence": [
+    "personal_hard_stop",
+    "structural_dont",
+    "preparation_dont",
+    "clear_do",
+    "mixed_conditional_incomplete",
+    "mode_adjustment",
+    "personal_history_display"
+  ],
+  "essentialFields": [
+    "productName",
+    "ingredientsText"
+  ],
+  "doPatterns": [
+    {
+      "id": "plain_rice",
+      "label": "plain white rice",
+      "terms": [
+        "plain rice",
+        "white rice",
+        "jasmine rice",
+        "basmati rice",
+        "sushi rice"
+      ],
+      "result": "good",
+      "reason": "Plain refined rice is a soft, low-roughage starch when no conflicting structural ingredient or preparation is present."
+    },
+    {
+      "id": "plain_lean_protein",
+      "label": "plain lean protein",
+      "terms": [
+        "plain chicken",
+        "chicken breast",
+        "skinless chicken",
+        "plain turkey",
+        "turkey breast",
+        "plain fish",
+        "white fish",
+        "cod",
+        "tilapia",
+        "plain eggs",
+        "egg whites"
+      ],
+      "result": "good",
+      "reason": "Simply prepared lean protein is a predictable starting pattern when no conflicting preparation or structural warning is present."
+    },
+    {
+      "id": "peeled_soft_potato",
+      "label": "peeled soft potato",
+      "terms": [
+        "peeled potato",
+        "peeled potatoes",
+        "mashed potato",
+        "mashed potatoes",
+        "skinless potato",
+        "skinless potatoes"
+      ],
+      "requiresAnyPreparation": [
+        "peeled",
+        "skinless",
+        "mashed",
+        "soft cooked",
+        "very soft"
+      ],
+      "result": "good",
+      "reason": "Potatoes are treated differently when the skin is removed and the texture is established as soft."
+    }
+  ],
+  "structuralDont": [
+    {
+      "id": "skins_hulls",
+      "label": "skins or hulls",
+      "terms": [
+        "potato skin",
+        "potato skins",
+        "skin-on potato",
+        "skin on potato",
+        "unpeeled potato",
+        "fruit skin",
+        "vegetable skin",
+        "corn hull",
+        "corn hulls",
+        "popcorn hull"
+      ],
+      "result": "ugly",
+      "reason": "Skins and hulls are coarse physical structures and remain a hard structural warning regardless of serving size."
+    },
+    {
+      "id": "whole_seeds",
+      "label": "whole seeds",
+      "terms": [
+        "sesame seeds",
+        "poppy seeds",
+        "chia seeds",
+        "flax seeds",
+        "sunflower seeds",
+        "pumpkin seeds",
+        "whole seeds",
+        "multiseed",
+        "seeded bread"
+      ],
+      "result": "ugly",
+      "reason": "Whole seeds preserve a coarse physical matrix and are not equivalent to seed oils."
+    },
+    {
+      "id": "whole_nuts",
+      "label": "whole nuts or nut pieces",
+      "terms": [
+        "whole peanuts",
+        "peanut pieces",
+        "whole almonds",
+        "almond pieces",
+        "walnut pieces",
+        "pecan pieces",
+        "cashew pieces",
+        "pistachio pieces",
+        "mixed nuts",
+        "peanuts",
+        "almonds",
+        "walnuts",
+        "pecans",
+        "cashews",
+        "pistachios",
+        "hazelnuts"
+      ],
+      "result": "ugly",
+      "reason": "Whole nuts and nut pieces retain a coarse physical structure; smooth nut butter is evaluated separately."
+    },
+    {
+      "id": "whole_corn",
+      "label": "whole corn or kernels",
+      "terms": [
+        "whole corn",
+        "corn kernels",
+        "popcorn"
+      ],
+      "result": "ugly",
+      "reason": "Whole corn and popcorn retain hulls and physical structure; cornstarch and corn syrup are different forms."
+    },
+    {
+      "id": "coarse_bran_roughage",
+      "label": "bran or coarse roughage",
+      "terms": [
+        "wheat bran",
+        "oat bran",
+        "bran cereal",
+        "cracked wheat",
+        "rye berries",
+        "raw salad",
+        "large salad",
+        "coarse roughage"
+      ],
+      "result": "ugly",
+      "reason": "Bran and coarse roughage are structural warnings rather than medium numeric risk."
+    }
+  ],
+  "preparationDont": [
+    {
+      "id": "fried_greasy",
+      "label": "fried or greasy preparation",
+      "terms": [
+        "fried",
+        "deep fried",
+        "greasy",
+        "battered",
+        "crispy fried"
+      ],
+      "result": "ugly",
+      "reason": "Frying creates a clear preparation warning and cannot be neutralized by a small serving."
+    },
+    {
+      "id": "raw_crisp_structural",
+      "label": "raw or crisp fibrous preparation",
+      "terms": [
+        "raw broccoli",
+        "raw cabbage",
+        "raw kale",
+        "raw vegetables",
+        "crisp vegetables",
+        "crunchy vegetables"
+      ],
+      "result": "ugly",
+      "reason": "Raw or crisp fibrous preparation preserves more physical structure."
+    }
+  ],
+  "formFamilies": [
+    {
+      "id": "corn_forms",
+      "label": "corn form",
+      "forms": [
+        {
+          "name": "whole",
+          "terms": [
+            "whole corn",
+            "corn kernels",
+            "popcorn"
+          ],
+          "result": "ugly",
+          "kind": "structural"
+        },
+        {
+          "name": "processed",
+          "terms": [
+            "corn starch",
+            "cornstarch",
+            "corn syrup",
+            "high fructose corn syrup",
+            "corn flour",
+            "maltodextrin",
+            "dextrose"
+          ],
+          "result": "hold",
+          "kind": "conditional"
+        }
+      ]
+    },
+    {
+      "id": "seed_forms",
+      "label": "seed form",
+      "forms": [
+        {
+          "name": "whole",
+          "terms": [
+            "sesame seeds",
+            "poppy seeds",
+            "chia seeds",
+            "flax seeds",
+            "sunflower seeds",
+            "pumpkin seeds"
+          ],
+          "result": "ugly",
+          "kind": "structural"
+        },
+        {
+          "name": "oil",
+          "terms": [
+            "sesame oil",
+            "sesame seed oil",
+            "soybean oil",
+            "canola oil",
+            "sunflower oil",
+            "safflower oil",
+            "vegetable oil",
+            "cottonseed oil"
+          ],
+          "result": "hold",
+          "kind": "dose_sensitive"
+        }
+      ]
+    },
+    {
+      "id": "nut_forms",
+      "label": "nut form",
+      "forms": [
+        {
+          "name": "whole",
+          "terms": [
+            "whole peanuts",
+            "peanut pieces",
+            "whole almonds",
+            "almond pieces",
+            "walnut pieces",
+            "pecan pieces",
+            "cashew pieces",
+            "mixed nuts",
+            "peanuts",
+            "almonds",
+            "walnuts",
+            "pecans",
+            "cashews",
+            "pistachios",
+            "hazelnuts"
+          ],
+          "result": "ugly",
+          "kind": "structural"
+        },
+        {
+          "name": "smooth_butter",
+          "terms": [
+            "smooth peanut butter",
+            "creamy peanut butter",
+            "smooth almond butter",
+            "smooth cashew butter"
+          ],
+          "result": "hold",
+          "kind": "conditional"
+        }
+      ]
+    },
+    {
+      "id": "onion_forms",
+      "label": "onion form",
+      "forms": [
+        {
+          "name": "whole_visible",
+          "terms": [
+            "raw onion",
+            "sliced onion",
+            "chopped onion",
+            "diced onion",
+            "onion pieces",
+            "onions"
+          ],
+          "result": "ugly",
+          "kind": "structural"
+        },
+        {
+          "name": "dehydrated_pieces",
+          "terms": [
+            "dehydrated onion",
+            "dried onion pieces"
+          ],
+          "result": "hold",
+          "kind": "strong_conditional",
+          "strength": "strong"
+        },
+        {
+          "name": "powder",
+          "terms": [
+            "onion powder",
+            "powdered onion",
+            "granulated onion",
+            "onion seasoning"
+          ],
+          "result": "hold",
+          "kind": "conditional",
+          "strength": "moderate"
+        },
+        {
+          "name": "infused_oil",
+          "terms": [
+            "onion infused oil",
+            "onion-infused oil"
+          ],
+          "result": "hold",
+          "kind": "conditional",
+          "strength": "lower"
+        }
+      ]
+    },
+    {
+      "id": "garlic_forms",
+      "label": "garlic form",
+      "forms": [
+        {
+          "name": "whole",
+          "terms": [
+            "whole garlic",
+            "garlic cloves",
+            "chopped garlic",
+            "roasted garlic"
+          ],
+          "result": "hold",
+          "kind": "conditional",
+          "strength": "strong"
+        },
+        {
+          "name": "dehydrated",
+          "terms": [
+            "dehydrated garlic",
+            "dried garlic pieces"
+          ],
+          "result": "hold",
+          "kind": "conditional",
+          "strength": "strong"
+        },
+        {
+          "name": "powder",
+          "terms": [
+            "garlic powder",
+            "granulated garlic"
+          ],
+          "result": "hold",
+          "kind": "conditional",
+          "strength": "moderate"
+        },
+        {
+          "name": "infused_oil",
+          "terms": [
+            "garlic infused oil",
+            "garlic-infused oil"
+          ],
+          "result": "hold",
+          "kind": "conditional",
+          "strength": "lower"
+        }
+      ],
+      "identityRule": "Garlic never automatically becomes the identity of a mixed food solely because it appears as a seasoning ingredient."
+    }
+  ],
+  "conditionalFamilies": [
+    {
+      "id": "processed_meat",
+      "label": "processed or fatty meat",
+      "terms": [
+        "pepperoni",
+        "salami",
+        "bacon",
+        "sausage",
+        "hot dog",
+        "bratwurst",
+        "sodium nitrite",
+        "sodium nitrate",
+        "mechanically separated"
+      ],
+      "normal": "hold",
+      "flare": "ugly",
+      "reason": "Processed meats combine fat, seasoning, preservatives, and processing; in a mixed food they must be weighed as part of the main construction rather than allowing a minor seasoning to dominate."
+    },
+    {
+      "id": "dairy_lactose",
+      "label": "milk or higher-lactose dairy",
+      "terms": [
+        "milk",
+        "nonfat milk",
+        "skim milk",
+        "whole milk",
+        "milk powder",
+        "dry milk",
+        "whey",
+        "lactose",
+        "cream",
+        "sour cream",
+        "ice cream"
+      ],
+      "normal": "hold",
+      "flare": "hold",
+      "doseSensitive": true,
+      "reason": "Dairy/lactose tolerance is conditional and personal rather than a structural hard stop."
+    },
+    {
+      "id": "added_fiber",
+      "label": "added fiber",
+      "terms": [
+        "inulin",
+        "chicory root fiber",
+        "chicory fiber",
+        "soluble corn fiber",
+        "polydextrose",
+        "resistant starch"
+      ],
+      "normal": "hold",
+      "flare": "hold",
+      "doseSensitive": true,
+      "reason": "Added fiber may increase gas or bloating, but it is dose-sensitive rather than a structural permission rule."
+    },
+    {
+      "id": "sugar_alcohols",
+      "label": "sugar alcohol",
+      "terms": [
+        "sorbitol",
+        "xylitol",
+        "erythritol",
+        "maltitol",
+        "mannitol",
+        "isomalt"
+      ],
+      "normal": "hold",
+      "flare": "hold",
+      "doseSensitive": true,
+      "reason": "Sugar alcohols may affect urgency, gas, or diarrhea and are treated as dose-sensitive concerns, not structural hard stops."
+    },
+    {
+      "id": "caffeine",
+      "label": "caffeine or stimulant",
+      "terms": [
+        "caffeine",
+        "coffee",
+        "espresso",
+        "cold brew",
+        "energy drink",
+        "black tea",
+        "green tea",
+        "oolong",
+        "matcha",
+        "chai",
+        "cola",
+        "mountain dew"
+      ],
+      "normal": "hold",
+      "flare": "hold",
+      "doseSensitive": true,
+      "reason": "Caffeine can increase urgency for some people; amount and personal history matter."
+    },
+    {
+      "id": "alcohol",
+      "label": "alcohol",
+      "terms": [
+        "beer",
+        "wine",
+        "vodka",
+        "rum",
+        "whiskey",
+        "whisky",
+        "gin",
+        "tequila",
+        "liqueur",
+        "hard cider",
+        "cocktail",
+        "alcohol"
+      ],
+      "normal": "hold",
+      "flare": "hold",
+      "doseSensitive": true,
+      "reason": "Alcohol is a primary exposure whose amount and personal history matter."
+    },
+    {
+      "id": "acidic_ingredients",
+      "label": "acidic ingredient",
+      "terms": [
+        "vinegar",
+        "citric acid",
+        "lemon juice",
+        "lime juice",
+        "tomato paste",
+        "tomato puree",
+        "tomato sauce",
+        "horseradish"
+      ],
+      "normal": "hold",
+      "flare": "hold",
+      "reason": "Acidity is a conditional concern and should not independently force UGLY."
+    },
+    {
+      "id": "mild_spices",
+      "label": "mild spices",
+      "terms": [
+        "paprika",
+        "turmeric",
+        "cumin",
+        "coriander",
+        "parsley",
+        "oregano",
+        "basil",
+        "thyme",
+        "rosemary",
+        "black pepper",
+        "white pepper"
+      ],
+      "normal": "hold",
+      "flare": "hold",
+      "minorIngredient": true,
+      "reason": "Mild seasonings are secondary context and should not determine the food identity."
+    }
+  ],
+  "preparationSupport": [
+    {
+      "id": "peeled",
+      "terms": [
+        "peeled",
+        "skinless",
+        "without skin",
+        "no skin"
+      ],
+      "reason": "Removing skins reduces rough physical structure but does not override another structural hard stop."
+    },
+    {
+      "id": "soft_cooked",
+      "terms": [
+        "soft cooked",
+        "cooked soft",
+        "very soft",
+        "mashed",
+        "slow cooked",
+        "pressure cooked"
+      ],
+      "reason": "Soft cooking can reduce physical roughness when no structural hard stop remains."
+    },
+    {
+      "id": "pureed",
+      "terms": [
+        "pureed",
+        "puréed",
+        "blended",
+        "smooth puree",
+        "fully blended",
+        "strained"
+      ],
+      "reason": "Pureeing or straining can reduce physical structure when the source food is otherwise compatible."
+    }
+  ],
+  "nutrition": {
+    "informationalFields": [
+      "servingSize",
+      "servingsPerContainer",
+      "packageQuantity",
+      "calories",
+      "fat",
+      "saturatedFat",
+      "carbohydrates",
+      "fiber",
+      "sugars",
+      "addedSugars",
+      "sugarAlcohols",
+      "protein",
+      "sodium",
+      "perServing",
+      "per100g"
+    ],
+    "doseSensitiveFields": [
+      "fat",
+      "fiber",
+      "sugarAlcohols",
+      "caffeine",
+      "alcohol",
+      "lactose"
+    ],
+    "neverDowngradeStructuralDont": true
+  },
+  "falsePositiveRules": [
+    {
+      "term": "locust bean gum",
+      "mustNotTrigger": [
+        "legume"
+      ]
+    },
+    {
+      "term": "soybean oil",
+      "mustNotTrigger": [
+        "whole_seed",
+        "legume"
+      ]
+    },
+    {
+      "term": "sesame seed oil",
+      "mustNotTrigger": [
+        "whole_seed"
+      ]
+    },
+    {
+      "term": "cocoa butter",
+      "mustNotTrigger": [
+        "dairy"
+      ]
+    },
+    {
+      "term": "lactic acid",
+      "mustNotTrigger": [
+        "dairy"
+      ]
+    },
+    {
+      "term": "butter flavor",
+      "mustNotTrigger": [
+        "dairy"
+      ]
+    }
+  ],
+  "mainFoodPatterns": [
+    {
+      "id": "pepperoni_pizza",
+      "terms": [
+        "pepperoni pizza"
+      ],
+      "main": "pizza with processed meat",
+      "normal": "hold",
+      "flare": "ugly",
+      "reason": "The main construction and processed meat matter; garlic or onion seasoning must not dominate the explanation."
+    },
+    {
+      "id": "plain_rice",
+      "terms": [
+        "plain rice",
+        "white rice",
+        "jasmine rice",
+        "basmati rice"
+      ],
+      "main": "plain refined rice",
+      "normal": "good",
+      "flare": "good",
+      "reason": "Plain refined rice is a clear Do pattern when no conflicting ingredient or preparation is present."
+    },
+    {
+      "id": "plain_lean_protein",
+      "terms": [
+        "plain chicken",
+        "chicken breast",
+        "plain turkey",
+        "turkey breast",
+        "plain fish",
+        "white fish",
+        "cod",
+        "tilapia"
+      ],
+      "main": "plain lean protein",
+      "normal": "good",
+      "flare": "good",
+      "reason": "Plain lean protein is a clear Do pattern when preparation is compatible."
+    }
+  ]
+}
