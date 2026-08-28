@@ -1,0 +1,54 @@
+name: Publish v2 scanner phone test
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/publish-v2-scanner-test.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  publish-test-folder:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout existing test site
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch locked v2 scanner branch
+        run: |
+          git clone --depth 1 --branch scanner-integration-lock https://github.com/phshbone/bills-bad-belly-v2.git /tmp/bbb-v2-lock
+
+      - name: Refresh isolated phone-test folder
+        run: |
+          rm -rf scanner-v2-test
+          mkdir -p scanner-v2-test
+          cp /tmp/bbb-v2-lock/index.html scanner-v2-test/index.html
+          cp '/tmp/bbb-v2-lock/bbb header-transparent.png' 'scanner-v2-test/bbb header-transparent.png'
+          cp /tmp/bbb-v2-lock/bbb-rules-v1.5.2.json scanner-v2-test/bbb-rules-v1.5.2.json
+          cp /tmp/bbb-v2-lock/bbb-scanner-engine.js scanner-v2-test/bbb-scanner-engine.js
+          cp /tmp/bbb-v2-lock/bbb-v2-scanner-adapter.js scanner-v2-test/bbb-v2-scanner-adapter.js
+          printf 'scanner-integration-lock\n' > scanner-v2-test/TEST-BUILD.txt
+
+      - name: Verify phone-test package
+        run: |
+          test -s scanner-v2-test/index.html
+          test -s scanner-v2-test/bbb-rules-v1.5.2.json
+          grep -q 'bbb-v2-scanner-adapter.js' scanner-v2-test/index.html
+          grep -q 'bbb-rules-v1.5.2.json' scanner-v2-test/bbb-v2-scanner-adapter.js
+          ! grep -q 'bbb-rules.json' scanner-v2-test/bbb-v2-scanner-adapter.js
+
+      - name: Commit isolated phone-test deployment
+        run: |
+          git config user.name "bbb-phone-test"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add scanner-v2-test .github/workflows/publish-v2-scanner-test.yml
+          if git diff --cached --quiet; then
+            echo 'Phone-test folder already current'
+            exit 0
+          fi
+          git commit -m 'Publish isolated v2 scanner phone test'
+          git push origin HEAD:main
