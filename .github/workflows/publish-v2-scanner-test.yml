@@ -1,5 +1,6 @@
 name: Publish v2 scanner phone test
 
+# refresh trigger: live research barcode scanner
 on:
   workflow_dispatch:
   push:
