@@ -3,8 +3,10 @@
 const RULES_URL='./bbb-rules-v1.5.2.json';
 const INGREDIENT_FLAGS_KEY='bbbIngredientFlagsV152';
 let rulesPromise=null;
+let liveBarcodeControls=null;
+let liveBarcodeLock=false;
 const loadRules=()=>rulesPromise||(rulesPromise=fetch(RULES_URL,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(`Rules HTTP ${r.status}`);return r.json();}).then(r=>{if(r.version!=='1.5.2'||r.status!=='authoritative')throw new Error('Wrong rules source');return r;}));
-const e=s=>typeof escapeHtml==='function'?escapeHtml(String(s??'')):String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+const e=s=>typeof escapeHtml==='function'?escapeHtml(String(s??'')):String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#039;'}[c]));
 const labelPersonal=s=>s==='works'?'Works for Me':s==='not_for_me'?'Not for Me':'Hold On';
 const fmtDate=s=>{try{return new Date(s).toLocaleDateString();}catch(_){return String(s||'');}};
 function nutrientRows(record){
@@ -45,18 +47,50 @@ function decisionsPanel(){
   const rows=Object.values(all).sort((a,b)=>String(b.date).localeCompare(String(a.date))).slice(0,50);if(!rows.length)return '';
   return `<section class="input-card"><h3>Personal Food Decisions</h3><p class="small-muted">Change a saved decision here; future scans use the updated choice.</p><div class="list-stack">${rows.map(d=>`<article class="food-result-card"><div class="food-result-top"><div><strong>${e(d.brand?d.brand+' '+d.productName:d.productName||d.barcode)}</strong><span>${e(d.barcode)} • ${e(labelPersonal(d.status))} • ${e(fmtDate(d.date))}</span></div></div><div class="food-result-actions"><button class="secondary-action compact-action" data-bbb-history-status="works" data-barcode="${e(d.barcode)}">works</button><button class="secondary-action compact-action" data-bbb-history-status="hold" data-barcode="${e(d.barcode)}">hold on</button><button class="secondary-action compact-action" data-bbb-history-status="not_for_me" data-barcode="${e(d.barcode)}">not for me</button></div></article>`).join('')}</div></section>`;
 }
-async function decodeFrames(frames){
-  const reader=BBBScanner.getBarcodeReader();if(!reader)throw new Error('Barcode decoder unavailable');
-  for(const frame of frames||[]){try{const result=await reader.decodeFromImageUrl(frame.dataUrl);const text=typeof result.getText==='function'?result.getText():result.text;if(text)return String(text).trim();}catch(_){}}
-  throw new Error('No barcode found in captured frames');
+function stopLiveBarcodeScanner(){
+  try{liveBarcodeControls?.stop();}catch(_){}
+  liveBarcodeControls=null;
+  const video=document.getElementById('cameraVideo');
+  if(video?.srcObject){try{video.srcObject.getTracks().forEach(t=>t.stop());}catch(_){}video.srcObject=null;}
+  const overlay=document.getElementById('cameraOverlay');
+  if(overlay){overlay.classList.remove('active');overlay.setAttribute('aria-hidden','true');}
+  liveBarcodeLock=false;
 }
-async function realPipeline(){
-  state.cameraStage='barcode';state.cameraMessage='Looking for barcode…';render();
+async function handleLiveBarcode(code){
   try{
-    const code=await decodeFrames(state.scanPhotos||[]);state.cameraMessage=`Barcode ${code} found. Checking product facts…`;render();
-    const rules=await loadRules();const product=await BBBScanner.retrieveProduct(code,{storage:localStorage});state.cameraStage='identify';state.cameraMessage='Applying food/form rules…';render();
-    const evaluation=BBBScanner.evaluateProduct(product,rules,{mode:state.mode,storage:localStorage});state.bbbLiveProduct=product;state.bbbLiveEvaluation=evaluation;state.cameraStage='complete';state.cameraMessage=`${evaluation.label} • ${evaluation.reason}`;render();
+    state.cameraStage='barcode';state.cameraMessage=`Barcode ${code} found. Checking product facts…`;render();
+    const rules=await loadRules();
+    const product=await BBBScanner.retrieveProduct(code,{storage:localStorage});
+    state.cameraStage='identify';state.cameraMessage='Applying food/form rules…';render();
+    const evaluation=BBBScanner.evaluateProduct(product,rules,{mode:state.mode,storage:localStorage});
+    state.bbbLiveProduct=product;state.bbbLiveEvaluation=evaluation;state.cameraStage='complete';state.cameraMessage=`${evaluation.label} • ${evaluation.reason}`;render();
   }catch(err){state.cameraStage='complete';state.cameraMessage=err.message||'Barcode scan failed.';state.bbbLiveProduct=null;state.bbbLiveEvaluation=null;render();}
+}
+async function openLiveBarcodeScanner(){
+  state.bbbLiveProduct=null;state.bbbLiveEvaluation=null;state.scanPhotos=[];state.cameraMessage='Scanning live barcode…';state.cameraStage='barcode';
+  const overlay=document.getElementById('cameraOverlay'),video=document.getElementById('cameraVideo'),hint=document.getElementById('cameraHint');
+  if(!overlay||!video)return;
+  overlay.classList.add('active');overlay.setAttribute('aria-hidden','false');
+  if(hint)hint.textContent='Center the barcode in the frame. The scanner will read it automatically.';
+  liveBarcodeLock=false;
+  try{
+    if(typeof ZXingBrowser==='undefined')throw new Error('Barcode decoder unavailable');
+    const reader=new ZXingBrowser.BrowserMultiFormatReader();
+    const cb=(result,err,controls)=>{
+      if(result&&!liveBarcodeLock){
+        liveBarcodeLock=true;
+        const raw=result.getText?result.getText():String(result.text||result);
+        const code=String(raw||'').replace(/\D/g,'');
+        try{controls.stop();}catch(_){}
+        stopLiveBarcodeScanner();
+        if(code)handleLiveBarcode(code);
+      }
+    };
+    liveBarcodeControls=await reader.decodeFromConstraints({audio:false,video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}}},video,cb);
+    if(hint)hint.textContent='Scanning… hold the barcode steady inside the frame.';
+  }catch(err){
+    if(hint)hint.textContent=err.message||'Scanner could not open.';
+  }
 }
 function storeIngredientFlag(record){
   const term=(document.getElementById('bbbIngredientFlag')?.value||'').trim();if(!term){state.savedNotice='enter an ingredient before saving a flag.';render();return;}
@@ -75,14 +109,16 @@ function installHoldOnDisplayOverrides(){
   if(typeof foodPanel==='function') foodPanel=function(icon,title,foods){const visible=title==='ehh'?'hold on':title;return `<article class="food-panel food-panel-${e(title)}"><div class="food-panel-title"><span class="icon">${icon}</span><h3>${e(visible)}</h3></div><ul>${foods.map(food=>`<li>${e(food)}</li>`).join('')}</ul></article>`;};
   if(typeof infoToast==='function'){const original=infoToast;infoToast=function(){if(state.infoTopic==='rating-ehh')return `<div class="info-toast" role="status"><button data-action="close-info" type="button" aria-label="Close explanation">×</button><strong>hold on</strong><p>Hold On is a decision state for mixed, conditional, incomplete, or uncertain information. It is not a medium numeric risk score and does not mean a small portion is automatically safe.</p></div>`;return original();};}
 }
-
 function install(){
   if(typeof BBBScanner==='undefined'||typeof scanScreen!=='function'||typeof bindEvents!=='function')return setTimeout(install,50);
   installHoldOnDisplayOverrides();
   const originalScanScreen=scanScreen;scanScreen=function(){return resultView()||originalScanScreen();};
   const originalHistory=typeof historyScreen==='function'?historyScreen:null;if(originalHistory)historyScreen=function(){const base=originalHistory();return base.replace(/<\/div>\s*$/,'')+decisionsPanel()+'</div>';};
   const originalBind=bindEvents;bindEvents=function(){originalBind();bindAdapterEvents();};
-  runCameraFoundationPipeline=realPipeline;loadRules().catch(err=>console.error('BBB rules load failed',err));render();
+  openCameraOverlay=openLiveBarcodeScanner;
+  closeCameraOverlay=stopLiveBarcodeScanner;
+  runCameraFoundationPipeline=()=>{};
+  loadRules().catch(err=>console.error('BBB rules load failed',err));render();
 }
 install();
 })();
