@@ -5,6 +5,8 @@ const INGREDIENT_FLAGS_KEY='bbbIngredientFlagsV152';
 let rulesPromise=null;
 let liveBarcodeControls=null;
 let liveBarcodeLock=false;
+let rotatedBarcodeTimer=null;
+let rotatedDecodeBusy=false;
 const loadRules=()=>rulesPromise||(rulesPromise=fetch(RULES_URL,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error(`Rules HTTP ${r.status}`);return r.json();}).then(r=>{if(r.version!=='1.5.2'||r.status!=='authoritative')throw new Error('Wrong rules source');return r;}));
 const e=s=>typeof escapeHtml==='function'?escapeHtml(String(s??'')):String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot',"'":'&#039;'}[c]));
 const labelPersonal=s=>s==='works'?'Works for Me':s==='not_for_me'?'Not for Me':'Hold On';
@@ -50,11 +52,12 @@ function decisionsPanel(){
 function stopLiveBarcodeScanner(){
   try{liveBarcodeControls?.stop();}catch(_){}
   liveBarcodeControls=null;
+  if(rotatedBarcodeTimer){clearInterval(rotatedBarcodeTimer);rotatedBarcodeTimer=null;}
+  rotatedDecodeBusy=false;
   const video=document.getElementById('cameraVideo');
   if(video?.srcObject){try{video.srcObject.getTracks().forEach(t=>t.stop());}catch(_){}video.srcObject=null;}
   const overlay=document.getElementById('cameraOverlay');
   if(overlay){overlay.classList.remove('active');overlay.setAttribute('aria-hidden','true');}
-  liveBarcodeLock=false;
 }
 async function handleLiveBarcode(code){
   try{
@@ -66,6 +69,37 @@ async function handleLiveBarcode(code){
     state.bbbLiveProduct=product;state.bbbLiveEvaluation=evaluation;state.cameraStage='complete';state.cameraMessage=`${evaluation.label} • ${evaluation.reason}`;render();
   }catch(err){state.cameraStage='complete';state.cameraMessage=err.message||'Barcode scan failed.';state.bbbLiveProduct=null;state.bbbLiveEvaluation=null;render();}
 }
+/* BBB ORIENTATION-INDEPENDENT BARCODE PASS */
+function acceptLiveBarcode(result,controls){
+  if(!result||liveBarcodeLock)return;
+  const raw=result.getText?result.getText():String(result.text||result);
+  const code=String(raw||'').replace(/\D/g,'');
+  if(!code)return;
+  liveBarcodeLock=true;
+  try{controls?.stop();}catch(_){}
+  stopLiveBarcodeScanner();
+  handleLiveBarcode(code);
+}
+function startRotatedBarcodePass(video){
+  if(typeof ZXingBrowser==='undefined'||!video)return;
+  const rotatedReader=new ZXingBrowser.BrowserMultiFormatReader();
+  const canvas=document.createElement('canvas');
+  const ctx=canvas.getContext('2d',{willReadFrequently:true});
+  if(!ctx)return;
+  rotatedBarcodeTimer=setInterval(async()=>{
+    if(liveBarcodeLock||rotatedDecodeBusy||!video.videoWidth||!video.videoHeight)return;
+    rotatedDecodeBusy=true;
+    try{
+      const sourceW=video.videoWidth,sourceH=video.videoHeight;
+      const maxSide=960,scale=Math.min(1,maxSide/Math.max(sourceW,sourceH));
+      const w=Math.max(1,Math.round(sourceW*scale)),h=Math.max(1,Math.round(sourceH*scale));
+      canvas.width=h;canvas.height=w;
+      ctx.save();ctx.clearRect(0,0,canvas.width,canvas.height);ctx.translate(h,0);ctx.rotate(Math.PI/2);ctx.drawImage(video,0,0,w,h);ctx.restore();
+      const result=await rotatedReader.decodeFromCanvas(canvas);
+      if(result&&!liveBarcodeLock)acceptLiveBarcode(result,null);
+    }catch(_){}finally{rotatedDecodeBusy=false;}
+  },350);
+}
 async function openLiveBarcodeScanner(){
   state.bbbLiveProduct=null;state.bbbLiveEvaluation=null;state.scanPhotos=[];state.cameraMessage='Scanning live barcode…';state.cameraStage='barcode';
   const overlay=document.getElementById('cameraOverlay'),video=document.getElementById('cameraVideo'),hint=document.getElementById('cameraHint');
@@ -76,18 +110,10 @@ async function openLiveBarcodeScanner(){
   try{
     if(typeof ZXingBrowser==='undefined')throw new Error('Barcode decoder unavailable');
     const reader=new ZXingBrowser.BrowserMultiFormatReader();
-    const cb=(result,err,controls)=>{
-      if(result&&!liveBarcodeLock){
-        liveBarcodeLock=true;
-        const raw=result.getText?result.getText():String(result.text||result);
-        const code=String(raw||'').replace(/\D/g,'');
-        try{controls.stop();}catch(_){}
-        stopLiveBarcodeScanner();
-        if(code)handleLiveBarcode(code);
-      }
-    };
+    const cb=(result,err,controls)=>{if(result)acceptLiveBarcode(result,controls);};
     liveBarcodeControls=await reader.decodeFromConstraints({audio:false,video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}}},video,cb);
-    if(hint)hint.textContent='Scanning… hold the barcode steady inside the frame.';
+    startRotatedBarcodePass(video);
+    if(hint)hint.textContent='Scanning… barcode can be horizontal or vertical.';
   }catch(err){
     if(hint)hint.textContent=err.message||'Scanner could not open.';
   }
