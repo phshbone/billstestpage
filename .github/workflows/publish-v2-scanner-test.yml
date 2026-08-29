@@ -1,6 +1,6 @@
 name: Publish v2 scanner phone test
 
-# refresh trigger: live research barcode scanner
+# refresh trigger: live research barcode scanner + automatic dual orientation
 on:
   workflow_dispatch:
   push:
@@ -40,6 +40,8 @@ jobs:
           test -s scanner-v2-test/bbb-rules-v1.5.2.json
           grep -q 'bbb-v2-scanner-adapter.js' scanner-v2-test/index.html
           grep -q 'bbb-rules-v1.5.2.json' scanner-v2-test/bbb-v2-scanner-adapter.js
+          grep -q 'BBB ORIENTATION-INDEPENDENT BARCODE PASS' scanner-v2-test/bbb-v2-scanner-adapter.js
+          grep -q 'decodeFromCanvas' scanner-v2-test/bbb-v2-scanner-adapter.js
           ! grep -q 'bbb-rules.json' scanner-v2-test/bbb-v2-scanner-adapter.js
 
       - name: Commit isolated phone-test deployment
