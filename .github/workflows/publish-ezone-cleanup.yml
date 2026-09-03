@@ -1,0 +1,54 @@
+name: Publish E-Zone cleanup preview
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/publish-ezone-cleanup.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  publish-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout existing test site
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Fetch verified E-Zone cleanup branch
+        run: |
+          git clone --depth 1 --branch cleanup/ezone-structure https://github.com/phshbone/modzone.git /tmp/ezone-cleanup
+
+      - name: Refresh isolated E-Zone preview folder
+        run: |
+          rm -rf ezone-cleanup
+          mkdir -p ezone-cleanup
+          cp /tmp/ezone-cleanup/index.html ezone-cleanup/index.html
+          cp /tmp/ezone-cleanup/instructions.html ezone-cleanup/instructions.html
+          cp /tmp/ezone-cleanup/feedback.html ezone-cleanup/feedback.html
+          printf 'cleanup/ezone-structure\n' > ezone-cleanup/TEST-BUILD.txt
+
+      - name: Verify preview package
+        run: |
+          test -s ezone-cleanup/index.html
+          test -s ezone-cleanup/instructions.html
+          test -s ezone-cleanup/feedback.html
+          grep -q "version: '0.9.1'" ezone-cleanup/index.html
+          grep -q 'reachedRequiredRadius' ezone-cleanup/index.html
+          ! grep -q 'builderBypassCode' ezone-cleanup/index.html
+          ! grep -q "mode: 'no-cors'" ezone-cleanup/feedback.html
+
+      - name: Commit isolated preview deployment
+        run: |
+          git config user.name "ezone-preview"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ezone-cleanup .github/workflows/publish-ezone-cleanup.yml
+          if git diff --cached --quiet; then
+            echo 'E-Zone preview folder already current'
+            exit 0
+          fi
+          git commit -m 'Publish isolated E-Zone cleanup preview'
+          git push origin HEAD:main
