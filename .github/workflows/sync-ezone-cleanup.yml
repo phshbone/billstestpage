@@ -20,6 +20,7 @@ jobs:
           fetch-depth: 0
       - name: Copy cleanup candidate
         run: |
+          # Pull the exact current cleanup branch application files.
           curl -fsSL https://raw.githubusercontent.com/phshbone/modzone/cleanup/ezone-structure/index.html -o ezone-cleanup/index.html
           curl -fsSL https://raw.githubusercontent.com/phshbone/modzone/cleanup/ezone-structure/feedback.html -o ezone-cleanup/feedback.html
           curl -fsSL https://raw.githubusercontent.com/phshbone/modzone/cleanup/ezone-structure/instructions.html -o ezone-cleanup/instructions.html
