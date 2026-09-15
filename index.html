@@ -558,6 +558,8 @@ html,body{max-width:100%;overflow-x:hidden!important}
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 <script>
 const STORAGE_KEY="bbb_v123_saved_foods";
+const CUPBOARD_KEY="bbbCupboardItems";
+const FOOD_LOG_KEY="bbbFoodLogs";
 const CHECKIN_KEY="bbb_v150_daily_checkins";
 const PERSONAL_TRIGGER_KEY="bbb_v150_personal_triggers";
 const USDA_WORKER="https://bad-belly-usda.phshbone.workers.dev";
@@ -1036,7 +1038,7 @@ function resultCard(a){
   const primaryNames=(a.ingredientFamilies||[]).filter(h=>h.dominant||["lean_protein","broccoli_fibrous","potato_skin_starch"].includes(h.id)).slice(0,5).map(h=>h.label||h.name||h.id);
   const primaryNote=primaryNames.length?`<div class="primary-foods-note"><strong>main foods identified:</strong> ${primaryNames.map(escapeHtml).join(", ")}</div>`:"";
   const exposureHtml=(a.exposures||[]).length?`<details class="support-drawer"><summary>exposures detected</summary><div class="exposure-grid">${a.exposures.map(x=>`<div class="exposure-chip">${escapeHtml(x.label)}</div>`).join("")}</div></details>`:"";
-  return `<section class="result-shell ${cls}" id="resultCard"><div class="result-inner"><div class="verdict-area"><div class="overall-rating-label">overall result</div>${ratingPill(state.mode==="Flare"?a.active:normalDisplayRating(a.active),state.mode==="Flare")}<div class="detected-name food-title">${escapeHtml(a.detected)}</div>${modeGuidancePill(a)?`<div class="mode-guidance">${modeGuidancePill(a)}</div>`:""}</div>${primaryNote}<div class="card-section"><h4>gut check</h4><p class="result-copy">${escapeHtml(a.gutCheck||"This food needs a closer look.")}</p></div>${breakdownHtml?`<div class="food-breakdown">${breakdownHtml}</div>`:""}<div class="compare-row"><div class="compare-box"><span>normal side</span>${ratingPill(normalDisplayRating(a.normal),false)}</div><div class="compare-box"><span>flare side</span>${ratingPill(a.flare,true)}</div></div><div class="button-row three-actions"><button class="secondary-action" data-action="save-current" type="button">save it</button><button class="primary-action" data-action="ate-current" type="button">ate it</button><button class="secondary-action" data-action="junk-current" type="button">junk for now</button></div>${ingredientDrawer}${exposureHtml}<details class="support-drawer"><summary>nutrition support drawer</summary>${nutritionTiles(a.nutrition)}</details>${technical}</div></section>`;
+  return `<section class="result-shell ${cls}" id="resultCard"><div class="result-inner"><div class="verdict-area"><div class="overall-rating-label">overall result</div>${ratingPill(state.mode==="Flare"?a.active:normalDisplayRating(a.active),state.mode==="Flare")}<div class="detected-name food-title">${escapeHtml(a.detected)}</div>${modeGuidancePill(a)?`<div class="mode-guidance">${modeGuidancePill(a)}</div>`:""}</div>${primaryNote}<div class="card-section"><h4>gut check</h4><p class="result-copy">${escapeHtml(a.gutCheck||"This food needs a closer look.")}</p></div>${breakdownHtml?`<div class="food-breakdown">${breakdownHtml}</div>`:""}<div class="compare-row"><div class="compare-box"><span>normal side</span>${ratingPill(normalDisplayRating(a.normal),false)}</div><div class="compare-box"><span>flare side</span>${ratingPill(a.flare,true)}</div></div><div class="button-row three-actions"><button class="secondary-action" data-action="save-current" type="button">save it</button><button class="primary-action" data-action="ate-current" type="button">ate it</button><button class="secondary-action" data-action="junk-current" type="button">junk for now</button></div>${state.savedNotice?`<p class="save-notice" role="status">${escapeHtml(state.savedNotice)}</p>`:""}${ingredientDrawer}${exposureHtml}<details class="support-drawer"><summary>nutrition support drawer</summary>${nutritionTiles(a.nutrition)}</details>${technical}</div></section>`;
 }
 
 function ocrPillClass(){if(state.ocrConfidence==="good")return "good-read";if(state.ocrConfidence==="weak")return "weak-read";if(state.ocrConfidence==="none"||state.ocrConfidence==="error")return "no-read";return "";}
@@ -1147,7 +1149,7 @@ function scanScreen(){
     ${ocrReviewCard()}
     ${aiBackupCard()}
     <details class="input-card scan-clean-card advanced-drawer" id="deepDrawer"><summary>manual deep check</summary><p>Paste or type ingredients/nutrition text here.</p><textarea class="text-input" id="ingredientText" placeholder="ingredients: wheat flour, tomato puree, mozzarella cheese, garlic powder...">${escapeHtml(state.ingredientText)}</textarea><div class="button-row"><button class="secondary-action" data-action="copy-ocr-to-deep" type="button">use OCR text</button><button class="primary-action" data-action="deep-check" type="button">deep check</button></div></details>
-    ${a?resultCard(a):""}${state.savedNotice?`<p class="save-notice">${escapeHtml(state.savedNotice)}</p>`:""}
+    ${a?resultCard(a):(state.savedNotice?`<p class="save-notice" role="status">${escapeHtml(state.savedNotice)}</p>`:"")}
     <section class="memory-card"><h3>Personal Food Memory</h3><p>Saved foods stay on this device for testing.</p>${savedFoodsList()}</section>
   </div>`;
 }
@@ -1155,7 +1157,72 @@ function flareScreen(){return `<div class="screen-content">${screenTitle("flare"
 function meScreen(){return `<div class="screen-content">${screenTitle("me","patterns and memory")}${dailyCheckinCard()}${personalTriggerSection()}<section class="memory-card"><h3>Personal Food Memory</h3><p>Saved foods and reactions stay on this device for testing.</p>${savedFoodsList()}</section><section class="mini-card"><h3>reports foundation</h3><p>Meal timestamps, daily check-ins, incomplete ingredient flags, and personal triggers are now stored so a later weekly report can sort entries into tolerated, not so much, and still figuring it out.</p></section></div>`;}
 function getSavedFoods(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY)||"[]");}catch(e){return [];}}
 function setSavedFoods(items){localStorage.setItem(STORAGE_KEY,JSON.stringify(items));}
-function saveCurrentFood(kind="saved"){if(!state.lastAnalysis){state.savedNotice="Run a check first.";render();return;}const items=getSavedFoods();items.unshift({id:crypto?.randomUUID?.()||String(Date.now()),kind,detected:state.lastAnalysis.detected,rating:ratingLabel(state.lastAnalysis.active),mode:state.mode,category:state.lastAnalysis.primaryCategory||"unknown",ingredientFamilies:(state.lastAnalysis.ingredientFamilies||[]).map(x=>x.id),ingredients:state.lastAnalysis.rawIngredients||[],createdAt:new Date().toLocaleString()});setSavedFoods(items.slice(0,40));state.savedNotice=kind==="ate"?"Logged as eaten. The ingredient families were saved for later pattern learning.":kind==="junk"?"Junked for now. It is not marked as a permanent trigger.":"Saved to Personal Food Memory.";render();}
+/* BBB SCANNER MEMORY BRIDGE v1 */
+function getLocalList(key){try{const v=JSON.parse(localStorage.getItem(key)||"[]");return Array.isArray(v)?v:[];}catch(e){return [];}}
+function setLocalList(key,items){localStorage.setItem(key,JSON.stringify(items));}
+function currentScanIdentity(){
+  const p=state.barcodeProduct||{};
+  const barcode=barcodeDigits(p.code||state.barcodeValue||"");
+  return {
+    barcode,
+    name:p.name||state.lastAnalysis?.detected||state.foodName||"Scanned food",
+    brand:p.brand||"",
+    source:p.source||state.currentSource||state.barcodeSource||"Manual",
+    productText:p.text||state.ingredientText||""
+  };
+}
+function canonicalVerdict(value){const label=String(value||"").trim().toLowerCase();if(label==="ehh"||label==="hold on"||label==="hold")return "HOLD ON";if(label==="good")return "GOOD";if(label==="ugly")return "UGLY";return String(value||"HOLD ON").toUpperCase();}
+function saveCurrentFood(kind="saved"){
+  if(!state.lastAnalysis){state.savedNotice="Run a check first.";render();return;}
+  const identity=currentScanIdentity();
+  const now=new Date();
+  const timestamp=now.toISOString();
+  const displayRating=ratingLabel(state.lastAnalysis.active);
+  const verdict=canonicalVerdict(displayRating);
+  const id=identity.barcode?`GTIN-${identity.barcode}`:`SCAN-${timestamp}`;
+  const base={
+    id:crypto?.randomUUID?.()||String(Date.now()),
+    kind,
+    detected:state.lastAnalysis.detected,
+    productName:identity.name,
+    barcode:identity.barcode,
+    brand:identity.brand,
+    source:identity.source,
+    productText:identity.productText,
+    rating:displayRating,
+    verdict,
+    mode:state.mode,
+    category:state.lastAnalysis.primaryCategory||"unknown",
+    ingredientFamilies:(state.lastAnalysis.ingredientFamilies||[]).map(x=>x.id),
+    ingredients:state.lastAnalysis.rawIngredients||[],
+    nutrition:state.lastAnalysis.nutrition||{},
+    timestamp,
+    createdAt:now.toLocaleString(),
+    origin:identity.barcode?"barcode-scanner":"manual-or-ocr"
+  };
+
+  const items=getSavedFoods();
+  items.unshift(base);
+  setSavedFoods(items.slice(0,40));
+
+  if(kind==="saved"){
+    const cupboard=getLocalList(CUPBOARD_KEY);
+    const entry={id,barcode:identity.barcode,name:identity.name,brand:identity.brand,rating:verdict,mode:state.mode,timestamp,source:identity.source,ingredients:base.ingredients,ingredientFamilies:base.ingredientFamilies,nutrition:base.nutrition,origin:base.origin};
+    const existing=cupboard.findIndex(x=>(identity.barcode&&String(x.barcode||"")===identity.barcode)||x.id===id);
+    if(existing>=0)cupboard.splice(existing,1);
+    cupboard.unshift(entry);
+    setLocalList(CUPBOARD_KEY,cupboard.slice(0,100));
+    state.savedNotice=identity.barcode?"Saved to Cupboard. Barcode product details were kept with it.":"Saved to Cupboard and Personal Food Memory.";
+  }else if(kind==="ate"){
+    const logs=getLocalList(FOOD_LOG_KEY);
+    logs.unshift({id,barcode:identity.barcode,name:identity.name,brand:identity.brand,rating:verdict,mode:state.mode,timestamp,source:identity.source,ingredients:base.ingredients,ingredientFamilies:base.ingredientFamilies,nutrition:base.nutrition,origin:base.origin});
+    setLocalList(FOOD_LOG_KEY,logs.slice(0,100));
+    state.savedNotice=identity.barcode?"Ate it logged. This scanned product is now in your food history.":"Ate it logged in your food history.";
+  }else{
+    state.savedNotice="Junked for now. It is not marked as a permanent trigger.";
+  }
+  render();
+}
 function savedFoodsList(){const items=getSavedFoods();if(!items.length)return `<p class="small-muted">No saved foods yet.</p>`;return `<div class="saved-list">${items.slice(0,8).map(item=>`<div class="saved-item"><strong>${escapeHtml(item.detected)}</strong><span>${escapeHtml(item.rating)} • ${escapeHtml(item.mode)} • ${escapeHtml(item.kind)} • ${escapeHtml(item.createdAt)}</span></div>`).join("")}</div>`;}
 function demoResult(kind){if(kind==="good"){state.foodName="plain white rice";state.ingredientText="ingredients: rice. nutrition: total fat 0g fiber 1g protein 4g sodium 0mg";}if(kind==="caution"){state.foodName="mac and cheese";state.ingredientText="ingredients: pasta, cheese, milk, cream, wheat flour. nutrition: total fat 12g fiber 2g protein 10g sodium 690mg";}if(kind==="ugly"){state.foodName="pepperoni pizza";state.ingredientText="ingredients: wheat flour, mozzarella cheese, tomato paste, pepperoni, garlic powder, onion powder, spices. nutrition: total fat 18g saturated fat 8g fiber 3g sodium 820mg";}if(kind==="ocr"){state.foodName="";state.extractedText="INGREDIENTS: enriched wheat flour, tomato puree, mozzarella cheese, pepperoni, garlic powder, onion powder, spices. NUTRITION FACTS: Total Fat 18g, Fiber 3g, Sugars 4g, Protein 13g, Sodium 820mg.";state.ingredientText=state.extractedText;state.ocrStatus="Sample OCR text loaded. Run Deep Check or review/edit text.";state.ocrProgress=100;state.ocrConfidence="good";state.ocrReviewOpen=false;}analyze(kind==="ocr"?"ocr":"demo");}
 function cleanOcrText(text){
