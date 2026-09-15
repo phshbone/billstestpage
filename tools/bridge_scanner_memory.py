@@ -1,3 +1,4 @@
+# trigger: scanner memory bridge integration
 from pathlib import Path
 import re
 
