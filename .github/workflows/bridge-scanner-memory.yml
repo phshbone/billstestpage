@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - 'tools/bridge_scanner_memory.py'
+      - '.github/workflows/bridge-scanner-memory.yml'
 
 permissions:
   contents: write
@@ -21,18 +22,35 @@ jobs:
       - name: Apply scanner memory bridge
         run: python tools/bridge_scanner_memory.py
 
-      - name: Verify bridge markers
+      - name: Verify persistence bridge v2
         run: >-
-          grep -q 'BBB SCANNER MEMORY BRIDGE v1' index.html &&
+          grep -q 'BBB SCANNER MEMORY BRIDGE v2' index.html &&
           grep -q 'const CUPBOARD_KEY="bbbCupboardItems"' index.html &&
           grep -q 'const FOOD_LOG_KEY="bbbFoodLogs"' index.html &&
-          grep -q 'Ate it logged. This scanned product is now in your food history.' index.html &&
-          grep -q 'Saved to Cupboard. Barcode product details were kept with it.' index.html &&
-          grep -q 'canonicalVerdict' index.html
+          grep -q 'writeListVerified' index.html &&
+          grep -q 'recentDuplicate' index.html &&
+          grep -q 'Ate it logged and verified in food history.' index.html &&
+          grep -q 'Saved and verified in Cupboard.' index.html &&
+          grep -q 'Already logged just now — no duplicate meal was added.' index.html
+
+      - name: Syntax check inline scripts
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re, subprocess
+          text=Path('index.html').read_text(encoding='utf-8')
+          scripts=re.findall(r'<script(?:\s[^>]*)?>(.*?)</script>',text,re.S|re.I)
+          for i,script in enumerate(scripts):
+              if not script.strip():
+                  continue
+              path=Path(f'/tmp/inline-{i}.js')
+              path.write_text(script,encoding='utf-8')
+              subprocess.run(['node','--check',str(path)],check=True)
+          PY
 
       - name: Commit validated bridge
         run: >-
           git config user.name 'bbb-test-bridge' &&
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com' &&
           git add index.html &&
-          (git diff --cached --quiet || (git commit -m 'Connect scanned products to Cupboard and food history' && git push origin HEAD:main))
+          (git diff --cached --quiet || (git commit -m 'Harden scanner persistence and prevent rapid duplicates' && git push origin HEAD:main))
